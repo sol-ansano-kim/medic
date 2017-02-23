@@ -1,5 +1,7 @@
 import os
 import re
+import copy
+from ..core import karte
 
 
 PLUGIN_PATH_ENV = "MEDIC_KARTES_PATH"
@@ -8,12 +10,16 @@ BUILT_IN_DIR_PATH = os.path.abspath(os.path.join(__file__, "../../plugins/Karte"
 _SEARCHED_KARTES = []
 
 
-def _importKarte(path):
+def _importKarte(path, testers):
     karte_data = {}
 
     try:
-        with open(full_path, "r") as f:
+        with open(path, "r") as f:
             karte_data = eval(f.read())
+
+            if karte_data:
+                k = karte.Karte(karte_data, path, testers)
+                return k
     except:
         return None
 
@@ -42,7 +48,7 @@ def _loadKartes():
             if not RE_EXT_KARTE.search(f):
                 continue
 
-            karte = _importKarte(full_path)
+            karte = _importKarte(full_path, testers)
 
             if not karte:
                 continue

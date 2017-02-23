@@ -2,9 +2,15 @@ PluginType = "Tester"
 
 
 class TesterBase(object):
+    Name = "TesterBase"
+
     @classmethod
     def Create(klass):
         return klass()
+
+    @classmethod
+    def name(klass):
+        return klass.Name
 
     def __init__(self):
         super(TesterBase, self).__init__()
@@ -16,4 +22,4 @@ class TesterBase(object):
         return False
 
 
-Class = TesterBase
+Tester = TesterBase

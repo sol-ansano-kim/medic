@@ -48,13 +48,12 @@ def _loadTesters():
             if not module:
                 continue
 
-            if not hasattr(module, "Class"):
+            if not hasattr(module, "Tester"):
                 continue
 
             if not hasattr(module.Tester, "Name"):
                 continue
 
-            
             if not issubclass(module.Tester, PLUGIN_BASE_CLASS):
                 continue
 

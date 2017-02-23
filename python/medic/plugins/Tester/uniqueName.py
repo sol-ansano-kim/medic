@@ -4,6 +4,7 @@ from maya import OpenMaya
 
 class UniqueName(testerBase.TesterBase):
     Name = "UniqueName"
+
     def __init__(self):
         super(UniqueName, self).__init__()
 
