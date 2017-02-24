@@ -7,6 +7,7 @@ from ..core import karte
 PLUGIN_PATH_ENV = "MEDIC_KARTES_PATH"
 RE_EXT_KARTE = re.compile("[.]karte$", re.IGNORECASE)
 BUILT_IN_DIR_PATH = os.path.abspath(os.path.join(__file__, "../../plugins/Karte")).replace("\\", "/")
+
 _SEARCHED_KARTES = []
 
 

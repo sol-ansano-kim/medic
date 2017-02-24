@@ -26,7 +26,8 @@ class DependencyNode(object):
         return "<%s '%s'>" % (self.__class__.__name__, self.name())
 
     def __init__(self, m_object):
-        super(DependencyNode, self).__init__(m_object)
+        super(DependencyNode, self).__init__()
+        self._m_object = m_object
         self._mfn_depn = OpenMaya.MFnDependencyNode(self._m_object)
 
     def object(self):

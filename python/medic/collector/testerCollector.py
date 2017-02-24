@@ -12,6 +12,7 @@ BUILT_IN_DIR_PATH = os.path.abspath(os.path.join(__file__, "../../plugins/Tester
 
 _SEARCHED_TESTERS = []
 
+
 def _importModule(path):
     module = None
 
