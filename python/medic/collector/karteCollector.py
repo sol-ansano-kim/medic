@@ -29,7 +29,7 @@ def _importKarte(path, testers):
 
 def _loadKartes():
     from . import testerCollector
-    testers = testerCollector.GetTesters()
+    testers = testerCollector.GetTesters(forceReload=True)
 
     global _SEARCHED_KARTES
 

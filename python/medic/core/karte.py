@@ -55,3 +55,6 @@ class Karte(object):
 
     def description(self):
         return self.__description
+
+    def accept(self, visitor):
+        visitor.visit(self)
