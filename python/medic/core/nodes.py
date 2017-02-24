@@ -13,7 +13,7 @@ def GetNodes():
         dep = dependencyNode.DependencyNode(obj)
         dg = dep.dg()
 
-        if not dg.isShared() and not dg.isDefaultNode() and dg.canBeWritten() and not dg.isFromReferencedFile():
+        if not dg.isShared() and not dg.isDefaultNode() and dg.canBeWritten():
             deps.append(dep)
 
         it.next()
