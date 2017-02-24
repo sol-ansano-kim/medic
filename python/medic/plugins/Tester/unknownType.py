@@ -1,4 +1,5 @@
-from medic.core import testerBaset
+from medic.core import testerBase
+from maya import OpenMaya
 
 
 class UnknownType(testerBase.TesterBase):
@@ -8,10 +9,12 @@ class UnknownType(testerBase.TesterBase):
         super(UnknownType, self).__init__()
 
     def Match(self, node):
-        return True
+        return node.object().hasFn(OpenMaya.MFn.kUnknown) or node.object().hasFn(OpenMaya.MFn.kUnknownTransform) or node.object().hasFn(OpenMaya.MFn.kUnknownDag)
 
     def Test(self, node):
-        return node.dg().typeId().id() in [0x554e4b44, 0x554e4b4e, 0x554e4b54]
+        return True
 
 
 Tester = UnknownType
+
+
