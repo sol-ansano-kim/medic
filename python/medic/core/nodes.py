@@ -10,12 +10,11 @@ def GetNodes():
     deps = []
     while (not it.isDone()):
         obj = it.thisNode()
-        if dependencyNode.DependencyNode.Match(obj):
-            dep = dependencyNode.DependencyNode(obj)
-            dg = dep.dg()
+        dep = dependencyNode.DependencyNode(obj)
+        dg = dep.dg()
 
-            if not dg.isShared() and not dg.isDefaultNode() and dg.canBeWritten() and not dg.isFromReferencedFile():
-                deps.append(dep)
+        if not dg.isShared() and not dg.isDefaultNode() and dg.canBeWritten() and not dg.isFromReferencedFile():
+            deps.append(dep)
 
         it.next()
 
