@@ -2,11 +2,11 @@ from medic.core import testerBase
 from maya import OpenMaya
 
 
-class UniqueName(testerBase.TesterBase):
-    Name = "UniqueName"
+class NonUniqueName(testerBase.TesterBase):
+    Name = "NonUniqueName"
 
     def __init__(self):
-        super(UniqueName, self).__init__()
+        super(NonUniqueName, self).__init__()
 
     def Match(self, m_object):
         return m_object.hasFn(OpenMaya.MFn.kDagNode)
@@ -15,4 +15,4 @@ class UniqueName(testerBase.TesterBase):
         return not node.dg().hasUniqueName()
 
 
-Tester = UniqueName
+Tester = NonUniqueName
