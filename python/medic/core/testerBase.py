@@ -5,6 +5,10 @@ class TesterBase(object):
     Name = "TesterBase"
 
     @classmethod
+    def __repr__(klass):
+        return "<Tester '%s'>" % klass.Name
+
+    @classmethod
     def Create(klass):
         return klass()
 

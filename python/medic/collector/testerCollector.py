@@ -58,7 +58,7 @@ def _loadTesters():
             if not issubclass(module.Tester, PLUGIN_BASE_CLASS):
                 continue
 
-            _SEARCHED_TESTERS.append(module.Tester)
+            _SEARCHED_TESTERS.append(module.Tester())
 
 
 def GetTesters(forceReload=False):

@@ -4,6 +4,9 @@ import copy
 
 
 class Karte(object):
+    def __repr__(self):
+        return "<Karte '%s'>" % self.name()
+
     def __init__(self, karte_data, filepath, testers):
         self.__name = None
         self.__filepath = None

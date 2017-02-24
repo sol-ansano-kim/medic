@@ -1,8 +1,8 @@
-def CollectTesters():
+def CollectTesters(forceReload=False):
     from . import testerCollector
-    return testerCollector.GetTesters()
+    return testerCollector.GetTesters(forceReload=forceReload)
 
 
-def CollectKartes():
+def CollectKartes(forceReload=False):
     from . import karteCollector
-    return karteCollector.GetKartes()
+    return karteCollector.GetKartes(forceReload=forceReload)
