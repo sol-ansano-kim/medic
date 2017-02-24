@@ -7,7 +7,7 @@ class Referenced(testerBase.TesterBase):
     def __init__(self):
         super(Referenced, self).__init__()
 
-    def Match(self, m_object):
+    def Match(self, node):
         return True
 
     def Test(self, node):

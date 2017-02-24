@@ -8,8 +8,8 @@ class InstanceNode(testerBase.TesterBase):
     def __init__(self):
         super(InstanceNode, self).__init__()
 
-    def Match(self, m_object):
-        return m_object.hasFn(OpenMaya.MFn.kDagNode)
+    def Match(self, node):
+        return node.object().hasFn(OpenMaya.MFn.kDagNode)
 
     def Test(self, node):
         return node.dag().isInstanced()

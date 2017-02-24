@@ -12,7 +12,7 @@ class TestNodes(visitor.Visitor):
         all_nodes = nodes.GetNodes()
 
         for tester in karte.testers():
-            test_nodes = filter(lambda x : tester.Match(x.object()), all_nodes)
+            test_nodes = filter(lambda x : tester.Match(x), all_nodes)
 
             for node in test_nodes:
                 if tester.Test(node):

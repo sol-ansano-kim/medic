@@ -19,7 +19,7 @@ class TesterBase(object):
     def __init__(self):
         super(TesterBase, self).__init__()
 
-    def Match(self, m_object):
+    def Match(self, node):
         return False
 
     def Test(self, node):

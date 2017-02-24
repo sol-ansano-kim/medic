@@ -11,7 +11,7 @@ class HasNamespace(testerBase.TesterBase):
     def __init__(self):
         super(HasNamespace, self).__init__()
 
-    def Match(self, m_object):
+    def Match(self, node):
         return True
 
     def Test(self, node):
