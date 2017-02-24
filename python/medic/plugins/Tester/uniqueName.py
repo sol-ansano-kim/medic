@@ -11,8 +11,8 @@ class UniqueName(testerBase.TesterBase):
     def Match(self, m_object):
         return m_object.hasFn(OpenMaya.MFn.kDagNode)
 
-    def Test(self, m_object):
-        return self.dg().hasUniqueName()
+    def Test(self, node):
+        return node.dg().hasUniqueName()
 
 
 Tester = UniqueName
