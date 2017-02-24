@@ -1,5 +1,4 @@
 from medic.core import testerBase
-from maya import OpenMaya
 
 
 class UnknownNode(testerBase.TesterBase):
