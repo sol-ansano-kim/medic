@@ -27,8 +27,20 @@ class FaceAssigned(testerBase.TesterBase):
         if not obj_grp:
             return False
 
-        if obj_grp.numConnectedElements() > 0:
-            return True
+        connected_count = obj_grp.numConnectedElements()
+        if connected_count is 0:
+            return False
+
+        for i in range(connected_count):
+            has_connection_plug = obj_grp.connectionByPhysicalIndex(i)
+            arr = OpenMaya.MPlugArray()
+
+            if not has_connection_plug.connectedTo(arr, False, True):
+                continue
+
+            for j in range(arr.length()):
+                if arr[j].node().hasFn(OpenMaya.MFn.kShadingEngine):
+                    return True
 
         return False
 
