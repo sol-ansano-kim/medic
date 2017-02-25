@@ -2,11 +2,11 @@ from medic.core import testerBase
 from maya import OpenMaya
 
 
-class hasInputGeometry(testerBase.TesterBase):
-    Name = "hasInputGeometry"
+class HasInputGeometry(testerBase.TesterBase):
+    Name = "HasInputGeometry"
 
     def __init__(self):
-        super(hasInputGeometry, self).__init__()
+        super(HasInputGeometry, self).__init__()
 
     def Match(self, node):
         return node.object().hasFn(OpenMaya.MFn.kNurbsSurfaceGeom) or node.object().hasFn(OpenMaya.MFn.kNurbsCurve) or node.object().hasFn(OpenMaya.MFn.kMesh)
@@ -31,6 +31,6 @@ class hasInputGeometry(testerBase.TesterBase):
         return self._plugHasSourceConnection(node.dg().findPlug(plug_name))
 
 
-Tester = hasInputGeometry
+Tester = HasInputGeometry
 
 
