@@ -21,9 +21,6 @@ class FaceAssigned(testerBase.TesterBase):
         except:
             return False
 
-        if geom is None:
-            return False
-
         for i in range(node.dag().instanceCount(True)):
             objs = OpenMaya.MObjectArray()
             sid = OpenMaya.MIntArray()
