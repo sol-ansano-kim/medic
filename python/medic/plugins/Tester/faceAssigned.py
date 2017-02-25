@@ -9,38 +9,27 @@ class FaceAssigned(testerBase.TesterBase):
         super(FaceAssigned, self).__init__()
 
     def Match(self, node):
-        return node.object().hasFn(OpenMaya.MFn.kDagNode)
+        return node.object().hasFn(OpenMaya.MFn.kMesh) or node.object().hasFn(OpenMaya.MFn.kNurbsSurfaceGeom)
 
     def Test(self, node):
-        inst_grp = node.dg().findPlug("instObjGroups", True)
-        if not inst_grp:
+        geom = None
+        try:
+            if node.object().hasFn(OpenMaya.MFn.kMesh):
+                geom = OpenMaya.MFnMesh(node.object())
+            elif node.object().hasFn(OpenMaya.MFn.kNurbsSurfaceGeom):
+                geom = OpenMaya.MFnNurbsSurface(node.object())
+        except:
             return False
 
-        obj_grp = None
-
-        for i in range(inst_grp.numChildren()):
-            child = inst_grp.child(i)
-            if child.partialName() == "iog[-1].og":
-                obj_grp = child
-                break
-
-        if not obj_grp:
+        if geom is None:
             return False
 
-        connected_count = obj_grp.numConnectedElements()
-        if connected_count is 0:
-            return False
-
-        for i in range(connected_count):
-            has_connection_plug = obj_grp.connectionByPhysicalIndex(i)
-            arr = OpenMaya.MPlugArray()
-
-            if not has_connection_plug.connectedTo(arr, False, True):
-                continue
-
-            for j in range(arr.length()):
-                if arr[j].node().hasFn(OpenMaya.MFn.kShadingEngine):
-                    return True
+        for i in range(node.dag().instanceCount(True)):
+            objs = OpenMaya.MObjectArray()
+            sid = OpenMaya.MIntArray()
+            geom.getConnectedShaders(i, objs, sid)
+            if objs.length() > 1:
+                return True
 
         return False
 
