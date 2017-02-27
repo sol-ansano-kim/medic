@@ -7,7 +7,7 @@ class TestNodes(visitor.Visitor):
         super(TestNodes, self).__init__()
 
     def visit(self, karte):
-        karte.resetResults()
+        self.resetResults()
 
         all_nodes = nodes.GetNodes()
 
@@ -16,4 +16,4 @@ class TestNodes(visitor.Visitor):
 
             for node in test_nodes:
                 if tester.Test(node):
-                    karte.addResult(tester, node)
+                    self.addResult(tester, node)

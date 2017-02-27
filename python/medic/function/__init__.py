@@ -23,5 +23,5 @@ def Visit(karte, visitor):
     karte.accept(visitor)
 
 
-def Result(karte):
-    return karte.results()
+def Result(visitor):
+    return visitor.results()

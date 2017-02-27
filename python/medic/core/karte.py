@@ -12,7 +12,6 @@ class Karte(object):
         self.__filepath = None
         self.__description = ""
         self.__testers = []
-        self.__result = {}
         self.__initKarte(karte_data, filepath, testers)
 
     def __initKarte(self, karte_data, filepath, testers):
@@ -44,17 +43,6 @@ class Karte(object):
                 t = n_t_map.get(tester_name)
                 if t:
                     self.__testers.append(t)
-
-    def addResult(self, tester, node):
-        if not self.__result.has_key(tester.name()):
-            self.__result[tester.name()] = set()
-        self.__result[tester.name()].add(node)
-
-    def resetResults(self):
-        self.__result = {}
-
-    def results(self):
-        return copy.copy(self.__result)
 
     def testers(self):
         return copy.copy(self.__testers)
