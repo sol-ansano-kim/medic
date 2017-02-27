@@ -11,7 +11,7 @@ class Referenced(testerBase.TesterBase):
         return True
 
     def Test(self, node):
-        return node.dg().isFromReferencedFile()
+        return (node.dg().isFromReferencedFile(), None)
 
 
 Tester = Referenced

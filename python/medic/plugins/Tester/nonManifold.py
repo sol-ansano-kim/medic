@@ -16,7 +16,7 @@ class NonManifold(testerBase.TesterBase):
         try:
             it = OpenMaya.MItMeshPolygon(node.object())
         except:
-            return False
+            return (False, None)
 
         all_edges = []
 
@@ -27,13 +27,13 @@ class NonManifold(testerBase.TesterBase):
             edge_set = set(edges)
 
             if edge_set in all_edges:
-                return True
+                return (True, None)
 
             all_edges.append(edge_set)
 
             it.next()
 
-        return False
+        return (False, None)
 
 
 Tester = NonManifold

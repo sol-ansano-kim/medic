@@ -16,7 +16,7 @@ class IncompleteUV(testerBase.TesterBase):
         try:
             mesh = OpenMaya.MFnMesh(node.object())
         except:
-            return False
+            return (False, None)
 
         uv_count = 0
 
@@ -29,12 +29,12 @@ class IncompleteUV(testerBase.TesterBase):
             if i == 0:
                 uv_count = n_uvs
             elif uv_count != n_uvs:
-                return True
+                return (True, None)
 
         if uv_count is 0:
-            return True
+            return (True, None)
 
-        return False
+        return (False, None)
 
 
 Tester = IncompleteUV

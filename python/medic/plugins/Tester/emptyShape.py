@@ -26,9 +26,9 @@ class EmptyShape(testerBase.TesterBase):
             nc = cc.asMDataHandle().asNurbsSurface()
 
         if nc is not None and nc.isNull():
-            return True
+            return (True, None)
 
-        return False
+        return (False, None)
 
 
 Tester = EmptyShape

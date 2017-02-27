@@ -19,7 +19,7 @@ class NotDefaultUVSet(testerBase.TesterBase):
         except:
             return False
 
-        return mesh.currentUVSetName() != NotDefaultUVSet.__DefaultSetName
+        return (mesh.currentUVSetName() != NotDefaultUVSet.__DefaultSetName, None)
 
 
 Tester = NotDefaultUVSet

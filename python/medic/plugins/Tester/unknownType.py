@@ -12,7 +12,7 @@ class UnknownType(testerBase.TesterBase):
         return node.object().hasFn(OpenMaya.MFn.kUnknown) or node.object().hasFn(OpenMaya.MFn.kUnknownTransform) or node.object().hasFn(OpenMaya.MFn.kUnknownDag)
 
     def Test(self, node):
-        return True
+        return (True, None)
 
 
 Tester = UnknownType

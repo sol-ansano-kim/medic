@@ -23,7 +23,7 @@ class TesterBase(object):
         return False
 
     def Test(self, node):
-        return False
+        return (False, None)
 
 
 Tester = TesterBase

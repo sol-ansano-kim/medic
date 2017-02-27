@@ -16,15 +16,15 @@ class OverFourSidedPolygon(testerBase.TesterBase):
         try:
             it = OpenMaya.MItMeshPolygon(node.object())
         except:
-            return False
+            return (False, None)
 
         while (not it.isDone()):
             if it.polygonVertexCount() > 4:
-                return True
+                return (True, None)
 
             it.next()
 
-        return False
+        return (False, None)
 
 
 Tester = OverFourSidedPolygon

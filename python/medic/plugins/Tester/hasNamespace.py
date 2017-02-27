@@ -15,7 +15,7 @@ class HasNamespace(testerBase.TesterBase):
         return True
 
     def Test(self, node):
-        return True if (not node.dg().isFromReferencedFile()) and (RE_NS.search(node.name())) else False
+        return (True if (not node.dg().isFromReferencedFile()) and (RE_NS.search(node.name())) else False, None)
 
 
 Tester = HasNamespace

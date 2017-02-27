@@ -14,16 +14,16 @@ class NotFreezed(testerBase.TesterBase):
 
     def Test(self, node):
         if node.dag().isInstanced():
-            return False
+            return (False, None)
 
         iden = OpenMaya.MMatrix()
 
         for p in node.parents():
             transform = p.dag().transformationMatrix()
             if not NotFreezed.Identity == transform:
-                return True
+                return (True, None)
 
-        return False
+        return (False, None)
 
 
 Tester = NotFreezed

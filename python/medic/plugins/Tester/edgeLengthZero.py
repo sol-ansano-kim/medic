@@ -19,7 +19,7 @@ class EdgeLengthZero(testerBase.TesterBase):
             try:
                 it = OpenMaya.MItMeshEdge(node.object())
             except:
-                return False
+                return (False, None)
 
             su = OpenMaya.MScriptUtil()
             dp = su.asDoublePtr()
@@ -27,11 +27,11 @@ class EdgeLengthZero(testerBase.TesterBase):
             while (not it.isDone()):
                 it.getLength(dp)
                 if EdgeLengthZero.ThreadsHold > OpenMaya.MScriptUtil_getDouble(dp):
-                    return True
+                    return (True, None)
 
                 it.next()
 
-        return False
+        return (False, None)
 
 
 Tester = EdgeLengthZero

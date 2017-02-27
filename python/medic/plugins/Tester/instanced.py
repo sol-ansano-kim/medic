@@ -12,7 +12,7 @@ class InstanceNode(testerBase.TesterBase):
         return node.object().hasFn(OpenMaya.MFn.kDagNode)
 
     def Test(self, node):
-        return node.dag().isInstanced()
+        return (node.dag().isInstanced(), None)
 
 
 Tester = InstanceNode
