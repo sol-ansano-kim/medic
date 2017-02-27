@@ -14,24 +14,29 @@ class EdgeLengthZero(testerBase.TesterBase):
         return node.object().hasFn(OpenMaya.MFn.kMesh)
 
     def Test(self, node):
-        if node.object().hasFn(OpenMaya.MFn.kMesh):
-            it = None
-            try:
-                it = OpenMaya.MItMeshEdge(node.object())
-            except:
-                return (False, None)
+        it = None
+        try:
+            it = OpenMaya.MItMeshEdge(node.object())
+        except:
+            return (False, None)
 
-            su = OpenMaya.MScriptUtil()
-            dp = su.asDoublePtr()
+        result = False
 
-            while (not it.isDone()):
-                it.getLength(dp)
-                if EdgeLengthZero.ThreadsHold > OpenMaya.MScriptUtil_getDouble(dp):
-                    return (True, None)
+        comp = OpenMaya.MFnSingleIndexedComponent()
+        comp_obj = comp.create(OpenMaya.MFn.kMeshEdgeComponent)
 
-                it.next()
+        su = OpenMaya.MScriptUtil()
+        dp = su.asDoublePtr()
 
-        return (False, None)
+        while (not it.isDone()):
+            it.getLength(dp)
+            if EdgeLengthZero.ThreadsHold > OpenMaya.MScriptUtil_getDouble(dp):
+                result = True
+                comp.addElement(it.index())
+
+            it.next()
+
+        return (result, comp_obj if result else None)
 
 
 Tester = EdgeLengthZero

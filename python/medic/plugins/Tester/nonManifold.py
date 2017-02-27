@@ -14,26 +14,24 @@ class NonManifold(testerBase.TesterBase):
     def Test(self, node):
         it = None
         try:
-            it = OpenMaya.MItMeshPolygon(node.object())
+            it = OpenMaya.MItMeshEdge(node.object())
         except:
             return (False, None)
 
-        all_edges = []
+        result = False
+
+        comp = OpenMaya.MFnSingleIndexedComponent()
+        comp_obj = comp.create(OpenMaya.MFn.kMeshEdgeComponent)
 
         while (not it.isDone()):
-            edges = OpenMaya.MIntArray()
-
-            it.getEdges(edges)
-            edge_set = set(edges)
-
-            if edge_set in all_edges:
-                return (True, None)
-
-            all_edges.append(edge_set)
+            faces = OpenMaya.MIntArray()
+            if it.getConnectedFaces(faces) > 2:
+                result = True
+                comp.addElement(it.index())
 
             it.next()
 
-        return (False, None)
+        return (result, comp_obj if result else None)
 
 
 Tester = NonManifold

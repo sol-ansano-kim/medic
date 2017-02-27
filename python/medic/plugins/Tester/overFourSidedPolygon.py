@@ -18,13 +18,19 @@ class OverFourSidedPolygon(testerBase.TesterBase):
         except:
             return (False, None)
 
+        result = False
+
+        comp = OpenMaya.MFnSingleIndexedComponent()
+        comp_obj = comp.create(OpenMaya.MFn.kMeshPolygonComponent)
+
         while (not it.isDone()):
             if it.polygonVertexCount() > 4:
-                return (True, None)
+                result = True
+                comp.addElement(it.index())
 
             it.next()
 
-        return (False, None)
+        return (result, comp_obj if result else None)
 
 
 Tester = OverFourSidedPolygon

@@ -18,7 +18,11 @@ class LaminaFace(testerBase.TesterBase):
         except:
             return (False, None)
 
+        result = False
         all_edges = []
+
+        comp = OpenMaya.MFnSingleIndexedComponent()
+        comp_obj = comp.create(OpenMaya.MFn.kMeshPolygonComponent)
 
         while (not it.isDone()):
             edges = OpenMaya.MIntArray()
@@ -27,13 +31,14 @@ class LaminaFace(testerBase.TesterBase):
             edge_set = set(edges)
 
             if edge_set in all_edges:
-                return (True, None)
-
-            all_edges.append(edge_set)
+                result = True
+                comp.addElement(it.index())
+            else:
+                all_edges.append(edge_set)
 
             it.next()
 
-        return (False, None)
+        return (result, comp_obj if result else None)
 
 
 Tester = LaminaFace
