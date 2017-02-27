@@ -14,9 +14,11 @@ class Visitor(object):
     def resetResults(self):
         self.__result = {}
 
+    def result(self, tester_name):
+        return self.__result.get(tester_name, set())
+
     def results(self):
         return copy.copy(self.__result)
-
 
     def visit(self, karte):
         pass

@@ -2,9 +2,9 @@ from ..core import visitor
 from ..core import nodes
 
 
-class TestNodes(visitor.Visitor):
+class TestOnly(visitor.Visitor):
     def __init__(self):
-        super(TestNodes, self).__init__()
+        super(TestOnly, self).__init__()
 
     def visit(self, karte):
         self.resetResults()
