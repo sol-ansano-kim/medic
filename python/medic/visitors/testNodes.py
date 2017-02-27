@@ -15,5 +15,6 @@ class TestNodes(visitor.Visitor):
             test_nodes = filter(lambda x : tester.Match(x), all_nodes)
 
             for node in test_nodes:
-                if tester.Test(node):
-                    self.addResult(tester, node)
+                (result, component) = tester.Test(node)
+                if result:
+                    self.addResult(tester, (node, component))
