@@ -26,9 +26,9 @@ class HasInputGeometry(testerBase.TesterBase):
             plug_name = "inMesh"
             
         if not plug_name:
-            return False
+            return (False, None)
 
-        return self._plugHasSourceConnection(node.dg().findPlug(plug_name))
+        return (self._plugHasSourceConnection(node.dg().findPlug(plug_name)), None)
 
 
 Tester = HasInputGeometry

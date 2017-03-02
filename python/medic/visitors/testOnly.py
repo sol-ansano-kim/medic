@@ -2,12 +2,12 @@ from ..core import visitor
 from ..core import nodes
 
 
-class TestNodes(visitor.Visitor):
+class TestOnly(visitor.Visitor):
     def __init__(self):
-        super(TestNodes, self).__init__()
+        super(TestOnly, self).__init__()
 
     def visit(self, karte):
-        karte.resetResults()
+        self.resetResults()
 
         all_nodes = nodes.GetNodes()
 
@@ -15,5 +15,6 @@ class TestNodes(visitor.Visitor):
             test_nodes = filter(lambda x : tester.Match(x), all_nodes)
 
             for node in test_nodes:
-                if tester.Test(node):
-                    karte.addResult(tester, node)
+                (result, component) = tester.Test(node)
+                if result:
+                    self.addResult(tester, (node, component))

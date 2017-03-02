@@ -4,6 +4,7 @@ from maya import OpenMaya
 
 class DagNode(dependencyNode.DependencyNode):
     FuncionType = OpenMaya.MFn.kDagNode
+    IsDag = True
     Name = "Dag"
 
     def __init__(self, m_object):
@@ -44,3 +45,8 @@ class DagNode(dependencyNode.DependencyNode):
             chdrn.append(DagNode(dag.child(i)))
 
         return chdrn
+
+    def getPath(self):
+        path = OpenMaya.MDagPath()
+        self.dag().getPath(path)
+        return path

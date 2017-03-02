@@ -12,7 +12,7 @@ class HasLayer(testerBase.TesterBase):
         return node.object().hasFn(OpenMaya.MFn.kDisplayLayer) or node.object().hasFn(OpenMaya.MFn.kAnimLayer) or node.object().hasFn(OpenMaya.MFn.kRenderLayer)
 
     def Test(self, node):
-        return node.name() not in ["BaseAnimation", "defaultRenderLayer", "defaultLayer"]
+        return (node.name() not in ["BaseAnimation", "defaultRenderLayer", "defaultLayer"], None)
 
 
 Tester = HasLayer

@@ -19,16 +19,16 @@ class FaceAssigned(testerBase.TesterBase):
             elif node.object().hasFn(OpenMaya.MFn.kNurbsSurfaceGeom):
                 geom = OpenMaya.MFnNurbsSurface(node.object())
         except:
-            return False
+            return (False, None)
 
         for i in range(node.dag().instanceCount(True)):
             objs = OpenMaya.MObjectArray()
             sid = OpenMaya.MIntArray()
             geom.getConnectedShaders(i, objs, sid)
             if objs.length() > 1:
-                return True
+                return (True, None)
 
-        return False
+        return (False, None)
 
 
 Tester = FaceAssigned

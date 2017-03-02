@@ -2,11 +2,11 @@ from medic.core import testerBase
 from maya import OpenMaya
 
 
-class OverFourSidedPolygon(testerBase.TesterBase):
-    Name = "OverFourSidedPolygon"
+class LaminaFace(testerBase.TesterBase):
+    Name = "LaminaFace"
 
     def __init__(self):
-        super(OverFourSidedPolygon, self).__init__()
+        super(LaminaFace, self).__init__()
 
     def Match(self, node):
         return node.object().hasFn(OpenMaya.MFn.kMesh)
@@ -19,18 +19,26 @@ class OverFourSidedPolygon(testerBase.TesterBase):
             return (False, None)
 
         result = False
+        all_edges = []
 
         comp = OpenMaya.MFnSingleIndexedComponent()
         comp_obj = comp.create(OpenMaya.MFn.kMeshPolygonComponent)
 
         while (not it.isDone()):
-            if it.polygonVertexCount() > 4:
+            edges = OpenMaya.MIntArray()
+
+            it.getEdges(edges)
+            edge_set = set(edges)
+
+            if edge_set in all_edges:
                 result = True
                 comp.addElement(it.index())
+            else:
+                all_edges.append(edge_set)
 
             it.next()
 
         return (result, comp_obj if result else None)
 
 
-Tester = OverFourSidedPolygon
+Tester = LaminaFace

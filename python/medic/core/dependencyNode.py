@@ -3,7 +3,12 @@ from maya import OpenMaya
 
 class DependencyNode(object):
     FuncionType = OpenMaya.MFn.kDependencyNode
+    IsDag = False
     Name = "Dependency"
+
+    @classmethod
+    def IsDagNode(klass):
+        return klass.IsDag
 
     @classmethod
     def Create(klass, m_object):

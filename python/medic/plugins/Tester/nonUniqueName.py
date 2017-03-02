@@ -12,7 +12,7 @@ class NonUniqueName(testerBase.TesterBase):
         return node.object().hasFn(OpenMaya.MFn.kDagNode)
 
     def Test(self, node):
-        return not node.dg().hasUniqueName()
+        return (not node.dg().hasUniqueName(), None)
 
 
 Tester = NonUniqueName

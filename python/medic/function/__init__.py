@@ -14,14 +14,5 @@ def GetKarte(karte_name, forceReload=False):
     return None
 
 
-def GetNodeTester():
-    from ..visitors import testNodes
-    return testNodes.TestNodes()
-
-
 def Visit(karte, visitor):
     karte.accept(visitor)
-
-
-def Result(karte):
-    return karte.results()
