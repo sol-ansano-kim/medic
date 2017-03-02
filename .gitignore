@@ -1,3 +1,4 @@
+*.pyc
 .sconsign.dblite
 build/
 *.dylib
