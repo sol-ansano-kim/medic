@@ -46,18 +46,6 @@ template <typename T> bool Array<T>::get(size_t index, T &v) const
 Parameter::Parameter()
 : m_name(""), m_label(""), m_value(0), m_default(0), m_size(0), m_type(MNull), m_action(0) {}
 
-Parameter::Parameter(std::string name, std::string label, MTypes type)
-: m_name(name), m_label(label), m_value(0), m_default(0), m_action(0)
-{
-    setType(type);
-}
-
-Parameter::Parameter(std::string name, std::string label, MTypes type, Action *action)
-: m_name(name), m_label(label), m_value(0), m_default(0)
-{
-    setType(type);
-    m_action = action;
-}
 
 Parameter &Parameter::operator=(const Parameter &p)
 {
@@ -164,52 +152,158 @@ std::string Parameter::getLabel() const
     return m_label;
 }
 
-template <typename T>
-bool Parameter::set(const T &v, size_t index)
+bool Parameter::set(const bool &v, size_t index)
 {
-    if (!isArray() && index != 0)
+    return SetValue<bool>(m_value, v, index, isArray());
+}
+
+bool Parameter::set(const int &v, size_t index)
+{
+    return SetValue<int>(m_value, v, index, isArray());
+}
+
+bool Parameter::set(const long &v, size_t index)
+{
+    return SetValue<int>(m_value, (int)v, index, isArray());
+}
+
+bool Parameter::set(const float &v, size_t index)
+{
+    return SetValue<float>(m_value, v, index, isArray());
+}
+
+bool Parameter::set(const double &v, size_t index)
+{
+    return SetValue<float>(m_value, (float)v, index, isArray());
+}
+
+bool Parameter::set(const std::string &v, size_t index)
+{
+    return SetValue<std::string>(m_value, v, index, isArray());
+}
+
+bool Parameter::set(const char *v, size_t index)
+{
+    return SetValue<std::string>(m_value, (std::string)v, index, isArray());
+}
+
+bool Parameter::get(bool &v, size_t index) const
+{
+    return GetValue<bool>(m_value, v, index, isArray());
+}
+
+bool Parameter::get(int &v, size_t index) const
+{
+    return GetValue<int>(m_value, v, index, isArray());
+}
+
+bool Parameter::get(float &v, size_t index) const
+{
+    return GetValue<float>(m_value, v, index, isArray());
+}
+
+bool Parameter::get(std::string &v, size_t index) const
+{
+    return GetValue<std::string>(m_value, v, index, isArray());
+}
+
+template <typename T>
+bool SetValue(void *data, const T &v, size_t index, bool isArray)
+{
+    if (data == 0)
     {
         return false;
     }
 
-    if (!isArray())
-    {
-        *((T *)m_value) = v;
-        return true;
-    }
-
-    return ((Array<T>*)m_value)->set(index, v);
-}
-
-template <typename T>
-bool Parameter::get(T &v, size_t index) const
-{
-    if (!isArray() && index != 0)
+    if (!isArray && index != 0)
     {
         return false;
     }
 
-    if (!isArray())
+    if (!isArray)
     {
-        v = *((T *)m_value);
+        *((T *)data) = v;
         return true;
     }
 
-    return ((Array<T>*)m_value)->get(index, v);
+    return ((Array<T>*)data)->set(index, v);
 }
 
 template <typename T>
-bool Parameter::setDefault(const T &v)
+bool GetValue(void *data, T &v, size_t index, bool isArray)
 {
-    *((T *)m_default) = v;
-    return true;
+    if (data == 0)
+    {
+        return false;
+    }
+
+    if (!isArray && index != 0)
+    {
+        return false;
+    }
+
+    if (!isArray)
+    {
+        v = *((T *)data);
+        return true;
+    }
+
+    return ((Array<T>*)data)->get(index, v);
 }
 
-template <typename T>
-bool Parameter::getDefault(T &v) const
+bool Parameter::setDefault(const bool &v)
 {
-    v = *((T *)m_default);
-    return true;
+    return SetValue(m_default, v, 0, false);
+}
+bool Parameter::getDefault(bool &v) const
+{
+    return GetValue(m_default, v, 0, false);
+}
+bool Parameter::setDefault(const int &v)
+{
+    return SetValue(m_default, v, 0, false);
+}
+bool Parameter::getDefault(int &v) const
+{
+    return GetValue(m_default, v, 0, false);
+}
+bool Parameter::setDefault(const long &v)
+{
+    return SetValue(m_default, v, 0, false);
+}
+bool Parameter::getDefault(long &v) const
+{
+    return GetValue(m_default, v, 0, false);
+}
+bool Parameter::setDefault(const float &v)
+{
+    return SetValue(m_default, v, 0, false);
+}
+bool Parameter::getDefault(float &v) const
+{
+    return GetValue(m_default, v, 0, false);
+}
+bool Parameter::setDefault(const double &v)
+{
+    return SetValue(m_default, v, 0, false);
+}
+bool Parameter::getDefault(double &v) const
+{
+    return GetValue(m_default, v, 0, false);
+}
+bool Parameter::setDefault(const std::string &v)
+{
+    return SetValue(m_default, v, 0, false);
+}
+
+bool Parameter::setDefault(const char *v)
+{
+    return SetValue(m_default, (std::string)v, 0, false);
+}
+
+bool Parameter::getDefault(std::string &v) const
+{
+    return GetValue(m_default, v, 0, false);
 }
 
 bool Parameter::resize(size_t s)
@@ -303,6 +397,9 @@ void Parameter::destroy()
                 break;
         }
     }
+
+    m_value = 0;
+
     if (m_default != 0)
     {
         switch (m_type)
@@ -328,6 +425,8 @@ void Parameter::destroy()
                 break;
         }
     }
+
+    m_default = 0;
 }
 
 bool Parameter::allocate()

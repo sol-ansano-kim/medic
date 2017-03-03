@@ -44,8 +44,8 @@ class Parameter
         };
 
         Parameter();
-        Parameter(std::string name, std::string label, MTypes type);
-        Parameter(std::string name, std::string label, MTypes type, Action *action);
+        template <typename T>
+        Parameter(std::string name, std::string label, MTypes type, T &defaultValue, Action *action=0);
         Parameter(const Parameter &p);
         Parameter &operator=(const Parameter &p);
         ~Parameter();
@@ -55,14 +55,30 @@ class Parameter
         std::string getName() const;
         void setLabel(std::string);
         std::string getLabel() const;
-        template <typename T>
-        bool set(const T &v, size_t index=0);
-        template <typename T>
-        bool get(T &v, size_t index=0) const;
-        template <typename T>
-        bool setDefault(const T &v);
-        template <typename T>
-        bool getDefault(T &v) const;
+        bool set(const bool &v, size_t index=0);
+        bool get(bool &v, size_t index=0) const;
+        bool set(const int &v, size_t index=0);
+        bool set(const long &v, size_t index=0);
+        bool get(int &v, size_t index=0) const;
+        bool set(const float &v, size_t index=0);
+        bool set(const double &v, size_t index=0);
+        bool get(float &v, size_t index=0) const;
+        bool set(const std::string &v, size_t index=0);
+        bool set(const char *v, size_t index=0);
+        bool get(std::string &v, size_t index=0) const;
+        bool setDefault(const bool &v);
+        bool getDefault(bool &v) const;
+        bool setDefault(const int &v);
+        bool getDefault(int &v) const;
+        bool setDefault(const long &v);
+        bool getDefault(long &v) const;
+        bool setDefault(const float &v);
+        bool getDefault(float &v) const;
+        bool setDefault(const double &v);
+        bool getDefault(double &v) const;
+        bool setDefault(const std::string &v);
+        bool setDefault(const char *v);
+        bool getDefault(std::string &v) const;
         bool resize(size_t s);
         size_t size() const;
         bool isArray() const;
@@ -84,8 +100,21 @@ class Parameter
         void *m_value;
 };
 
+template <typename T>
+Parameter::Parameter(std::string name, std::string label, MTypes type, T &defaultValue, Action *action)
+: m_name(name), m_label(label), m_value(0), m_default(0)
+{
+    setType(type);
+    m_action = action;
+    setDefault(defaultValue);
+}
+
 
 template <typename T>void CopyArrayValue(void *dst, void *src);
+template <typename T>
+bool SetValue(void *data, const T &v, size_t index, bool isArray);
+template <typename T>
+bool GetValue(void *data, T &v, size_t index, bool isArray);
 
 
 #endif
