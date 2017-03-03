@@ -2,7 +2,9 @@
 #define CORE_ACTION_INCLUDED
 
 
-#include "core/Parameter.h"
+#include "core/parameter.h"
+
+
 class Parameter;
 
 
