@@ -4,6 +4,7 @@ from maya import OpenMaya
 
 class EmptyShape(testerBase.TesterBase):
     Name = "EmptyShape"
+    Fixable = True
 
     def __init__(self):
         super(EmptyShape, self).__init__()
@@ -29,6 +30,21 @@ class EmptyShape(testerBase.TesterBase):
             return (True, None)
 
         return (False, None)
+
+    def GetParameters(self):
+        return []
+
+    def Fix(self, node, component, parameterParser):
+        if node.dg().isFromReferencedFile():
+            return False
+
+        if node.dg().isLocked():
+            node.dg().setLocked(False)
+
+        mod = OpenMaya.MDGModifier()
+        mod.deleteNode(node.object())
+        mod.doIt()
+        return True
 
 
 Tester = EmptyShape
