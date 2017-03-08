@@ -3,6 +3,11 @@ PluginType = "Tester"
 
 class TesterBase(object):
     Name = "TesterBase"
+    Fixable = False
+
+    @classmethod
+    def IsFixable(klass):
+        return klass.Fixable
 
     @classmethod
     def __repr__(klass):
@@ -24,6 +29,12 @@ class TesterBase(object):
 
     def Test(self, node):
         return (False, None)
+
+    def GetParameters(self):
+        return []
+
+    def Fix(self, node, component, param_parser):
+        return False
 
 
 Tester = TesterBase
