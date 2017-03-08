@@ -17,7 +17,7 @@ class NotDefaultUVSet(testerBase.TesterBase):
         try:
             mesh = OpenMaya.MFnMesh(node.object())
         except:
-            return False
+            return (False, None)
 
         return (mesh.currentUVSetName() != NotDefaultUVSet.__DefaultSetName, None)
 
