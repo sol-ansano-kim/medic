@@ -32,6 +32,9 @@ class NonUniqueName(testerBase.TesterBase):
         node.dg().setName("%s%d" % (base, i))
 
     def Fix(self, node, component, parameterParser):
+        if node.dg().isFromReferencedFile():
+            return False
+
         rename_target = node
 
         if not node.dg().hasUniqueName():
