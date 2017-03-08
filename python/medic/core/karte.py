@@ -11,7 +11,7 @@ class Karte(object):
         self.__name = None
         self.__filepath = None
         self.__description = ""
-        self.__testers = []
+        self.__testers = {}
         self.__initKarte(karte_data, filepath, testers)
 
     def __initKarte(self, karte_data, filepath, testers):
@@ -25,7 +25,8 @@ class Karte(object):
             return
 
         if isinstance(tester_list, basestring) and tester_list == "ALL":
-            self.__testers = copy.copy(testers)
+            for t in testers:
+                self.__testers[t.name()] = t
             return
 
         n_t_map = {}
@@ -35,7 +36,7 @@ class Karte(object):
         if isinstance(tester_list, basestring):
             t = n_t_map.get(tester_list)
             if t:
-                self.__testers.append(t)
+                self.__testers[t.name()] = t
                 return
 
         if isinstance(tester_list, list):
@@ -43,6 +44,9 @@ class Karte(object):
                 t = n_t_map.get(tester_name)
                 if t:
                     self.__testers.append(t)
+
+    def tester(self, tester_name):
+        return self.__testers.get(tester_name, None)
 
     def testers(self):
         return copy.copy(self.__testers)

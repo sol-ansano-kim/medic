@@ -11,7 +11,7 @@ class TestOnly(visitor.Visitor):
 
         all_nodes = nodes.GetNodes()
 
-        for tester in karte.testers():
+        for tester in karte.testers().values():
             test_nodes = filter(lambda x : tester.Match(x), all_nodes)
 
             for node in test_nodes:
