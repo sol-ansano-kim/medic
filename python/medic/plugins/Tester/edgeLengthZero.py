@@ -1,6 +1,5 @@
 from medic.core import testerBase
 from maya import OpenMaya
-import sys
 
 
 class EdgeLengthZero(testerBase.TesterBase):
