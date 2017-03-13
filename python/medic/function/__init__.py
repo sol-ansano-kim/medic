@@ -1,4 +1,5 @@
 from .. import collector
+from ..core import nodes
 
 
 def GetKartes(forceReload=False):
@@ -12,6 +13,14 @@ def GetKarte(karte_name, forceReload=False):
             return karte
 
     return None
+
+
+def GetTesters(forceReload=False):
+    return collector.GetTesters(forceReload=forceReload)
+
+
+def GetAllNodes():
+    return nodes.GetNodes()
 
 
 def Visit(karte, visitor):
