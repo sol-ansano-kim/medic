@@ -4,6 +4,7 @@ from maya import OpenMaya
 
 class OverFourSidedPolygon(testerBase.TesterBase):
     Name = "OverFourSidedPolygon"
+    Description = "5 or more faced polygon(s)"
 
     def __init__(self):
         super(OverFourSidedPolygon, self).__init__()

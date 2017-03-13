@@ -4,6 +4,7 @@ from maya import OpenMaya
 
 class UnknownType(testerBase.TesterBase):
     Name = "UnknownType"
+    Description = "Unknown type node(s) exists"
     Fixable = True
 
     def __init__(self):

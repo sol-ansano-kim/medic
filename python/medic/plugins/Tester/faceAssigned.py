@@ -4,6 +4,7 @@ from maya import OpenMaya
 
 class FaceAssigned(testerBase.TesterBase):
     Name = "FaceAssigned"
+    Description = "Face assigned mesh(s)"
 
     def __init__(self):
         super(FaceAssigned, self).__init__()

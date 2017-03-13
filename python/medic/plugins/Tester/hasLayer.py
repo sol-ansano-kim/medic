@@ -4,6 +4,7 @@ from maya import OpenMaya
 
 class HasLayer(testerBase.TesterBase):
     Name = "HasLayer"
+    Description = "layer(s) exists"
     Fixable = True
 
     def __init__(self):

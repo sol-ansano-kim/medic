@@ -4,6 +4,7 @@ from maya import OpenMaya
 
 class EdgeLengthZero(testerBase.TesterBase):
     Name = "EdgeLengthZero"
+    Description = "Zero edge length"
     ThreadsHold = 0.001
 
     def __init__(self):

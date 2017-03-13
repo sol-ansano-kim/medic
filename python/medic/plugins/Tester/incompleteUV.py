@@ -4,6 +4,7 @@ from maya import OpenMaya
 
 class IncompleteUV(testerBase.TesterBase):
     Name = "IncompleteUV"
+    Description = "Mesh(s) has incomplete UV(s)"
 
     def __init__(self):
         super(IncompleteUV, self).__init__()

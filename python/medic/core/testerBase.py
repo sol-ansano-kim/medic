@@ -4,6 +4,7 @@ PluginType = "Tester"
 class TesterBase(object):
     Name = "TesterBase"
     Fixable = False
+    Description = ""
 
     @classmethod
     def IsFixable(klass):
@@ -20,6 +21,13 @@ class TesterBase(object):
     @classmethod
     def name(klass):
         return klass.Name
+
+    @classmethod
+    def GetDescription(klass):
+        if not klass.Description:
+            return klass.Name
+        return klass.Description
+
 
     def __init__(self):
         super(TesterBase, self).__init__()

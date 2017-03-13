@@ -4,6 +4,7 @@ from maya import OpenMaya
 
 class NotFreezed(testerBase.TesterBase):
     Name = "NotFreezed"
+    Description = "Not freezed mesh(s)"
     Identity = OpenMaya.MMatrix()
 
     def __init__(self):

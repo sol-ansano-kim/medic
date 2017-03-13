@@ -4,6 +4,7 @@ from maya import OpenMaya
 
 class HasInputGeometry(testerBase.TesterBase):
     Name = "HasInputGeometry"
+    Description = "Shape(s) has an input connection"
 
     def __init__(self):
         super(HasInputGeometry, self).__init__()

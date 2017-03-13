@@ -4,6 +4,7 @@ from maya import OpenMaya
 
 class EmptyShape(testerBase.TesterBase):
     Name = "EmptyShape"
+    Description = "Empty shape(s)"
     Fixable = True
 
     def __init__(self):

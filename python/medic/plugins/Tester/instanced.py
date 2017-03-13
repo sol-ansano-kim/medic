@@ -4,6 +4,7 @@ from maya import OpenMaya
 
 class InstanceNode(testerBase.TesterBase):
     Name = "InstanceNode"
+    Description = "Instance node(s) exists"
 
     def __init__(self):
         super(InstanceNode, self).__init__()

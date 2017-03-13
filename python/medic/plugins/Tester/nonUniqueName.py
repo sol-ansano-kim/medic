@@ -5,6 +5,7 @@ from medic.core import parameter
 
 class NonUniqueName(testerBase.TesterBase):
     Name = "NonUniqueName"
+    Description = "Non unique name(s) exists"
     Fixable = True
 
     def __init__(self):

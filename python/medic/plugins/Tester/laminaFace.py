@@ -4,6 +4,7 @@ from maya import OpenMaya
 
 class LaminaFace(testerBase.TesterBase):
     Name = "LaminaFace"
+    Description = "Mesh has lamina face(s)"
 
     def __init__(self):
         super(LaminaFace, self).__init__()

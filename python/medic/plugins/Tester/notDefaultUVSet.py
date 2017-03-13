@@ -4,6 +4,7 @@ from maya import OpenMaya
 
 class NotDefaultUVSet(testerBase.TesterBase):
     Name = "NotDefaultUVSet"
+    Description = "Mesh(s) is not setted default uv set(map1)"
     __DefaultSetName = "map1"
 
     def __init__(self):

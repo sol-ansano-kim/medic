@@ -4,6 +4,7 @@ from maya import OpenMaya
 
 class NonManifold(testerBase.TesterBase):
     Name = "NonManifold"
+    Description = "Non manifold mesh(s) exists"
 
     def __init__(self):
         super(NonManifold, self).__init__()

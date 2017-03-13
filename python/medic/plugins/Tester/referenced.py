@@ -3,6 +3,7 @@ from medic.core import testerBase
 
 class Referenced(testerBase.TesterBase):
     Name = "Referenced"
+    Description = "Refrenced node(s) exists"
 
     def __init__(self):
         super(Referenced, self).__init__()
