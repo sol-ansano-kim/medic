@@ -23,7 +23,7 @@ class TesterBase(object):
         return klass.Name
 
     @classmethod
-    def GetDescription(klass):
+    def description(klass):
         if not klass.Description:
             return klass.Name
         return klass.Description
@@ -38,6 +38,7 @@ class TesterBase(object):
     def Test(self, node):
         return (False, None)
 
+    # TODO: do not access parameter directly.
     def GetParameters(self):
         return []
 
