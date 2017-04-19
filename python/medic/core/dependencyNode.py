@@ -46,3 +46,6 @@ class DependencyNode(object):
 
     def type(self):
         return self.dg().typeName()
+
+    def __eq__(self, a):
+        return a.object() == self.object()
