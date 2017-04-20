@@ -1,6 +1,7 @@
 import os
 from .. import collector
 import copy
+import fnmatch
 
 
 class Karte(object):
@@ -18,32 +19,13 @@ class Karte(object):
         self.__name = karte_data.get("Name", "UNKNOWN")
         self.__description = karte_data.get("Description", "")
         self.__filepath = filepath
+        tester_patterns = karte_data.get("Testers", [])
 
-        tester_list = karte_data.get("Testers", [])
-
-        if not tester_list:
-            return
-
-        if isinstance(tester_list, basestring) and tester_list == "ALL":
-            for t in testers:
-                self.__testers[t.name()] = t
-            return
-
-        n_t_map = {}
-        for t in testers:
-            n_t_map[t.name()] = t
-
-        if isinstance(tester_list, basestring):
-            t = n_t_map.get(tester_list)
-            if t:
-                self.__testers[t.name()] = t
-                return
-
-        if isinstance(tester_list, list):
-            for tester_name in tester_list:
-                t = n_t_map.get(tester_name)
-                if t:
-                    self.__testers.append(t)
+        for tester in testers:
+            for pt in tester_patterns:
+                if fnmatch.fnmatchcase(tester.name(), pt):
+                    self.__testers[tester.name()] = tester
+                    break
 
     def tester(self, tester_name):
         return self.__testers.get(tester_name, None)
