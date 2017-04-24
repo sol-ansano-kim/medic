@@ -5,6 +5,7 @@ from maya import OpenMaya
 class SmoothMeshPreview(testerBase.TesterBase):
     Name = "SmoothMeshPreview"
     Description = "Mesh(s) is set 'smooth mesh preview' on"
+    Fixable = True
 
     def __init__(self):
         super(SmoothMeshPreview, self).__init__()
