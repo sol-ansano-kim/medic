@@ -25,3 +25,16 @@ def GetAllNodes():
 
 def Visit(karte, visitor):
     karte.accept(visitor)
+
+
+def Report(karte_name):
+    from ..visitors import testAndReport
+    karte = GetKarte(karte_name)
+    if not karte:
+        print "Warning : no karte '%s'" % (karte_name)
+        return {}
+
+    visitor = testAndReport.TestAndReport()
+    Visit(karte, visitor)
+
+    return visitor.Report()
