@@ -17,47 +17,44 @@ class LockedNormal(testerBase.TesterBase):
         it = None
         mesh = None
         try:
-            it = OpenMaya.MItMeshVertex(node.object())
+            it = OpenMaya.MItMeshPolygon(node.object())
             mesh = OpenMaya.MFnMesh(node.object())
         except:
             return (False, None)
 
-        result = False
-
-        comp = OpenMaya.MFnSingleIndexedComponent()
-        comp_obj = comp.create(OpenMaya.MFn.kMeshVertComponent)
+        vertices = OpenMaya.MIntArray()
 
         while (not it.isDone()):
-            normal_indices = OpenMaya.MIntArray()
-            it.getNormalIndices(normal_indices)
+            for i in range(it.polygonVertexCount()):
+                vi = it.vertexIndex(i)
+                if vi in vertices:
+                    continue
 
-            for i in range(normal_indices.length()):
-                if mesh.isNormalLocked(normal_indices[i]):
-                    result = True
-                    comp.addElement(it.index())
-                    break
+                ni = it.normalIndex(i)
+                if mesh.isNormalLocked(ni):
+                    vertices.append(vi)
 
             it.next()
 
-        return (result, comp_obj if result else None)
+        if vertices.length() > 0:
+            comp = OpenMaya.MFnSingleIndexedComponent()
+            comp_obj = comp.create(OpenMaya.MFn.kMeshVertComponent)
+            comp.addElements(vertices)
+            return (True, comp_obj)
+
+        return (False, None)
 
     def Fix(self, node, component, parameterParser):
         if node.dg().isFromReferencedFile():
             return False
 
-        target_normal_indices = OpenMaya.MIntArray()
-
         mesh = OpenMaya.MFnMesh(node.object())
-        it = OpenMaya.MItMeshVertex(node.getPath(), component)
-        while (not it.isDone()):
-            normal_indices = OpenMaya.MIntArray()
-            it.getNormalIndices(normal_indices)
 
-            for i in range(normal_indices.length()):
-                target_normal_indices.append(normal_indices[i])
-            it.next()
+        vertices = OpenMaya.MIntArray()
+        ver_comp = OpenMaya.MFnSingleIndexedComponent(component)
+        ver_comp.getElements(vertices)
 
-        mesh.unlockVertexNormals(target_normal_indices)
+        mesh.unlockVertexNormals(vertices)
 
         return True
 
