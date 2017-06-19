@@ -2,3 +2,4 @@
 .sconsign.dblite
 build/
 *.dylib
+excons.cache
