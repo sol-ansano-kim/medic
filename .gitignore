@@ -1,5 +1,7 @@
 *.pyc
 .sconsign.dblite
-build/
+.build
+release/
+debug/
 *.dylib
 excons.cache
