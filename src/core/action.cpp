@@ -1,10 +1,14 @@
-#include "core/action.h"
+#include "medic/action.h"
 
-Action::Action() {}
 
-Action::~Action() {}
+using namespace MEDIC;
 
-Action *Action::Create()
+
+MdAction::MdAction() {}
+
+MdAction::~MdAction() {}
+
+MdAction *MdAction::Create()
 {
-    return new Action();
+    return new MdAction();
 }

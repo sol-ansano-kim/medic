@@ -1,4 +1,5 @@
 .DS_Store
+src/py/*.cpp
 *.pyc
 .sconsign.dblite
 .build
