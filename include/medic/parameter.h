@@ -50,6 +50,8 @@ namespace MEDIC
             MdParameter();
             template <typename T>
             MdParameter(std::string name, std::string label, MdTypes type, const T &defaultValue, MdAction *action=0);
+            template <typename T>
+            static MdParameter *Create(std::string name, std::string label, MdTypes type, const T &defaultValue, MdAction *action=0);
             MdParameter(const MdParameter &p);
             MdParameter &operator=(const MdParameter &p);
             ~MdParameter();
@@ -109,6 +111,12 @@ namespace MEDIC
         setType(type);
         m_action = action;
         setDefault(defaultValue);
+    }
+
+    template <typename T>
+    MdParameter *MdParameter::Create(std::string name, std::string label, MdTypes type, const T &defaultValue, MdAction *action)
+    {
+        return new MdParameter(name, label, type, defaultValue, action);
     }
 
 

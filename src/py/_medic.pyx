@@ -17,6 +17,123 @@ class StaticVars:
     SelectionList = OpenMaya.MSelectionList()
 
 
+class Types:
+    Null = MdTypes.MdNull
+    Bool = MdTypes.MdBool
+    Int = MdTypes.MdInt
+    Float = MdTypes.MdFloat
+    String = MdTypes.MdString
+    BoolArray = MdTypes.MdBoolArray
+    IntArray = MdTypes.MdIntArray
+    FloatArray = MdTypes.MdFloatArray
+    StringArray = MdTypes.MdStringArray
+
+
+cdef class Parameter:
+    cdef MdParameter *ptr
+
+    def __cinit__(self, name, label, typ, defaultValue):
+        if typ == Types.Bool or typ == Types.BoolArray:
+            self.ptr = MdParameter.Create[bint](name, label, typ, defaultValue, NULL)
+        elif typ == Types.Int or typ == Types.IntArray:
+            self.ptr = MdParameter.Create[int](name, label, typ, defaultValue, NULL)
+        elif typ == Types.Float or typ == Types.FloatArray:
+            self.ptr = MdParameter.Create[float](name, label, typ, defaultValue, NULL)
+        elif typ == Types.String or typ == Types.StringArray:
+            self.ptr = MdParameter.Create[string](name, label, typ, defaultValue, NULL)
+        else:
+            print "WARNING : NOT SUPPORTED TYPE"
+
+
+cdef class ParamContainer:
+    cdef MdParamContainer *ptr
+
+    def __cinit__(self):
+        self.ptr = new MdParamContainer()
+
+    def append(self, Parameter param):
+        return self.ptr.append(param.ptr)
+
+
+    def set(self, paramName, value, index=0):
+        cdef MdParameter *ptr = self.ptr.getParam(<string>paramName)
+
+        if ptr == NULL:
+            return False
+
+        typ = ptr.getType()
+
+        if typ == Types.Bool or typ == Types.BoolArray:
+            return self.ptr.set[bint](paramName, value, <size_t>index)
+        elif typ == Types.Int or typ == Types.IntArray:
+            return self.ptr.set[int](paramName, value, <size_t>index)
+        elif typ == Types.Float or typ == Types.FloatArray:
+            return self.ptr.set[float](paramName, value, <size_t>index)
+        elif typ == Types.String or typ == Types.StringArray:
+            return self.ptr.set[string](paramName, value, <size_t>index)
+
+        return False
+
+    def get(self, paramName, index=0):
+        cdef bint boolValue
+        cdef int intValue
+        cdef float floatValue
+        cdef string stringValue
+
+        cdef MdParameter *ptr = self.ptr.getParam(<string>paramName)
+
+        if ptr == NULL:
+            return None
+
+        typ = ptr.getType()
+
+        if typ == Types.Bool or typ == Types.BoolArray:
+            self.ptr.get[bint](paramName, boolValue, <size_t>index)
+            return boolValue
+        elif typ == Types.Int or typ == Types.IntArray:
+            self.ptr.get[int](paramName, intValue, <size_t>index)
+            return intValue
+        elif typ == Types.Float or typ == Types.FloatArray:
+            self.ptr.get[float](paramName, floatValue, <size_t>index)
+            return floatValue
+        elif typ == Types.String or typ == Types.StringArray:
+            self.ptr.get[string](paramName, stringValue, <size_t>index)
+            return stringValue
+
+        return None
+
+    def getDefault(self, paramName):
+        cdef bint boolValue
+        cdef int intValue
+        cdef float floatValue
+        cdef string stringValue
+
+        cdef MdParameter *ptr = self.ptr.getParam(<string>paramName)
+
+        if ptr == NULL:
+            return None
+
+        typ = ptr.getType()
+
+        if typ == Types.Bool or typ == Types.BoolArray:
+            self.ptr.getDefault[bint](paramName, boolValue)
+            return boolValue
+        elif typ == Types.Int or typ == Types.IntArray:
+            self.ptr.getDefault[int](paramName, intValue)
+            return intValue
+        elif typ == Types.Float or typ == Types.FloatArray:
+            self.ptr.getDefault[float](paramName, floatValue)
+            return floatValue
+        elif typ == Types.String or typ == Types.StringArray:
+            self.ptr.getDefault[string](paramName, stringValue)
+            return stringValue
+
+        return None
+
+    def __dealloc__(self):
+        del(self.ptr)
+
+
 cdef class Node:
     cdef MdNode *ptr
     cdef bint needToDelete

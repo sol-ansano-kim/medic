@@ -7,6 +7,37 @@ cdef extern from "maya/MObject.h" namespace "MEDIC":
     cdef cppclass MObject
 
 
+cdef extern from "medic/action.h" namespace "MEDIC":
+    cdef cppclass MdAction
+
+
+cdef extern from "medic/parameter.h" namespace "MEDIC":
+    cdef enum MdTypes:
+        MdNull = 0
+        MdBool
+        MdInt
+        MdFloat
+        MdString
+        MdBoolArray
+        MdIntArray
+        MdFloatArray
+        MdStringArray
+
+    cdef cppclass MdParameter:
+        MdParameter()
+        @staticmethod
+        MdParameter *Create[T](string name, string label, MdTypes typ, const T &defaultValue, MdAction *action)
+        MdTypes getType() const
+
+    cdef cppclass MdParamContainer:
+        MdParamContainer()
+        bint append(MdParameter *p)
+        MdParameter *getParam(string name)
+        bint set[T](string paramName, const T &v, size_t index)
+        bint get[T](string paramName, T &v, size_t index)
+        bint getDefault[T](string paramName, T &v)
+
+
 cdef extern from "medic/node.h" namespace "MEDIC":
     cdef cppclass MdNodeIterator:
         MdNodeIterator()
