@@ -8,17 +8,17 @@ MdTester::MdTester() {}
 
 MdTester::~MdTester() {}
 
-std::string MdTester::Name()
+std::string MdTester::Name() const
 {
     return "Tester";
 }
 
-std::string MdTester::Description()
+std::string MdTester::Description() const
 {
     return "";
 };
 
-bool MdTester::Match(MdNode *node)
+bool MdTester::Match(MdNode *node) const
 {
     return false;
 }

@@ -480,7 +480,7 @@ void MdParamContainer::clear()
     m_params.clear();
 }
 
-size_t MdParamContainer::size()
+size_t MdParamContainer::size() const
 {
     return m_params.size();
 }
@@ -494,6 +494,28 @@ MdParameter *MdParamContainer::getParam(std::string name)
     }
 
     return 0;
+}
+
+std::vector<std::string> MdParamContainer::names()
+{
+    std::vector<std::string> param_names;
+    for (ParamPtrMap::iterator it = m_params.begin(); it != m_params.end(); ++it)
+    {
+        param_names.push_back(it->first);
+    }
+
+    return param_names;
+}
+
+std::vector<MdTypes> MdParamContainer::types()
+{
+    std::vector<MdTypes> param_types;
+    for (ParamPtrMap::iterator it = m_params.begin(); it != m_params.end(); ++it)
+    {
+        param_types.push_back(it->second->getType());
+    }
+
+    return param_types;
 }
 
 template <typename T>void CopyArrayValue(void *dst, void *src)

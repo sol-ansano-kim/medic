@@ -36,6 +36,8 @@ cdef extern from "medic/parameter.h" namespace "MEDIC":
         bint set[T](string paramName, const T &v, size_t index)
         bint get[T](string paramName, T &v, size_t index)
         bint getDefault[T](string paramName, T &v)
+        std_vector[string] names()
+        std_vector[MdTypes] types()
 
 
 cdef extern from "medic/node.h" namespace "MEDIC":
@@ -61,7 +63,7 @@ cdef extern from "medic/report.h" namespace "MEDIC":
     cdef cppclass MdReport:
         MdNode *node()
         MObject &components()
-        bint hasComponents()
+        bint hasComponents() const
 
     cdef cppclass MdReportIterator:
         MdReportIterator()

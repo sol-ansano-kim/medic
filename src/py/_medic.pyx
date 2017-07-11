@@ -124,6 +124,22 @@ cdef class ParamContainer:
 
         return None
 
+    def getParamInfos(self):
+        if self.ptr == NULL:
+            return []
+
+        return_list = []
+
+        cdef std_vector[string] names = self.ptr.names()
+        cdef std_vector[MdTypes] types = self.ptr.types()
+
+        for i, n in enumerate(names):
+            default = self.getDefault(n)
+            return_list.append((n, types[i], default))
+
+        return return_list
+
+
     def getDefault(self, paramName):
         if self.ptr == NULL:
             return None

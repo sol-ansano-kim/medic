@@ -129,7 +129,9 @@ namespace MEDIC
             bool remove(MdParameter *p);
             MdParameter *getParam(std::string name);
             void clear();
-            size_t size();
+            size_t size() const;
+            std::vector<std::string> names();
+            std::vector<MdTypes> types();
 
             template <typename T>
             bool set(std::string paramName, const T &v, size_t index=0);

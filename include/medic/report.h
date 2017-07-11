@@ -23,7 +23,7 @@ namespace MEDIC
             void addSelection(MSelectionList &selection) const;
             MdNode *node();
             MObject &components();
-            bool hasComponents();
+            bool hasComponents() const;
 
         private:
             MdNode *m_node;

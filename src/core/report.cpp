@@ -48,7 +48,7 @@ MObject &MdReport::components()
     return m_comp;
 }
 
-bool MdReport::hasComponents()
+bool MdReport::hasComponents() const
 {
     return m_has_components;
 }

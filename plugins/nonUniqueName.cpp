@@ -11,9 +11,9 @@ class NonUniqueName : public MdTester
     public:
         NonUniqueName();
         ~NonUniqueName();
-        std::string Name();
-        std::string Description();
-        bool Match(MdNode *node);
+        std::string Name() const;
+        std::string Description() const;
+        bool Match(MdNode *node) const;
         bool IsFixable() const;
         MdParamContainer *GetParameters() const;
         MdReport *test(MdNode *node) const;
@@ -25,17 +25,17 @@ NonUniqueName::NonUniqueName() {}
 
 NonUniqueName::~NonUniqueName() {}
 
-std::string NonUniqueName::Name()
+std::string NonUniqueName::Name() const
 {
     return "NonUniqueName";
 }
 
-std::string NonUniqueName::Description()
+std::string NonUniqueName::Description() const
 {
     return "Non unique name(s) exists";
 }
 
-bool NonUniqueName::Match(MdNode *node)
+bool NonUniqueName::Match(MdNode *node) const
 {
     return node->object().hasFn(MFn::kDagNode);
 }
