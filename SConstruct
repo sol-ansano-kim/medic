@@ -83,15 +83,16 @@ prjs.append({"name": "_medic",
              "libs": ["medic"],
              "deps": ["medic-lib"],
              "srcs": [cython_out],
+             "install": {"py": ["src/py/medic.py"]},
              "custom": customs + [python.SoftRequire]})
 
 # plugins
 
-for plug in excons.glob("plugins/*.cpp"):
+for plug in excons.glob("plugins/Tester/*.cpp"):
     prjs.append({"name": os.path.splitext(os.path.basename(plug))[0],
                  "type": "dynamicmodule",
                  "alias": "medic-plugins",
-                 "prefix": "plugins",
+                 "prefix": "plugins/Tester",
                  "defs": defs,
                  "rpath": out_libdir,
                  "cppflags": cppflags,
