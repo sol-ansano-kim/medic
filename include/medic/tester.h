@@ -23,9 +23,9 @@ namespace MEDIC
             virtual std::string Name();
             virtual std::string Description();
             virtual bool Match(MdNode *node);
-            virtual bool isFixable() const;
-            virtual MdReport *test(MdNode *node) const;
+            virtual bool IsFixable() const;
             virtual MdParamContainer *GetParameters() const;
+            virtual MdReport *test(MdNode *node) const;
             virtual bool fix(MdReport *report, MdParamContainer *params) const;
     };
 

@@ -500,3 +500,30 @@ cdef class PluginManager:
             preincrement(it)
 
         return name_list
+
+
+class TesterBase(object):
+    def __init__(self):
+        super(TesterBase, self).__init__()
+
+    def Name(self):
+        return "TesterBase"
+
+    def Description(self):
+        return ""
+
+    def Match(self, node):
+        return False
+
+    def IsFixable(self):
+        return False
+
+    def GetParameters(self):
+        return ParamContainer()
+
+    def test(self, node):
+        return None
+
+    def fix(self, report, params):
+        return False
+

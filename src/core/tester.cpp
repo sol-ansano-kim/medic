@@ -23,19 +23,19 @@ bool MdTester::Match(MdNode *node)
     return false;
 }
 
-bool MdTester::isFixable() const
+bool MdTester::IsFixable() const
 {
     return false;
-};
-
-MdReport *MdTester::test(MdNode *node) const
-{
-    return 0;
 };
 
 MdParamContainer *MdTester::GetParameters() const
 {
     return new MdParamContainer();
+};
+
+MdReport *MdTester::test(MdNode *node) const
+{
+    return 0;
 };
 
 bool MdTester::fix(MdReport *report, MdParamContainer *params) const
