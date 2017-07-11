@@ -38,7 +38,7 @@ MdParamContainer *MdTester::GetParameters() const
     return new MdParamContainer();
 };
 
-bool MdTester::Fix(MdReport *report) const
+bool MdTester::fix(MdReport *report, MdParamContainer *params) const
 {
     return true;
 };

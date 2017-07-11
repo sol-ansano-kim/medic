@@ -26,7 +26,7 @@ namespace MEDIC
             virtual bool isFixable() const;
             virtual MdReport *test(MdNode *node) const;
             virtual MdParamContainer *GetParameters() const;
-            virtual bool Fix(MdReport *report) const;
+            virtual bool fix(MdReport *report, MdParamContainer *params) const;
     };
 
     typedef std::map<std::string, MdTester *> TesterPtrMap;

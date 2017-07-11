@@ -17,7 +17,7 @@ class NonUniqueName : public MdTester
         bool isFixable() const;
         MdReport *test(MdNode *node) const;
         MdParamContainer *GetParameters() const;
-        bool Fix(MdReport *report) const;
+        bool fix(MdReport *report, MdParamContainer *params) const;
 };
 
 
@@ -65,7 +65,7 @@ MdParamContainer *NonUniqueName::GetParameters() const
     return params;
 }
 
-bool NonUniqueName::Fix(MdReport *report) const
+bool NonUniqueName::fix(MdReport *report, MdParamContainer *params) const
 {
     return true;
 }
