@@ -32,30 +32,49 @@ class Types:
 cdef class Parameter:
     cdef MdParameter *ptr
 
-    def __cinit__(self, name, label, typ, defaultValue):
+    def __cinit__(self):
+        pass
+
+    @staticmethod
+    def Create(name, label, typ, defaultValue):
+        pram = Parameter()
         if typ == Types.Bool or typ == Types.BoolArray:
-            self.ptr = MdParameter.Create[bint](name, label, typ, defaultValue, NULL)
+            pram.ptr = MdParameter.Create[bint](name, label, typ, defaultValue, NULL)
         elif typ == Types.Int or typ == Types.IntArray:
-            self.ptr = MdParameter.Create[int](name, label, typ, defaultValue, NULL)
+            pram.ptr = MdParameter.Create[int](name, label, typ, defaultValue, NULL)
         elif typ == Types.Float or typ == Types.FloatArray:
-            self.ptr = MdParameter.Create[float](name, label, typ, defaultValue, NULL)
+            pram.ptr = MdParameter.Create[float](name, label, typ, defaultValue, NULL)
         elif typ == Types.String or typ == Types.StringArray:
-            self.ptr = MdParameter.Create[string](name, label, typ, defaultValue, NULL)
+            pram.ptr = MdParameter.Create[string](name, label, typ, defaultValue, NULL)
         else:
             print "WARNING : NOT SUPPORTED TYPE"
+            return None
+
+        return pram
 
 
 cdef class ParamContainer:
     cdef MdParamContainer *ptr
 
     def __cinit__(self):
-        self.ptr = new MdParamContainer()
+        pass
+
+    @staticmethod
+    def Create():
+        con = ParamContainer()
+        con.ptr = new MdParamContainer()
+        return con
 
     def append(self, Parameter param):
+        if self.ptr == NULL:
+            return None
+
         return self.ptr.append(param.ptr)
 
-
     def set(self, paramName, value, index=0):
+        if self.ptr == NULL:
+            return False
+
         cdef MdParameter *ptr = self.ptr.getParam(<string>paramName)
 
         if ptr == NULL:
@@ -75,6 +94,9 @@ cdef class ParamContainer:
         return False
 
     def get(self, paramName, index=0):
+        if self.ptr == NULL:
+            return None
+
         cdef bint boolValue
         cdef int intValue
         cdef float floatValue
@@ -103,6 +125,9 @@ cdef class ParamContainer:
         return None
 
     def getDefault(self, paramName):
+        if self.ptr == NULL:
+            return None
+
         cdef bint boolValue
         cdef int intValue
         cdef float floatValue
@@ -131,7 +156,8 @@ cdef class ParamContainer:
         return None
 
     def __dealloc__(self):
-        del(self.ptr)
+        if self.ptr != NULL:
+            del(self.ptr)
 
 
 cdef class Node:
