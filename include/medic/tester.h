@@ -25,7 +25,7 @@ namespace MEDIC
             virtual bool Match(MdNode *node);
             virtual bool isFixable() const;
             virtual MdReport *test(MdNode *node) const;
-            virtual MdParamContainer GetParameters() const;
+            virtual MdParamContainer *GetParameters() const;
             virtual bool Fix(MdReport *report) const;
     };
 

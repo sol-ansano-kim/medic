@@ -16,7 +16,7 @@ class NonUniqueName : public MdTester
         bool Match(MdNode *node);
         bool isFixable() const;
         MdReport *test(MdNode *node) const;
-        MdParamContainer GetParameters() const;
+        MdParamContainer *GetParameters() const;
         bool Fix(MdReport *report) const;
 };
 
@@ -56,11 +56,11 @@ MdReport *NonUniqueName::test(MdNode *node) const
     return new MdReport(node);
 }
 
-MdParamContainer NonUniqueName::GetParameters() const
+MdParamContainer *NonUniqueName::GetParameters() const
 {
-    MdParamContainer params;
+    MdParamContainer *params = new MdParamContainer();
     MdParameter *pattern = new MdParameter("pattern", "Rename Pattern", MdString, "");
-    params.append(pattern);
+    params->append(pattern);
 
     return params;
 }
