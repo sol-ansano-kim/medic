@@ -79,6 +79,11 @@ MdReportIterator MdVisitor::report(MdTester *tester)
     return it->second.iterator();
 }
 
+MdNodeIterator MdVisitor::nodes()
+{
+    return m_nodes.iterator();
+}
+
 TesterReportsMap &MdVisitor::reportAll()
 {
     return m_results;

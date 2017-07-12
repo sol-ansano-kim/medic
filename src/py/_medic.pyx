@@ -5,16 +5,29 @@ import fnmatch
 import os
 import re
 import sys
+import imp
 from maya import OpenMaya
 
 
-class StaticVars:
+class Statics:
     TesterPathEnvName = "MEDIC_TESTER_PATH"
     KartePathEnvName = "MEDIC_KARTE_PATH"
     RePluginExt = re.compile("[.]%s$" % ("so" if "linux" in sys.platform else "bundle" if "darwin" == sys.platform else "dll"), re.IGNORECASE)
+    RePyPluginExt = re.compile("[.]py$", re.IGNORECASE)
     ReKarteExt = re.compile("[.]karte$", re.IGNORECASE)
     RePyExt = re.compile("[.]py$", re.IGNORECASE)
     SelectionList = OpenMaya.MSelectionList()
+
+    @staticmethod
+    def ImportModule(path):
+        module = None
+
+        try:
+            module = imp.load_source(os.path.splitext(os.path.basename(path))[0], path)
+        except Exception as e:
+            return None
+
+        return module
 
 
 class Types:
@@ -139,7 +152,6 @@ cdef class ParamContainer:
 
         return return_list
 
-
     def getDefault(self, paramName):
         if self.ptr == NULL:
             return None
@@ -179,9 +191,9 @@ cdef class ParamContainer:
 cdef class Node:
     cdef MdNode *ptr
     cdef bint needToDelete
-    m_obj = OpenMaya.MObject()
-    m_dg = OpenMaya.MFnDependencyNode()
-    m_dag = OpenMaya.MFnDagNode()
+    cdef object __obj
+    cdef object __dg
+    cdef object __dag
 
     def __cinit__(self):
         needToDelete = False
@@ -194,12 +206,15 @@ cdef class Node:
         if self.ptr == NULL:
             return False
 
-        StaticVars.SelectionList.clear()
-        StaticVars.SelectionList.add(self.name())
-        StaticVars.SelectionList.getDependNode(0, self.m_obj)
-        self.m_dg.setObject(self.m_obj)
+        self.__obj = OpenMaya.MObject()
+        self.__dg = OpenMaya.MFnDependencyNode()
+        self.__dag = OpenMaya.MFnDagNode()
+        Statics.SelectionList.clear()
+        Statics.SelectionList.add(self.name())
+        Statics.SelectionList.getDependNode(0, self.__obj)
+        self.__dg.setObject(self.__obj)
         if self.isDag():
-            self.m_dag.setObject(self.m_obj)
+            self.__dag.setObject(self.__obj)
 
         return True
 
@@ -227,13 +242,13 @@ cdef class Node:
         if not self.isDag():
             return None
 
-        return self.m_dag
+        return self.__dag
 
     def dg(self):
-        return self.m_dg
+        return self.__dg
 
     def object(self):
-        return self.m_obj
+        return self.__obj
 
     def isDag(self):
         if self.ptr == NULL:
@@ -258,7 +273,7 @@ cdef class Node:
         cdef MdNode *n
         while (not it.isDone()):
             n = it.next()
-            new_node = Node.CreateByName(n.name())
+            new_node = Node.Create(n.name())
             parent_list.append(new_node)
 
         del(parents)
@@ -281,7 +296,7 @@ cdef class Node:
         cdef MdNode *n
         while (not it.isDone()):
             n = it.next()
-            new_node = Node.CreateByName(n.name())
+            new_node = Node.Create(n.name())
             child_list.append(new_node)
 
         del(children)
@@ -294,13 +309,13 @@ cdef class Tester:
     def __cinit__(self):
         pass
 
-    def name(self):
+    def Name(self):
         if self.ptr == NULL:
             return ""
 
         return self.ptr.Name()
 
-    def description(self):
+    def Description(self):
         if self.ptr == NULL:
             return ""
 
@@ -327,49 +342,80 @@ cdef class Report:
 
         new_node = Node()
         new_node.ptr = self.ptr.node()
+        new_node.initialize()
         return new_node
-
-    def components(self):
-        if self.ptr == NULL:
-            return None
-
-        if not self.ptr.hasComponents():
-            return None
-
-        ## TODO
-        return None
 
 
 cdef class Karte:
     cdef MdKarte *ptr
+    cdef object py_testers
 
     def __cinit__(self):
-        pass
+        self.py_testers = []
 
-    def name(self):
+    def Name(self):
         if self.ptr == NULL:
             return ""
 
         return self.ptr.Name()
 
-    def description(self):
+    def Description(self):
         if self.ptr == NULL:
             return ""
 
         return self.ptr.Description()
 
+    def pyTesters(self):
+        for t in self.py_testers:
+            yield t
+
+    def addPyTester(self, tester):
+        if tester in self.py_testers:
+            return False
+
+        self.py_testers.append(tester)
+        return True
+
 
 cdef class Visitor:
     cdef MdVisitor *ptr
+    cdef object __report_cache
 
     def __cinit__(self):
         self.ptr = new MdVisitor()
+        self.__report_cache = {}
 
     def __dealloc__(self):
         del(self.ptr)
 
     def visit(self, karte):
+        self.__report_cache = {}
         self.__visit(karte)
+        nodes = self.__nodes()
+
+        for t in karte.pyTesters():
+            for n in nodes:
+                if t.Match(n):
+                    r = t.test(n)
+                    if r:
+                        if not self.__report_cache.has_key(t):
+                            self.__report_cache[t] = []
+                        self.__report_cache[t].append(r)
+
+    def __nodes(self):
+        cdef MdNodeIterator it = self.ptr.nodes()
+        cdef MdNode *n
+        nodes = []
+
+        while (not it.isDone()):
+            n = it.next()
+            if n != NULL:
+                new_node = Node()
+                new_node.ptr = n
+                new_node.initialize()
+                nodes.append(new_node)
+
+        return nodes
 
     cdef __visit(self, Karte karte):
         self.ptr.visit(karte.ptr)
@@ -397,44 +443,130 @@ cdef class Visitor:
 
             preincrement(it)
 
+        for pytester, pyreports in self.__report_cache.iteritems():
+            results[pytester] = []
+            for pyr in pyreports:
+                results[pytester].append(pyr)
+
         return results
 
 
-cdef class PluginManager:
+class PyKarteManager(object):
+    __Instance = None
+    __Kartes = {}
+
+    def karteNames(self):
+        return self.__Kartes.keys()
+
+    def karte(self, name):
+        return self.__Kartes.get(name, None)
+
+    def regist(self, karte):
+        if self.__Kartes.has_key(karte.Name()):
+            return False
+
+        self.__Kartes[karte.Name()] = karte
+        return True
+
+    def __new__(cls):
+        if not cls.__Instance:
+            cls.__Instance = super(PyKarteManager, cls).__new__(cls)
+
+        return cls.__Instance
+
+class PyTesterManager(object):
+    __Instance = None
+    __Testers = {}
+
+    def regist(self, tester):
+        if self.__Testers.has_key(tester.Name()):
+            return False
+
+        self.__Testers[tester.Name()] = tester
+        return True
+
+    def testerNames(self):
+        return self.__Testers.keys()
+
+    def tester(self, name):
+        return self.__Testers.get(name, None)
+
+    def __new__(cls, existsList=[]):
+        if not cls.__Instance:
+            cls.__Instance = super(PyTesterManager, cls).__new__(cls)
+
+        return cls.__Instance
+
+
+cdef class __PluginManager:
     cdef MdPlugInManager *ptr
+    cdef object __py_tester_manager
+    cdef object __py_karte_manager
 
     def __cinit__(self):
         self.ptr = MdPlugInManager.Instance()
+
+    def __init__(self):
+        self.__py_tester_manager = PyTesterManager()
+        self.__py_karte_manager = PyKarteManager()
         self.__registTesters()
         self.__registKartes()
 
     def __registTesters(self):
-        search_dirs = map(lambda x : os.path.abspath(x), filter(lambda y : y, os.environ.get(StaticVars.TesterPathEnvName, "").split(os.pathsep)))
+        search_dirs = map(lambda x : os.path.abspath(x), filter(lambda y : y, os.environ.get(Statics.TesterPathEnvName, "").split(os.pathsep)))
         for sdir in search_dirs:
             if not os.path.isdir(sdir):
                 continue
 
             for f in os.listdir(sdir):
-                if not StaticVars.RePluginExt.search(f):
+                if not Statics.RePluginExt.search(f):
                     continue
 
                 full_path = os.path.join(sdir, f).replace("\\", "/")
                 if self.__addTester(full_path) == MdLoadingFailure:
                     print "Load PlugIn Failed : %s" % full_path
 
-    def __addTester(self, path):
-        return self.ptr.addTester(<string>path)
+        exists_list = self.__cTesterNames()
 
-    def __registKartes(self):
-        testers = self.testerNames()
-
-        search_dirs = map(lambda x : os.path.abspath(x), filter(lambda y : y, os.environ.get(StaticVars.KartePathEnvName, "").split(os.pathsep)))
         for sdir in search_dirs:
             if not os.path.isdir(sdir):
                 continue
 
             for f in os.listdir(sdir):
-                if not StaticVars.ReKarteExt.search(f):
+                if not Statics.RePyPluginExt.search(f):
+                    continue
+
+                full_path = os.path.join(sdir, f).replace("\\", "/")
+
+                module = Statics.ImportModule(full_path)
+
+                if not hasattr(module, "Create"):
+                    continue
+
+                tester = module.Create()
+
+                if not isinstance(tester, PyTester):
+                    continue
+
+                if tester.Name() in exists_list:
+                    print "Tester already exists '%s'" % tester.Name()
+                    continue
+
+                self.__py_tester_manager.regist(tester)
+
+    def __addTester(self, path):
+        return self.ptr.addTester(<string>path)
+
+    def __registKartes(self):
+        ctesters = self.__cTesterNames()
+
+        search_dirs = map(lambda x : os.path.abspath(x), filter(lambda y : y, os.environ.get(Statics.KartePathEnvName, "").split(os.pathsep)))
+        for sdir in search_dirs:
+            if not os.path.isdir(sdir):
+                continue
+
+            for f in os.listdir(sdir):
+                if not Statics.ReKarteExt.search(f):
                     continue
 
                 full_path = os.path.join(sdir, f).replace("\\", "/")
@@ -454,7 +586,7 @@ cdef class PluginManager:
                 tester_patterns = karte_data.get("Testers", [])
                 karte_testers = []
 
-                for tester in testers:
+                for tester in ctesters:
                     for pt in tester_patterns:
                         if fnmatch.fnmatchcase(tester, pt):
                             karte_testers.append(tester)
@@ -462,38 +594,48 @@ cdef class PluginManager:
 
                 if self.__addKarte(full_path, name, description, karte_testers) == MdLoadingFailure:
                     print "Load Karte Failed : %s" % full_path
+                    continue
+
+                karte = self.karte(name)
+                for pyt in self.__py_tester_manager.testerNames():
+                    for pt in tester_patterns:
+                        if fnmatch.fnmatchcase(pyt, pt):
+                            karte.addPyTester(self.__py_tester_manager.tester(pyt))
+
+                self.__py_karte_manager.regist(karte)
 
     cdef __addKarte(self, filepath, name, description, testers):
         cdef std_vector[string] tester_names;
         for t in testers:
             tester_names.push_back(<string>t)
-        return self.ptr.addKarte(<string>name, <string>description, tester_names)
+        result = self.ptr.addKarte(<string>name, <string>description, tester_names)
+
+        if result:
+            new_karte = Karte()
+            new_karte.ptr = self.ptr.karte(<string>name)
+            return self.__py_karte_manager.regist(new_karte)
+
+        return False
 
     def tester(self, name):
+        tester = self.__py_tester_manager.tester(name)
+        if tester:
+            return tester
+
         cdef MdTester *t
 
         t = self.ptr.tester(<string>name)
-        if t == NULL:
-            return None
+        if t != NULL:
+            new_tester = Tester()
+            new_tester.ptr = t
+            return new_tester
 
-        new_tester = Tester()
-        new_tester.ptr = t
-
-        return new_tester
+        return None
 
     def karte(self, name):
-        cdef MdKarte *k
+        return self.__py_karte_manager.karte(name)
 
-        k = self.ptr.karte(<string>name)
-        if k == NULL:
-            return None
-
-        new_karte = Karte()
-        new_karte.ptr = k
-        
-        return new_karte
-
-    def testerNames(self):
+    def __cTesterNames(self):
         name_list = []
 
         cdef std_vector[string] names = self.ptr.testerNames()
@@ -505,22 +647,54 @@ cdef class PluginManager:
 
         return name_list
 
+    def testerNames(self):
+        return self.__cTesterNames() + self.__py_tester_manager.testerNames()
+
     def karteNames(self):
-        name_list = []
-
-        cdef std_vector[string] names = self.ptr.karteNames()
-        cdef std_vector[string].iterator it = names.begin()
-
-        while (it != names.end()):
-            name_list.append(dereference(it))
-            preincrement(it)
-
-        return name_list
+        self.__py_karte_manager.karteNames()
 
 
-class TesterBase(object):
+class PluginManager(object):
+    __Instance = None
+    __Manager = None
+
+    def __new__(cls):
+        if not cls.__Instance:
+            cls.__Instance = super(PluginManager, cls).__new__(cls)
+            cls.__PluginManager = __PluginManager()
+            cls.tester = cls.__PluginManager.tester
+            cls.karte = cls.__PluginManager.karte
+            cls.testerNames = cls.__PluginManager.testerNames
+            cls.karteNames = cls.__PluginManager.karteNames
+
+        return cls.__Instance
+
+
+class PyReport(object):
+    def __init__(self, node, components=None):
+        self.__node = node
+        self.__components = components
+        self.__has_components = False if components is None else True
+
+    def addSelection(self, selection):
+        if self.__node.isDag():
+            if self.__has_components:
+                selection.add(self.__node.getPath(), self.__components)
+            else:
+                selection.add(self.__node.getPath())
+        else:
+            selection.add(self.__node.getPath())
+
+    def node(self):
+        return self.__node
+
+    def hasComponents(self):
+        return self.__has_components
+
+
+class PyTester(object):
     def __init__(self):
-        super(TesterBase, self).__init__()
+        super(PyTester, self).__init__()
 
     def Name(self):
         return "TesterBase"
@@ -542,4 +716,3 @@ class TesterBase(object):
 
     def fix(self, report, params):
         return False
-

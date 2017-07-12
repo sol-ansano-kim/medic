@@ -62,7 +62,6 @@ cdef extern from "medic/node.h" namespace "MEDIC":
 cdef extern from "medic/report.h" namespace "MEDIC":
     cdef cppclass MdReport:
         MdNode *node()
-        MObject &components()
         bint hasComponents() const
 
     cdef cppclass MdReportIterator:
@@ -90,6 +89,7 @@ cdef extern from "medic/visitor.h" namespace "MEDIC":
         void visit(MdKarte *k)
         std_vector[MdTester *] reportTesters()
         MdReportIterator report(MdTester *tester)
+        MdNodeIterator nodes()
 
 
 cdef extern from "medic/pluginManager.h" namespace "MEDIC":
@@ -102,7 +102,6 @@ cdef extern from "medic/pluginManager.h" namespace "MEDIC":
         @staticmethod
         MdPlugInManager *Instance()
         std_vector[string] testerNames()
-        std_vector[string] karteNames()
         MdTester *tester(string name)
         MdKarte *karte(string name)
         MdPluginLoadingStatus addTester(string pluginPath)

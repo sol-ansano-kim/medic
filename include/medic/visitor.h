@@ -24,6 +24,7 @@ namespace MEDIC
             void reset();
             std::vector<MdTester *> reportTesters();
             MdReportIterator report(MdTester *tester);
+            MdNodeIterator nodes();
             TesterReportsMap &reportAll();
 
         protected:
