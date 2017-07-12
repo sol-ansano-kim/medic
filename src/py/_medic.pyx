@@ -709,7 +709,7 @@ class PyTester(object):
         return False
 
     def GetParameters(self):
-        return ParamContainer()
+        return ParamContainer.Create()
 
     def test(self, node):
         return None
