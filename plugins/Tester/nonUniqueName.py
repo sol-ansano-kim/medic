@@ -10,7 +10,7 @@ class NonUniqueName(medic.PyTester):
         return "NonUniqueName"
 
     def Description(self):
-        return ""
+        return "Non unique name(s) exists"
 
     def Match(self, node):
         return node.object().hasFn(OpenMaya.MFn.kDagNode)
