@@ -106,10 +106,17 @@ for plug in excons.glob("plugins/Tester/*.cpp"):
 
 py_plugs = excons.glob("plugins/Tester/*.py")
 if py_plugs:
-    prjs.append({"name": "_medicPyPlugins",
+    prjs.append({"name": "medicPyPlugins",
                  "type": "install",
                  "alias": "medic-py-plugins",
                  "install": {"plugins/Tester": py_plugs}})
+
+kartes = excons.glob("plugins/Karte/*.karte")
+if kartes:
+    prjs.append({"name": "medicKartes",
+                 "type": "install",
+                 "alias": "medic-kartes",
+                 "install": {"plugins/Karte": kartes}})
 
 
 
