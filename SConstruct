@@ -104,6 +104,14 @@ for plug in excons.glob("plugins/Tester/*.cpp"):
                  "srcs": [plug],
                  "custom": customs})
 
+py_plugs = excons.glob("plugins/Tester/*.py")
+if py_plugs:
+    prjs.append({"name": "_medicPyPlugins",
+                 "type": "install",
+                 "alias": "medic-py-plugins",
+                 "install": {"plugins/Tester": py_plugs}})
+
+
 
 
 excons.DeclareTargets(env, prjs)
