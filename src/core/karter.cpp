@@ -17,6 +17,11 @@ MdTester *MdKarte::tester(std::string testerName)
     return m_testers.get(testerName);
 }
 
+bool MdKarte::hasTester(MdTester *t)
+{
+    return m_testers.hasTester(t);
+}
+
 std::string MdKarte::Name() const
 {
     return m_name;

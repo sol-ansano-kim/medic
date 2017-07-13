@@ -70,6 +70,17 @@ MdTester *MdTesterContainer::get(std::string testerName)
     return 0;
 }
 
+bool MdTesterContainer::hasTester(MdTester *t)
+{
+    TesterPtrMap::iterator it = m_testers.find(t->Name());
+    if (it == m_testers.end())
+    {
+        return false;
+    }
+
+    return true;
+}
+
 bool MdTesterContainer::append(MdTester *t)
 {
     TesterPtrMap::iterator it = m_testers.find(t->Name());

@@ -88,9 +88,11 @@ cdef extern from "medic/karte.h" namespace "MEDIC":
 cdef extern from "medic/visitor.h" namespace "MEDIC":
     cdef cppclass MdVisitor:
         MdVisitor()
-        void visit(MdKarte *k)
+        void visit(MdKarte *karte)
+        bint visit(MdKarte *karte, MdTester *tester)
         std_vector[MdTester *] reportTesters()
         MdReportIterator report(MdTester *tester)
+        void reset()
         MdNodeIterator nodes()
 
 

@@ -19,7 +19,8 @@ namespace MEDIC
         public:
             MdVisitor();
             virtual ~MdVisitor();
-            virtual void visit(MdKarte *k);
+            virtual void visit(MdKarte *karte);
+            virtual bool visit(MdKarte *karte, MdTester *tester);
             bool addReport(MdTester *tester, MdReport *report);
             void reset();
             std::vector<MdTester *> reportTesters();
@@ -28,8 +29,10 @@ namespace MEDIC
             TesterReportsMap &reportAll();
 
         protected:
+            void cleanReport(MdTester *tester);
             MdNodeContainer m_nodes;
             TesterReportsMap m_results;
+            bool m_node_collected;
     };
 }
 

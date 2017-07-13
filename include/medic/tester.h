@@ -40,6 +40,7 @@ namespace MEDIC
             ~MdTesterContainer();
             std::vector<std::string> names();
             MdTester *get(std::string testerName);
+            bool hasTester(MdTester *t);
             bool append(MdTester *t);
             bool remove(MdTester *t, bool kill=false);
             void clear(bool kill=false);

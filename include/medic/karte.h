@@ -22,6 +22,7 @@ namespace MEDIC
             MdKarte(std::string name, std::string desc);
             ~MdKarte();
             MdTester *tester(std::string testerName);
+            bool hasTester(MdTester *t);
             std::string Name() const;
             std::string Description() const;
             bool addTester(MdTester *tester);

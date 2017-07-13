@@ -381,6 +381,9 @@ cdef class Karte:
 
         return self.ptr.Description()
 
+    def hasPyTester(self, tester):
+        return tester in self.py_testers
+
     def pyTesters(self):
         for t in self.py_testers:
             yield t
@@ -404,19 +407,33 @@ cdef class Visitor:
     def __dealloc__(self):
         del(self.ptr)
 
-    def visit(self, karte):
-        self.__report_cache = {}
-        self.__visit(karte)
-        nodes = self.__nodes()
+    def visit(self, karte, tester=None):
+        if not tester:
+            self.__report_cache = {}
+            self.__visit(karte)
+            nodes = self.__nodes()
 
-        for t in karte.pyTesters():
-            for n in nodes:
-                if t.Match(n):
-                    r = t.test(n)
-                    if r:
-                        if not self.__report_cache.has_key(t):
-                            self.__report_cache[t] = []
-                        self.__report_cache[t].append(r)
+            for t in karte.pyTesters():
+                for n in nodes:
+                    if t.Match(n):
+                        r = t.test(n)
+                        if r:
+                            if not self.__report_cache.has_key(t):
+                                self.__report_cache[t] = []
+                            self.__report_cache[t].append(r)
+        else:
+            if karte.hasPyTester(tester):
+                self.__report_cache.pop(tester, None)
+                nodes = self.__nodes()
+                for n in nodes:
+                    if tester.Match(n):
+                        r = tester.test(n)
+                        if r:
+                            if not self.__report_cache.has_key(tester):
+                                self.__report_cache[tester] = []
+                            self.__report_cache[tester].append(r)
+            else:
+                self.__visitWithTester(karte, tester)
 
     def __nodes(self):
         cdef MdNodeIterator it = self.ptr.nodes()
@@ -435,6 +452,13 @@ cdef class Visitor:
 
     cdef __visit(self, Karte karte):
         self.ptr.visit(karte.ptr)
+
+    cdef __visitWithTester(self, Karte karte, Tester tester):
+        self.ptr.visit(karte.ptr, tester.ptr)
+
+    def reset(self):
+        self.ptr.reset()
+        self.__report_cache = {}
 
     cpdef results(self):
         cdef std_vector[MdTester *] testers = self.ptr.reportTesters()
