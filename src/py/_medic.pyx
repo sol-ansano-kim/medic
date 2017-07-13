@@ -339,6 +339,12 @@ cdef class Tester:
         con.ptr = self.ptr.GetParameters()
         return con
 
+    def fix(self, Report report, ParamContainer params):
+        if self.ptr == NULL:
+            return False
+
+        return self.ptr.fix(report.ptr, params.ptr)
+
 
 cdef class Report:
     cdef MdReport *ptr

@@ -76,6 +76,7 @@ cdef extern from "medic/tester.h" namespace "MEDIC":
         string Description()
         MdParamContainer *GetParameters()
         bint IsFixable()
+        bint fix(MdReport *report, MdParamContainer *params)
 
 
 cdef extern from "medic/karte.h" namespace "MEDIC":
