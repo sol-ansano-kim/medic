@@ -309,6 +309,10 @@ cdef class Tester:
     def __cinit__(self):
         pass
 
+    @staticmethod
+    def IsPyTester():
+        return False
+
     def Name(self):
         if self.ptr == NULL:
             return ""
@@ -320,6 +324,12 @@ cdef class Tester:
             return ""
 
         return self.ptr.Description()
+
+    def IsFixable(self):
+        if self.ptr == NULL:
+            return False
+
+        return self.ptr.IsFixable()
 
     def GetParameters(self):
         if self.ptr == NULL:
@@ -695,6 +705,10 @@ class PyReport(object):
 class PyTester(object):
     def __init__(self):
         super(PyTester, self).__init__()
+
+    @staticmethod
+    def IsPyTester():
+        return True
 
     def Name(self):
         return "TesterBase"
