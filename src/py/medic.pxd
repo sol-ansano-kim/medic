@@ -83,6 +83,7 @@ cdef extern from "medic/karte.h" namespace "MEDIC":
     cdef cppclass MdKarte:
         string Name() const
         string Description() const
+        bint hasTester(MdTester *t)
 
 
 cdef extern from "medic/visitor.h" namespace "MEDIC":

@@ -381,6 +381,19 @@ cdef class Karte:
 
         return self.ptr.Description()
 
+    def hasTester(self, tester):
+        if tester.IsPyTester():
+            return self.hasPyTester(tester)
+
+        else:
+            return self.__hasTester(tester)
+
+    def __hasTester(self, Tester tester):
+        if self.ptr == NULL:
+            return False
+
+        return self.ptr.hasTester(tester.ptr)
+
     def hasPyTester(self, tester):
         return tester in self.py_testers
 
