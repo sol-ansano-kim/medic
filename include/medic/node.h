@@ -3,6 +3,7 @@
 
 
 #include <vector>
+#include <algorithm>
 #include <string>
 #include <maya/MString.h>
 #include <maya/MObject.h>

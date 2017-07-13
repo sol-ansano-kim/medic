@@ -6,7 +6,7 @@
 #include <maya/MFnSingleIndexedComponent.h>
 #include <maya/MFnMesh.h>
 #include <maya/MIntArray.h>
-
+#include <algorithm>
 #include <vector>
 
 
