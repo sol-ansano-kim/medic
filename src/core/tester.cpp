@@ -8,37 +8,37 @@ MdTester::MdTester() {}
 
 MdTester::~MdTester() {}
 
-std::string MdTester::Name() const
+std::string MdTester::Name()
 {
     return "Tester";
 }
 
-std::string MdTester::Description() const
+std::string MdTester::Description()
 {
     return "";
 };
 
-bool MdTester::Match(MdNode *node) const
+bool MdTester::Match(MdNode *node)
 {
     return false;
 }
 
-bool MdTester::IsFixable() const
+bool MdTester::IsFixable()
 {
     return false;
 };
 
-MdParamContainer *MdTester::GetParameters() const
+MdParamContainer *MdTester::GetParameters()
 {
     return new MdParamContainer();
 };
 
-MdReport *MdTester::test(MdNode *node) const
+MdReport *MdTester::test(MdNode *node)
 {
     return 0;
 };
 
-bool MdTester::fix(MdReport *report, MdParamContainer *params) const
+bool MdTester::fix(MdReport *report, MdParamContainer *params)
 {
     return true;
 };

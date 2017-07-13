@@ -44,7 +44,7 @@ bool MdNode::Match(MObject &obj)
     return (!obj.isNull() && obj.hasFn(MFn::kDependencyNode)) ? true : false;
 }
 
-MObject MdNode::object() const
+MObject &MdNode::object()
 {
     return m_obj;
 }

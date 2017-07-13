@@ -20,13 +20,13 @@ namespace MEDIC
         public:
             MdTester();
             virtual ~MdTester();
-            virtual std::string Name() const;
-            virtual std::string Description() const;
-            virtual bool Match(MdNode *node) const;
-            virtual bool IsFixable() const;
-            virtual MdParamContainer *GetParameters() const;
-            virtual MdReport *test(MdNode *node) const;
-            virtual bool fix(MdReport *report, MdParamContainer *params) const;
+            virtual std::string Name();
+            virtual std::string Description();
+            virtual bool Match(MdNode *node);
+            virtual bool IsFixable();
+            virtual MdParamContainer *GetParameters();
+            virtual MdReport *test(MdNode *node);
+            virtual bool fix(MdReport *report, MdParamContainer *params);
     };
 
     typedef std::map<std::string, MdTester *> TesterPtrMap;

@@ -72,9 +72,9 @@ cdef extern from "medic/report.h" namespace "MEDIC":
 cdef extern from "medic/tester.h" namespace "MEDIC":
     cdef cppclass MdTesterIterator
     cdef cppclass MdTester:
-        string Name() const
-        string Description() const
-        MdParamContainer *GetParameters() const
+        string Name()
+        string Description()
+        MdParamContainer *GetParameters()
 
 
 cdef extern from "medic/karte.h" namespace "MEDIC":

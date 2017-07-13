@@ -28,7 +28,7 @@ namespace MEDIC
             MdNode(std::string name);
             ~MdNode();
             static bool Match(MObject &obj);
-            MObject object() const;
+            MObject &object();
             std::string name() const;
             std::string type() const;
             bool isDag() const;
