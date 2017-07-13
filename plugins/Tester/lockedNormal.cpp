@@ -1,4 +1,5 @@
 #include "medic/pluginapi.h"
+#include <set>
 #include <maya/MFn.h>
 #include <maya/MStatus.h>
 #include <maya/MObject.h>
@@ -61,11 +62,24 @@ MdReport *LockedNormal::test(MdNode *node)
     bool result = false;
     MFnSingleIndexedComponent comp;
     MObject comp_obj = comp.create(MFn::kMeshVertComponent);
+    std::set<unsigned int> vertices;
+    std::set<unsigned int>::iterator vit;
 
     while (!it.isDone())
     {
         for (unsigned int i = 0; i < it.polygonVertexCount(); i++)
         {
+            unsigned int vi = it.vertexIndex(i);
+
+            vit = vertices.find(vi);
+
+            if (vit != vertices.end())
+            {
+                continue;
+            }
+
+            vertices.insert(vi);
+
             unsigned int ni = it.normalIndex(i);
             if (mesh.isNormalLocked(ni))
             {
