@@ -667,7 +667,7 @@ cdef class __PluginManager:
         return self.__cTesterNames() + self.__py_tester_manager.testerNames()
 
     def karteNames(self):
-        self.__py_karte_manager.karteNames()
+        return self.__py_karte_manager.karteNames()
 
 
 class PluginManager(object):
