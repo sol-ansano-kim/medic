@@ -6,8 +6,6 @@
 #include <maya/MFnSingleIndexedComponent.h>
 #include <maya/MFnMesh.h>
 #include <maya/MIntArray.h>
-#include <algorithm>
-#include <vector>
 
 
 using namespace MEDIC;
@@ -61,7 +59,6 @@ MdReport *LockedNormal::test(MdNode *node)
     }
 
     bool result = false;
-    std::vector<unsigned int> vertices;
     MFnSingleIndexedComponent comp;
     MObject comp_obj = comp.create(MFn::kMeshVertComponent);
 
@@ -69,21 +66,11 @@ MdReport *LockedNormal::test(MdNode *node)
     {
         for (unsigned int i = 0; i < it.polygonVertexCount(); i++)
         {
-            unsigned vi = it.vertexIndex(i);
-
-            std::vector<unsigned int>::iterator vit = std::find(vertices.begin(), vertices.end(), vi);
-            if (vit != vertices.end())
-            {
-                continue;
-            }
-
-            vertices.push_back(vi);
-
             unsigned int ni = it.normalIndex(i);
             if (mesh.isNormalLocked(ni))
             {
                 result = true;
-                comp.addElement(vi);
+                comp.addElement(it.vertexIndex(i));
             }
         }
 
