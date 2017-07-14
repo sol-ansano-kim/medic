@@ -52,6 +52,16 @@ if run_cython:
     python.CythonGenerate(env, cython_source, cpp=True, incdirs=["include"])
 
 
+## custom plugins
+custom_plugins = excons.GetArgument("plugin-path", None)
+custom_cpp = []
+custom_py = []
+
+if custom_plugins:
+    custom_cpp = excons.glob(os.path.join(custom_plugins, "*.cpp"))
+    custom_py = excons.glob(os.path.join(custom_plugins, "*.py"))
+
+
 prjs.append({"name": "medic",
              "type": "sharedlib",
              "alias": "medic-lib",
@@ -112,7 +122,28 @@ if kartes:
                  "alias": "medic-kartes",
                  "install": {"plugins/Karte": kartes}})
 
+if custom_cpp:
+    for cpp in custom_cpp:
+        prjs.append({"name": os.path.splitext(os.path.basename(cpp))[0],
+                     "type": "dynamicmodule",
+                     "alias": "medic-custom-plugins",
+                     "prefix": "custom/Tester",
+                     "defs": defs,
+                     "rpath": out_libdir,
+                     "cppflags": cppflags,
+                     "symvis": "default",
+                     "incdirs": [out_incdir],
+                     "libdirs": [out_libdir],
+                     "libs": ["medic"],
+                     "deps": ["medic-lib"],
+                     "srcs": [cpp],
+                     "custom": customs})
 
+if custom_py:
+    prjs.append({"name": "medicCustonPyPlugins",
+                 "type": "install",
+                 "alias": "medic-custom-py-plugins",
+                 "install": {"custom/Tester": custom_py}})
 
 
 excons.DeclareTargets(env, prjs)
