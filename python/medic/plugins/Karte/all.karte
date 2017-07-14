@@ -1,5 +1,0 @@
-{
-    "Name": "All",
-    "Description": "All testers",
-    "Testers": ["*"],
-}
