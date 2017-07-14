@@ -63,15 +63,6 @@ prjs.append({"name": "medic",
              "install": {out_incdir: excons.glob("include/*")},
              "custom": customs})
 
-prjs.append({"name": "paramTest",
-             "type": "program",
-             "alias": "param-test",
-             "defs": defs,
-             "cppflags": cppflags,
-             "incdirs": [out_incdir],
-             "srcs": ["src/core/parameter.cpp", "paramTest.cpp"],
-             "custom": []})
-
 prjs.append({"name": "_medic",
              "type": "dynamicmodule",
              "alias": "medic-python",
