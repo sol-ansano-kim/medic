@@ -1,6 +1,6 @@
 [submodule "excons"]
 	path = excons
-	url = git@github.com:gatgui/excons.git
+	url = https://github.com/gatgui/excons.git
 [submodule "cython"]
 	path = cython
-	url = git@github.com:cython/cython
+	url = https://github.com/cython/cython
