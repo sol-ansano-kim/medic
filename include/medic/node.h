@@ -12,6 +12,7 @@
 #include <maya/MFnDagNode.h>
 #include <maya/MDagPath.h>
 #include <maya/MItDependencyNodes.h>
+#include "medic/platform.h"
 
 
 namespace MEDIC
@@ -24,20 +25,20 @@ namespace MEDIC
 	class MdNode
 	{
         public:
-            MdNode();
-            MdNode(MObject &obj);
-            MdNode(std::string name);
-            ~MdNode();
+            MEDIC_EXPORT MdNode();
+            MEDIC_EXPORT MdNode(MObject &obj);
+            MEDIC_EXPORT MdNode(std::string name);
+            MEDIC_EXPORT ~MdNode();
             static bool Match(MObject &obj);
-            MObject &object();
-            std::string name() const;
-            std::string type() const;
-            bool isDag() const;
-            void parents(MdNodeContainer *container) const;
-            void children(MdNodeContainer *container) const;
+            MEDIC_EXPORT MObject &object();
+            MEDIC_EXPORT std::string name() const;
+            MEDIC_EXPORT std::string type() const;
+            MEDIC_EXPORT bool isDag() const;
+            MEDIC_EXPORT void parents(MdNodeContainer *container) const;
+            MEDIC_EXPORT void children(MdNodeContainer *container) const;
             MDagPath getPath() const;
-            MFnDependencyNode &dg();
-            MFnDagNode &dag();
+            MEDIC_EXPORT MFnDependencyNode &dg();
+            MEDIC_EXPORT MFnDagNode &dag();
 
         private:
             MObject m_obj;
@@ -51,13 +52,13 @@ namespace MEDIC
     {
         friend class MdNodeIterator;
         public:
-            MdNodeContainer();
-            ~MdNodeContainer();
+            MEDIC_EXPORT MdNodeContainer();
+            MEDIC_EXPORT ~MdNodeContainer();
             bool append(MdNode *n);
             bool remove(MdNode *n);
             void clear();
             size_t size() const;
-            MdNodeIterator iterator();
+            MEDIC_EXPORT MdNodeIterator iterator();
 
         private:
             NodePtrVec m_nodes;
@@ -66,11 +67,11 @@ namespace MEDIC
     class MdNodeIterator
     {
         public:
-            MdNodeIterator();
-            MdNodeIterator(MdNodeContainer *container);
-            ~MdNodeIterator();
-            MdNode *next();
-            bool isDone();
+            MEDIC_EXPORT MdNodeIterator();
+            MEDIC_EXPORT MdNodeIterator(MdNodeContainer *container);
+            MEDIC_EXPORT ~MdNodeIterator();
+            MEDIC_EXPORT MdNode *next();
+            MEDIC_EXPORT bool isDone();
 
         private:
             MdNodeContainer *m_container;

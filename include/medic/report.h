@@ -5,6 +5,7 @@
 #include <maya/MObject.h>
 #include <vector>
 #include "medic/node.h"
+#include "medic/platform.h"
 #include "maya/MSelectionList.h"
 
 
@@ -17,12 +18,12 @@ namespace MEDIC
     class MdReport
     {
         public:
-            MdReport(MdNode *node, MObject &compObj);
-            MdReport(MdNode *node);
-            ~MdReport();
+            MEDIC_EXPORT MdReport(MdNode *node, MObject &compObj);
+            MEDIC_EXPORT MdReport(MdNode *node);
+            MEDIC_EXPORT ~MdReport();
             void addSelection(MSelectionList &selection) const;
-            MdNode *node();
-            MObject &components();
+            MEDIC_EXPORT MdNode *node();
+            MEDIC_EXPORT MObject &components();
             bool hasComponents() const;
 
         private:
@@ -53,11 +54,11 @@ namespace MEDIC
     class MdReportIterator
     {
         public:
-            MdReportIterator();
+            MEDIC_EXPORT MdReportIterator();
             MdReportIterator(MdReportContainer *container);
-            ~MdReportIterator();
-            MdReport *next();
-            bool isDone();
+            MEDIC_EXPORT ~MdReportIterator();
+            MEDIC_EXPORT MdReport *next();
+            MEDIC_EXPORT bool isDone();
 
         private:
             MdReportContainer *m_container;

@@ -7,6 +7,7 @@
 #include "medic/report.h"
 #include "medic/tester.h"
 #include "medic/node.h"
+#include "medic/platform.h"
 
 
 namespace MEDIC
@@ -17,15 +18,15 @@ namespace MEDIC
     class MdVisitor
     {
         public:
-            MdVisitor();
-            virtual ~MdVisitor();
+            MEDIC_EXPORT MdVisitor();
+            MEDIC_EXPORT virtual ~MdVisitor();
             virtual void visit(MdKarte *karte);
             virtual bool visit(MdKarte *karte, MdTester *tester);
             bool addReport(MdTester *tester, MdReport *report);
-            void reset();
-            std::vector<MdTester *> reportTesters();
-            MdReportIterator report(MdTester *tester);
-            MdNodeIterator nodes();
+            MEDIC_EXPORT void reset();
+            MEDIC_EXPORT std::vector<MdTester *> reportTesters();
+            MEDIC_EXPORT MdReportIterator report(MdTester *tester);
+            MEDIC_EXPORT MdNodeIterator nodes();
             TesterReportsMap &reportAll();
 
         protected:

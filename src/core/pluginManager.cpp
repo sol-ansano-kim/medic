@@ -1,20 +1,6 @@
 #include "medic/pluginManager.h"
 
 
-#ifdef _WIN32
-    #ifdef PLUGIN_BUILD
-        #define CORE_API extern "C" __declspec(dllimport)
-    #else
-        #define CORE_API extern "C" __declspec(dllexport)
-    #endif
-    #define RTLD_LAZY 0x01
-    #define RTLD_LOCAL 0x02
-#else
-    #define CORE_API
-    #include <dlfcn.h>
-#endif
-
-
 using namespace MEDIC;
 
 

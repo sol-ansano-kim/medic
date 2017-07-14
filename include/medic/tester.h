@@ -8,7 +8,6 @@
 #include "medic/parameter.h"
 #include "medic/report.h"
 
-
 namespace MEDIC
 {
     class MdTester;
@@ -18,15 +17,15 @@ namespace MEDIC
     class MdTester
     {
         public:
-            MdTester();
-            virtual ~MdTester();
-            virtual std::string Name();
-            virtual std::string Description();
-            virtual bool Match(MdNode *node);
-            virtual bool IsFixable();
-            virtual MdParamContainer *GetParameters();
-            virtual MdReport *test(MdNode *node);
-            virtual bool fix(MdReport *report, MdParamContainer *params);
+            MEDIC_EXPORT MdTester();
+            MEDIC_EXPORT virtual ~MdTester();
+            MEDIC_EXPORT virtual std::string Name();
+            MEDIC_EXPORT virtual std::string Description();
+            MEDIC_EXPORT virtual bool Match(MdNode *node);
+            MEDIC_EXPORT virtual bool IsFixable();
+            MEDIC_EXPORT virtual MdParamContainer *GetParameters();
+            MEDIC_EXPORT virtual MdReport *test(MdNode *node);
+            MEDIC_EXPORT virtual bool fix(MdReport *report, MdParamContainer *params);
     };
 
     typedef std::map<std::string, MdTester *> TesterPtrMap;

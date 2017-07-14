@@ -9,22 +9,25 @@ major = 1
 minor = 0
 patch = 0
 
-os.environ["PYTHONPATH"] = os.environ.get("PYTHONPATH", "") + ":" + os.path.abspath("cython")
+os.environ["PYTHONPATH"] = os.environ.get("PYTHONPATH", "") + os.pathsep + os.path.abspath("cython")
 maya.SetupMscver()
 
 env = excons.MakeBaseEnv()
 
 if sys.platform == "win32":
-    excons.SetArgument("with-cython", "cython/bin/cython.bat")    
+    excons.SetArgument("with-cython", os.path.abspath("cython/bin/cython.bat"))
 else:
-    excons.SetArgument("with-cython", "cython/bin/cython")
+    excons.SetArgument("with-cython", os.path.abspath("cython/bin/cython"))
 
 out_incdir = excons.OutputBaseDirectory() + "/include"
 out_libdir = excons.OutputBaseDirectory() + "/lib"
 
 
 defs = []
-cppflags = " -Wno-unused-parameter -Wunused-variable"
+if sys.platform == "win32":
+    cppflags = " /wd4100 /wd4505 /wd4701 /wd4127 /wd4189 /wd4005 /wd4510 /wd4512 /wd4610 /wd4211 /wd4702 /wd4706 /wd4310"
+else:
+    cppflags = " -Wno-unused-parameter -Wunused-variable"
 prjs = []
 customs = [excons.tools.maya.Require]
 

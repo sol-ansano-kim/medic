@@ -6,6 +6,7 @@
 #include <map>
 #include "medic/tester.h"
 #include "medic/visitor.h"
+#include "medic/platform.h"
 
 
 namespace MEDIC
@@ -22,9 +23,9 @@ namespace MEDIC
             MdKarte(std::string name, std::string desc);
             ~MdKarte();
             MdTester *tester(std::string testerName);
-            bool hasTester(MdTester *t);
-            std::string Name() const;
-            std::string Description() const;
+            MEDIC_EXPORT bool hasTester(MdTester *t);
+            MEDIC_EXPORT std::string Name() const;
+            MEDIC_EXPORT std::string Description() const;
             bool addTester(MdTester *tester);
             void accept(MdVisitor *v);
             MdTesterIterator testers();

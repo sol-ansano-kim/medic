@@ -4,6 +4,7 @@
 
 #include "medic/tester.h"
 #include "medic/karte.h"
+#include "medic/platform.h"
 #include <string>
 #include <vector>
 
@@ -20,14 +21,14 @@ namespace MEDIC
     class MdPlugInManager
     {
         public:
-            static MdPlugInManager *Instance();
+            MEDIC_EXPORT static MdPlugInManager *Instance();
             void testers(MdTesterContainer *container);
-            std::vector<std::string> testerNames();
+            MEDIC_EXPORT std::vector<std::string> testerNames();
             std::vector<std::string> karteNames();
-            MdTester *tester(std::string name);
-            MdKarte *karte(std::string name);
-            MdPluginLoadingStatus addTester(std::string pluginPath);
-            MdPluginLoadingStatus addKarte(std::string name, std::string description, std::vector<std::string> testerNames);
+            MEDIC_EXPORT MdTester *tester(std::string name);
+            MEDIC_EXPORT MdKarte *karte(std::string name);
+            MEDIC_EXPORT MdPluginLoadingStatus addTester(std::string pluginPath);
+            MEDIC_EXPORT MdPluginLoadingStatus addKarte(std::string name, std::string description, std::vector<std::string> testerNames);
             void unload();
 
         private:
