@@ -473,12 +473,37 @@ cdef class Visitor:
         self.ptr.reset()
         self.__report_cache = {}
 
-    cpdef results(self):
+    def results(self, tester=None):
+        if not tester:
+            return self._allresults()
+
+        if tester.IsPyTester():
+            return self.__report_cache.get(tester, [])[:]
+
+        else:
+            return self._result(tester)
+
+    cdef _result(self, Tester tester):
+        cdef MdReportIterator reports
+        cdef MdReport *report
+        results = []
+        reports = self.ptr.report(tester.ptr)
+
+        while (not reports.isDone()):
+            report = reports.next()
+            new_report = Report()
+            new_report.ptr = report
+            results.append(new_report)
+
+        return results
+
+    cpdef _allresults(self):
         cdef std_vector[MdTester *] testers = self.ptr.reportTesters()
         cdef std_vector[MdTester *].iterator it = testers.begin()
         cdef MdTester *tester
         cdef MdReportIterator reports
         cdef MdReport *report
+
         results = {}
 
         while (it != testers.end()):
