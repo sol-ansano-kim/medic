@@ -60,7 +60,7 @@ namespace MEDIC
             void setName(std::string);
             std::string getName() const;
             void setLabel(std::string);
-            std::string getLabel() const;
+            MEDIC_EXPORT std::string getLabel() const;
             MEDIC_EXPORT bool set(const bool &v, size_t index=0);
             MEDIC_EXPORT bool get(bool &v, size_t index=0) const;
             MEDIC_EXPORT bool set(const int &v, size_t index=0);
@@ -131,7 +131,6 @@ namespace MEDIC
             void clear();
             size_t size() const;
             MEDIC_EXPORT std::vector<std::string> names();
-            MEDIC_EXPORT std::vector<MdTypes> types();
 
             template <typename T>
             bool set(std::string paramName, const T &v, size_t index=0);

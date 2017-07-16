@@ -507,17 +507,6 @@ std::vector<std::string> MdParamContainer::names()
     return param_names;
 }
 
-std::vector<MdTypes> MdParamContainer::types()
-{
-    std::vector<MdTypes> param_types;
-    for (ParamPtrMap::iterator it = m_params.begin(); it != m_params.end(); ++it)
-    {
-        param_types.push_back(it->second->getType());
-    }
-
-    return param_types;
-}
-
 template <typename T>void CopyArrayValue(void *dst, void *src)
 {
     std::vector<T> *src_vector = (std::vector<T> *)src;

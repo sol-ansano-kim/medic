@@ -144,11 +144,11 @@ cdef class ParamContainer:
         return_list = []
 
         cdef std_vector[string] names = self.ptr.names()
-        cdef std_vector[MdTypes] types = self.ptr.types()
+        cdef MdParameter *param
 
-        for i, n in enumerate(names):
-            default = self.getDefault(n)
-            return_list.append((n, types[i], default))
+        for n in names:
+            param = self.ptr.getParam(n)
+            return_list.append((n, param.getLabel(), param.getType(), self.getDefault(n)))
 
         return return_list
 
@@ -256,6 +256,14 @@ cdef class Node:
 
         return self.ptr.isDag()
 
+    def getPath(self):
+        if self.ptr == NULL or not self.isDag():
+            return OpenMaya.MDagPath()
+
+        path = OpenMaya.MDagPath()
+        self.__dag.getPath(path)
+        return path
+
     def parents(self):
         if self.ptr == NULL:
             return []
@@ -352,6 +360,12 @@ cdef class Report:
     def __cinit__(self):
         pass
 
+    def addSelection(self):
+        if self.ptr == NULL:
+            return
+
+        self.ptr.addSelection()
+
     def node(self):
         if self.ptr == NULL:
             return None
@@ -436,7 +450,6 @@ cdef class Visitor:
                             self.__report_cache[t].append(r)
         else:
             if karte.hasPyTester(tester):
-                self.__report_cache.pop(tester, None)
                 nodes = self.__nodes()
                 for n in nodes:
                     if tester.Match(n):
@@ -754,14 +767,22 @@ class PyReport(object):
         self.__components = components
         self.__has_components = False if components is None else True
 
-    def addSelection(self, selection):
+    @staticmethod
+    def IsPyReport():
+        return True
+
+    def addSelection(self):
+        Statics.SelectionList.clear()
+
         if self.__node.isDag():
             if self.__has_components:
-                selection.add(self.__node.getPath(), self.__components)
+                Statics.SelectionList.add(self.__node.getPath(), self.__components)
             else:
-                selection.add(self.__node.getPath())
+                Statics.SelectionList.add(self.__node.getPath())
         else:
-            selection.add(self.__node.getPath())
+            Statics.SelectionList.add(self.__node.getPath())
+
+        OpenMaya.MGlobal.setActiveSelectionList(Statics.SelectionList, OpenMaya.MGlobal.kAddToList)
 
     def node(self):
         return self.__node
