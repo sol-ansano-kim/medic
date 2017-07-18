@@ -434,32 +434,46 @@ cdef class Visitor:
     def __dealloc__(self):
         del(self.ptr)
 
-    def visit(self, karte, tester=None):
-        if not tester:
-            self.__report_cache = {}
-            self.__visit(karte)
+    def test(self, karte, tester):
+        if karte.hasPyTester(tester):
             nodes = self.__nodes()
-
-            for t in karte.pyTesters():
-                for n in nodes:
-                    if t.Match(n):
-                        r = t.test(n)
-                        if r:
-                            if not self.__report_cache.has_key(t):
-                                self.__report_cache[t] = []
-                            self.__report_cache[t].append(r)
+            for n in nodes:
+                if tester.Match(n):
+                    r = tester.test(n)
+                    if r:
+                        if not self.__report_cache.has_key(tester):
+                            self.__report_cache[tester] = []
+                        self.__report_cache[tester].append(r)
         else:
-            if karte.hasPyTester(tester):
-                nodes = self.__nodes()
-                for n in nodes:
-                    if tester.Match(n):
-                        r = tester.test(n)
-                        if r:
-                            if not self.__report_cache.has_key(tester):
-                                self.__report_cache[tester] = []
-                            self.__report_cache[tester].append(r)
-            else:
-                self.__visitWithTester(karte, tester)
+            self.__visitWithTester(karte, tester)
+
+    def testAll(self, karte):
+        self.__report_cache = {}
+        self.__visitAll(karte)
+        nodes = self.__nodes()
+
+        for t in karte.pyTesters():
+            for n in nodes:
+                if t.Match(n):
+                    r = t.test(n)
+                    if r:
+                        if not self.__report_cache.has_key(t):
+                            self.__report_cache[t] = []
+                        self.__report_cache[t].append(r)
+
+    def reportAll(self):
+        return self.__reportAll()
+
+    def report(self, tester):
+        if tester.IsPyTester():
+            return self.__report_cache.get(tester, [])[:]
+
+        else:
+            return self.__report(tester)
+
+    def reset(self):
+        self.ptr.reset()
+        self.__report_cache = {}
 
     def __nodes(self):
         cdef MdNodeIterator it = self.ptr.nodes()
@@ -476,27 +490,13 @@ cdef class Visitor:
 
         return nodes
 
-    cdef __visit(self, Karte karte):
+    cdef __visitAll(self, Karte karte):
         self.ptr.visit(karte.ptr)
 
     cdef __visitWithTester(self, Karte karte, Tester tester):
         self.ptr.visit(karte.ptr, tester.ptr)
 
-    def reset(self):
-        self.ptr.reset()
-        self.__report_cache = {}
-
-    def results(self, tester=None):
-        if not tester:
-            return self._allresults()
-
-        if tester.IsPyTester():
-            return self.__report_cache.get(tester, [])[:]
-
-        else:
-            return self._result(tester)
-
-    cdef _result(self, Tester tester):
+    cdef __report(self, Tester tester):
         cdef MdReportIterator reports
         cdef MdReport *report
         results = []
@@ -510,7 +510,7 @@ cdef class Visitor:
 
         return results
 
-    cpdef _allresults(self):
+    cpdef __reportAll(self):
         cdef std_vector[MdTester *] testers = self.ptr.reportTesters()
         cdef std_vector[MdTester *].iterator it = testers.begin()
         cdef MdTester *tester
