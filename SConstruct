@@ -146,10 +146,4 @@ if custom_py:
                  "install": {"custom/Tester": custom_py}})
 
 
-prjs.append({"name": "medicModFile",
-             "type": "install",
-             "alias": "medic-mod",
-             "install": {".": ["medic.mod"]},})
-
-
 excons.DeclareTargets(env, prjs)
