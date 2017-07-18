@@ -28,6 +28,8 @@ cdef extern from "medic/parameter.h" namespace "MEDIC":
         @staticmethod
         MdParameter *Create[T](string name, string label, MdTypes typ, const T &defaultValue, MdAction *action)
         MdTypes getType() const
+        string getLabel() const
+        bint getDefault[T](T &t) const
 
     cdef cppclass MdParamContainer:
         MdParamContainer()
@@ -37,7 +39,6 @@ cdef extern from "medic/parameter.h" namespace "MEDIC":
         bint get[T](string paramName, T &v, size_t index)
         bint getDefault[T](string paramName, T &v)
         std_vector[string] names()
-        std_vector[MdTypes] types()
 
 
 cdef extern from "medic/node.h" namespace "MEDIC":
@@ -63,11 +64,13 @@ cdef extern from "medic/report.h" namespace "MEDIC":
     cdef cppclass MdReport:
         MdNode *node()
         bint hasComponents() const
+        void addSelection() const
 
     cdef cppclass MdReportIterator:
         MdReportIterator()
         MdReport *next()
         bint isDone()
+
 
 cdef extern from "medic/tester.h" namespace "MEDIC":
     cdef cppclass MdTesterIterator

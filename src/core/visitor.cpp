@@ -118,6 +118,7 @@ MdNodeIterator MdVisitor::nodes()
     if (!m_node_collected)
     {
         GetNodes(&m_nodes);
+        m_node_collected = true;
     }
 
     return m_nodes.iterator();

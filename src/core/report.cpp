@@ -19,23 +19,27 @@ MdReport::MdReport(MdNode *node)
 
 MdReport::~MdReport() {};
 
-void MdReport::addSelection(MSelectionList &selection) const
+void MdReport::addSelection() const
 {
+    selection_list.clear();
+
     if (m_node->isDag())
     {
         if (m_has_components)
         {
-            selection.add(m_node->getPath(), m_comp);
+            selection_list.add(m_node->getPath(), m_comp);
         }
         else
         {
-            selection.add(m_node->getPath());
+            selection_list.add(m_node->getPath());
         }
     }
     else
     {
-        selection.add(m_node->object());
+        selection_list.add(m_node->object());
     }
+
+    MGlobal::setActiveSelectionList(selection_list, MGlobal::kAddToList);
 }
 
 MdNode *MdReport::node()

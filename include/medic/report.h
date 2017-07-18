@@ -7,6 +7,7 @@
 #include "medic/node.h"
 #include "medic/platform.h"
 #include "maya/MSelectionList.h"
+#include "maya/MGlobal.h"
 
 
 namespace MEDIC
@@ -14,6 +15,7 @@ namespace MEDIC
     class MdReport;
     class MdReportContainer;
     class MdReportIterator;
+    static MSelectionList selection_list;
 
     class MdReport
     {
@@ -21,7 +23,7 @@ namespace MEDIC
             MEDIC_EXPORT MdReport(MdNode *node, MObject &compObj);
             MEDIC_EXPORT MdReport(MdNode *node);
             MEDIC_EXPORT ~MdReport();
-            void addSelection(MSelectionList &selection) const;
+            MEDIC_EXPORT void addSelection() const;
             MEDIC_EXPORT MdNode *node();
             MEDIC_EXPORT MObject &components();
             bool hasComponents() const;

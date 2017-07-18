@@ -144,11 +144,11 @@ cdef class ParamContainer:
         return_list = []
 
         cdef std_vector[string] names = self.ptr.names()
-        cdef std_vector[MdTypes] types = self.ptr.types()
+        cdef MdParameter *param
 
-        for i, n in enumerate(names):
-            default = self.getDefault(n)
-            return_list.append((n, types[i], default))
+        for n in names:
+            param = self.ptr.getParam(n)
+            return_list.append((n, param.getLabel(), param.getType(), self.getDefault(n)))
 
         return return_list
 
@@ -256,6 +256,14 @@ cdef class Node:
 
         return self.ptr.isDag()
 
+    def getPath(self):
+        if self.ptr == NULL or not self.isDag():
+            return OpenMaya.MDagPath()
+
+        path = OpenMaya.MDagPath()
+        self.__dag.getPath(path)
+        return path
+
     def parents(self):
         if self.ptr == NULL:
             return []
@@ -352,6 +360,12 @@ cdef class Report:
     def __cinit__(self):
         pass
 
+    def addSelection(self):
+        if self.ptr == NULL:
+            return
+
+        self.ptr.addSelection()
+
     def node(self):
         if self.ptr == NULL:
             return None
@@ -420,33 +434,46 @@ cdef class Visitor:
     def __dealloc__(self):
         del(self.ptr)
 
-    def visit(self, karte, tester=None):
-        if not tester:
-            self.__report_cache = {}
-            self.__visit(karte)
+    def test(self, karte, tester):
+        if karte.hasPyTester(tester):
             nodes = self.__nodes()
-
-            for t in karte.pyTesters():
-                for n in nodes:
-                    if t.Match(n):
-                        r = t.test(n)
-                        if r:
-                            if not self.__report_cache.has_key(t):
-                                self.__report_cache[t] = []
-                            self.__report_cache[t].append(r)
+            for n in nodes:
+                if tester.Match(n):
+                    r = tester.test(n)
+                    if r:
+                        if not self.__report_cache.has_key(tester):
+                            self.__report_cache[tester] = []
+                        self.__report_cache[tester].append(r)
         else:
-            if karte.hasPyTester(tester):
-                self.__report_cache.pop(tester, None)
-                nodes = self.__nodes()
-                for n in nodes:
-                    if tester.Match(n):
-                        r = tester.test(n)
-                        if r:
-                            if not self.__report_cache.has_key(tester):
-                                self.__report_cache[tester] = []
-                            self.__report_cache[tester].append(r)
-            else:
-                self.__visitWithTester(karte, tester)
+            self.__visitWithTester(karte, tester)
+
+    def testAll(self, karte):
+        self.__report_cache = {}
+        self.__visitAll(karte)
+        nodes = self.__nodes()
+
+        for t in karte.pyTesters():
+            for n in nodes:
+                if t.Match(n):
+                    r = t.test(n)
+                    if r:
+                        if not self.__report_cache.has_key(t):
+                            self.__report_cache[t] = []
+                        self.__report_cache[t].append(r)
+
+    def reportAll(self):
+        return self.__reportAll()
+
+    def report(self, tester):
+        if tester.IsPyTester():
+            return self.__report_cache.get(tester, [])[:]
+
+        else:
+            return self.__report(tester)
+
+    def reset(self):
+        self.ptr.reset()
+        self.__report_cache = {}
 
     def __nodes(self):
         cdef MdNodeIterator it = self.ptr.nodes()
@@ -463,22 +490,33 @@ cdef class Visitor:
 
         return nodes
 
-    cdef __visit(self, Karte karte):
+    cdef __visitAll(self, Karte karte):
         self.ptr.visit(karte.ptr)
 
     cdef __visitWithTester(self, Karte karte, Tester tester):
         self.ptr.visit(karte.ptr, tester.ptr)
 
-    def reset(self):
-        self.ptr.reset()
-        self.__report_cache = {}
+    cdef __report(self, Tester tester):
+        cdef MdReportIterator reports
+        cdef MdReport *report
+        results = []
+        reports = self.ptr.report(tester.ptr)
 
-    cpdef results(self):
+        while (not reports.isDone()):
+            report = reports.next()
+            new_report = Report()
+            new_report.ptr = report
+            results.append(new_report)
+
+        return results
+
+    cpdef __reportAll(self):
         cdef std_vector[MdTester *] testers = self.ptr.reportTesters()
         cdef std_vector[MdTester *].iterator it = testers.begin()
         cdef MdTester *tester
         cdef MdReportIterator reports
         cdef MdReport *report
+
         results = {}
 
         while (it != testers.end()):
@@ -729,14 +767,22 @@ class PyReport(object):
         self.__components = components
         self.__has_components = False if components is None else True
 
-    def addSelection(self, selection):
+    @staticmethod
+    def IsPyReport():
+        return True
+
+    def addSelection(self):
+        Statics.SelectionList.clear()
+
         if self.__node.isDag():
             if self.__has_components:
-                selection.add(self.__node.getPath(), self.__components)
+                Statics.SelectionList.add(self.__node.getPath(), self.__components)
             else:
-                selection.add(self.__node.getPath())
+                Statics.SelectionList.add(self.__node.getPath())
         else:
-            selection.add(self.__node.getPath())
+            Statics.SelectionList.add(self.__node.getPath())
+
+        OpenMaya.MGlobal.setActiveSelectionList(Statics.SelectionList, OpenMaya.MGlobal.kAddToList)
 
     def node(self):
         return self.__node
