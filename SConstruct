@@ -19,9 +19,6 @@ if sys.platform == "win32":
 else:
     excons.SetArgument("with-cython", os.path.abspath("cython/bin/cython"))
 
-out_incdir = excons.OutputBaseDirectory() + "/include"
-out_libdir = excons.OutputBaseDirectory() + "/lib"
-
 
 defs = []
 if sys.platform == "win32":
@@ -31,6 +28,21 @@ else:
 prjs = []
 customs = [excons.tools.maya.Require]
 
+
+mayaver = excons.GetArgument("mayaver", None)
+if not mayaver:
+    mayaver = excons.GetArgument("with-maya", None)
+
+try:
+    int(mayaver)
+except:
+    print "Set Maya version with 'mayaver'"
+    sys.exit(1)
+
+
+out_incdir = excons.OutputBaseDirectory() + "/include"
+out_libdir = excons.OutputBaseDirectory() + "/lib/" + mayaver
+out_pydir = excons.OutputBaseDirectory() + "/py/" + mayaver
 
 ## cython
 run_cython = False
@@ -62,22 +74,27 @@ if custom_plugins:
     custom_py = excons.glob(os.path.join(custom_plugins, "*.py"))
 
 
+## build
+headers = excons.glob("include/*")
+
+
 prjs.append({"name": "medic",
              "type": "sharedlib",
              "alias": "medic-lib",
              "defs": defs,
              "cppflags": cppflags,
              "incdirs": [out_incdir],
+             "prefix": mayaver,
              "srcs": excons.glob("src/core/*.cpp"),
              "symvis": "default",
-             "install": {out_incdir: excons.glob("include/*")},
+             "install": {out_incdir: headers},
              "custom": customs})
 
 prjs.append({"name": "_medic",
              "type": "dynamicmodule",
              "alias": "medic-python",
              "ext": python.ModuleExtension(),
-             "prefix": "py",
+             "prefix": "py/%s" % (mayaver),
              "defs": defs,
              "rpath": out_libdir,
              "cppflags": cppflags,
@@ -87,7 +104,7 @@ prjs.append({"name": "_medic",
              "libs": ["medic"],
              "deps": ["medic-lib"],
              "srcs": [cython_out],
-             "install": {"py": ["src/py/medic.py"]},
+             "install": {out_pydir: ["src/py/medic.py"]},
              "custom": customs + [python.SoftRequire]})
 
 # plugins
@@ -96,7 +113,7 @@ for plug in excons.glob("plugins/Tester/*.cpp"):
     prjs.append({"name": os.path.splitext(os.path.basename(plug))[0],
                  "type": "dynamicmodule",
                  "alias": "medic-plugins",
-                 "prefix": "plugins/Tester",
+                 "prefix": "plugins/%s/Tester" % (mayaver),
                  "defs": defs,
                  "rpath": out_libdir,
                  "cppflags": cppflags,
@@ -113,21 +130,21 @@ if py_plugs:
     prjs.append({"name": "medicPyPlugins",
                  "type": "install",
                  "alias": "medic-py-plugins",
-                 "install": {"plugins/Tester": py_plugs}})
+                 "install": {"plugins/%s/Tester" % (mayaver): py_plugs}})
 
 kartes = excons.glob("plugins/Karte/*.karte")
 if kartes:
     prjs.append({"name": "medicKartes",
                  "type": "install",
                  "alias": "medic-kartes",
-                 "install": {"plugins/Karte": kartes}})
+                 "install": {"plugins/%s/Karte" % (mayaver): kartes}})
 
 if custom_cpp:
     for cpp in custom_cpp:
         prjs.append({"name": os.path.splitext(os.path.basename(cpp))[0],
                      "type": "dynamicmodule",
                      "alias": "medic-custom-plugins",
-                     "prefix": "custom/Tester",
+                     "prefix": "custom/%s/Tester" % (mayaver),
                      "defs": defs,
                      "rpath": out_libdir,
                      "cppflags": cppflags,
@@ -143,13 +160,8 @@ if custom_py:
     prjs.append({"name": "medicCustonPyPlugins",
                  "type": "install",
                  "alias": "medic-custom-py-plugins",
-                 "install": {"custom/Tester": custom_py}})
+                 "install": {"custom/%s/Tester" % (mayaver): custom_py}})
 
-
-prjs.append({"name": "medicModFile",
-             "type": "install",
-             "alias": "medic-mod",
-             "install": {".": ["medic.mod"]},})
 
 
 excons.DeclareTargets(env, prjs)
