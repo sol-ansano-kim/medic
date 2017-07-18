@@ -34,9 +34,9 @@ if not mayaver:
     mayaver = excons.GetArgument("with-maya", None)
 
 try:
-    int(mayaver)
+    float(mayaver)
 except:
-    print "Set Maya version with 'mayaver'"
+    print "ERROR : Set Maya version with 'mayaver'"
     sys.exit(1)
 
 
