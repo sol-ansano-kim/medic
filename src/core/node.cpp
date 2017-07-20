@@ -192,12 +192,9 @@ bool MdNodeIterator::isDone()
 
 void MEDIC::GetNodes(MdNodeContainer *container)
 {
-    int i = 0;
     MItDependencyNodes it;
     while (!it.isDone())
     {
-        std::cout << i << std::endl;
-
         MObject obj = it.thisNode();
         if (MdNode::Match(obj))
         {
