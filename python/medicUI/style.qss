@@ -18,15 +18,21 @@ QLabel#medic_current_karte, QFrame#medic_top_bar, QFrame#medic_browser_buttons_w
 
 QLabel#medic_current_karte
 {
-    color: gray;
+    color: rgb(53, 53, 53);
     margin-right: 20px;
     font-size: 18px;
+}
+
+QPushButton
+{
+    color: rgb(140, 140, 140);
+    width: 24px;
+    height: 24px;
 }
 
 QPushButton#medic_browser_back
 {
     background-color: rgb(246, 246, 246);
-    color: rgb(140, 140, 140);
     border-style: solid;
     border-width: 0.5px;
     border-radius: 4px;
@@ -42,7 +48,6 @@ QPushButton#medic_browser_back::disabled
 QPushButton#medic_browser_next
 {
     background-color: rgb(246, 246, 246);
-    color: rgb(140, 140, 140);
     border-style: solid;
     border-width: 0.5px;
     border-radius: 4px;
@@ -55,9 +60,48 @@ QPushButton#medic_browser_next::disabled
     image: url("icons/nextOff.png");
 }
 
-QPushButton#medic_browser_button::disabled
+QPushButton#reset_button
 {
-    color: rgb(200, 200, 200);
+    border: none;
+    background: transparent;
+    image: url("icons/reset.png");
+}
+
+QPushButton#reset_button::hover
+{
+    image: url("icons/resetHover.png");
+}
+
+QPushButton#reset_button::disabled
+{
+    image: url("icons/resetDisabled.png");
+}
+
+QPushButton#reset_button::pressed
+{
+    image: url("icons/resetPressed.png");
+}
+
+QPushButton#test_button
+{
+    border: none;
+    background: transparent;
+    image: url("icons/test.png");
+}
+
+QPushButton#test_button::hover
+{
+    image: url("icons/testHover.png");
+}
+
+QPushButton#test_button::disabled
+{
+    image: url("icons/testDisabled.png");
+}
+
+QPushButton#test_button::pressed
+{
+    image: url("icons/testPressed.png");
 }
 
 QListView

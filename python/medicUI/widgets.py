@@ -1,11 +1,13 @@
 from Qt import QtWidgets, QtCore
 from . import model
 from . import delegate
+import os
+
+
+IconDir = os.path.abspath(os.path.join(__file__, "../icons"))
 
 
 class BrowserButtonWidget(QtWidgets.QFrame):
-    ButtonWidth = 24
-    ButtonHeight = 24
     BackClicked = QtCore.Signal()
     NextClicked = QtCore.Signal()
 
@@ -23,8 +25,6 @@ class BrowserButtonWidget(QtWidgets.QFrame):
 
         self.__back_button = QtWidgets.QPushButton()
         self.__next_button = QtWidgets.QPushButton()
-        self.__back_button.setFixedSize(BrowserButtonWidget.ButtonWidth, BrowserButtonWidget.ButtonHeight)
-        self.__next_button.setFixedSize(BrowserButtonWidget.ButtonWidth, BrowserButtonWidget.ButtonHeight)
         self.__back_button.setObjectName("medic_browser_back")
         self.__next_button.setObjectName("medic_browser_next")
 
@@ -99,8 +99,11 @@ class TopBarWidget(QtWidgets.QFrame):
         self.setObjectName("medic_top_bar")
         self.__browser_button_widget = None
         self.__current_karte_label = None
+        self.__phase_items = {}
+        self.__phase = 0
 
         self.__makeWidgets()
+        self.setPhase(0)
 
     def setBrowserButtonEnabled(self, prevValue, nextValue):
         self.__browser_button_widget.setBackEnabled(prevValue)
@@ -108,6 +111,25 @@ class TopBarWidget(QtWidgets.QFrame):
 
     def setCurrentKarteName(self, name):
         self.__current_karte_label.setText(name)
+
+    def phase(self):
+        return self.__phase
+
+    def next(self):
+        self.setPhase(self.__phase + 1)
+
+    def back(self):
+        self.setPhase(self.__phase - 1)
+
+    def setPhase(self, phase):
+        self.__phase = phase
+        for p, items in self.__phase_items.iteritems():
+            if p == self.__phase:
+                for item in items:
+                    item.show()
+            else:
+                for item in items:
+                    item.hide()
         
     def __makeWidgets(self):
         main_layout = QtWidgets.QVBoxLayout()
@@ -115,11 +137,21 @@ class TopBarWidget(QtWidgets.QFrame):
         self.setLayout(main_layout)
 
         horizon_layout = QtWidgets.QHBoxLayout()
+        horizon_layout.setSpacing(10)
         horizon_layout.setContentsMargins(0, 0, 0, 0)
         self.__browser_button_widget = BrowserButtonWidget()
+        self.__reset_button = QtWidgets.QPushButton()
+        self.__test_button = QtWidgets.QPushButton()
+        self.__reset_button.setObjectName("reset_button")
+        self.__test_button.setObjectName("test_button")
         self.__current_karte_label = CurrentKarteLabel()
+
+        self.__phase_items[1] = [self.__reset_button, self.__test_button]
         
         horizon_layout.addWidget(self.__browser_button_widget)
+        horizon_layout.addSpacing(20)
+        horizon_layout.addWidget(self.__reset_button)
+        horizon_layout.addWidget(self.__test_button)
         horizon_layout.addStretch(9999)
         horizon_layout.addWidget(self.__current_karte_label)
 
@@ -156,7 +188,6 @@ class MainWidget(QtWidgets.QWidget):
     def setPhase(self, p):
         self.__phase = p
         for phase, widgets in self.__phase_widgets.iteritems():
-            v = (phase == p)
             if phase is p:
                 for widget in widgets:
                     widget.show()

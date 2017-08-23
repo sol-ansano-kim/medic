@@ -47,7 +47,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.__top_widget.NextClicked.connect(self.__next)
 
     def __next(self):
+        self.__top_widget.next()
         self.__main_widget.next()
 
     def __back(self):
+        self.__top_widget.back()
         self.__main_widget.back()
