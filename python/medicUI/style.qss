@@ -1,0 +1,101 @@
+QWidget
+{
+    font-family: Helvetica;
+    background-color: rgb(255, 255, 255);
+    color: rgb(0, 0, 0);
+}
+
+QFrame#medic_top_bar
+{
+    border-bottom: 1px solid gray;
+    margin-bottom: 0.1px;
+}
+
+QLabel#medic_current_karte, QFrame#medic_top_bar, QFrame#medic_browser_buttons_widget
+{
+    background-color: rgb(235, 235, 235);
+}
+
+QLabel#medic_current_karte
+{
+    color: gray;
+    margin-right: 20px;
+    font-size: 18px;
+}
+
+QPushButton#medic_browser_back
+{
+    background-color: rgb(246, 246, 246);
+    color: rgb(140, 140, 140);
+    border-style: solid;
+    border-width: 0.5px;
+    border-radius: 4px;
+    border-color: rgb(199, 199, 199);
+    image: url("icons/backOn.png");
+}
+
+QPushButton#medic_browser_back::disabled
+{
+    image: url("icons/backOff.png");
+}
+
+QPushButton#medic_browser_next
+{
+    background-color: rgb(246, 246, 246);
+    color: rgb(140, 140, 140);
+    border-style: solid;
+    border-width: 0.5px;
+    border-radius: 4px;
+    border-color: rgb(199, 199, 199);
+    image: url("icons/nextOn.png");
+}
+
+QPushButton#medic_browser_next::disabled
+{
+    image: url("icons/nextOff.png");
+}
+
+QPushButton#medic_browser_button::disabled
+{
+    color: rgb(200, 200, 200);
+}
+
+QListView
+{
+    border: none;
+}
+
+QListView#medic_karte_list
+{
+    font-size: 18px;
+}
+
+QListView#medic_karte_list::item
+{
+    font-size: 30px;
+}
+
+QScrollBar
+{
+    border: none;
+    margin: 0px 0px 0px 0px;
+}
+
+QScrollBar::handle
+{
+    background: white;
+    border: 1px solid rgb(200, 200, 200);
+    border-radius: 6px;
+}
+
+QScrollBar::add-line
+{
+    background: rgb(200, 200, 200);
+    subcontrol-origin: margin;
+    border: none;
+}
+
+QScrollBar::add-page, QScrollBar::sub-page
+{
+    background: none;
+}

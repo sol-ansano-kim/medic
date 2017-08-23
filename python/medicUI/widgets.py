@@ -1,0 +1,223 @@
+from Qt import QtWidgets, QtCore
+from . import model
+from . import delegate
+
+
+class BrowserButtonWidget(QtWidgets.QFrame):
+    ButtonWidth = 24
+    ButtonHeight = 24
+    BackClicked = QtCore.Signal()
+    NextClicked = QtCore.Signal()
+
+    def __init__(self, parent=None):
+        super(BrowserButtonWidget, self).__init__(parent=parent)
+        self.setObjectName("medic_browser_buttons_widget")
+        self.__back_button = None
+        self.__next_button = None
+
+        self.__makeWidgets()
+
+    def __makeWidgets(self):
+        main_layout = QtWidgets.QHBoxLayout()
+        self.setLayout(main_layout)
+
+        self.__back_button = QtWidgets.QPushButton()
+        self.__next_button = QtWidgets.QPushButton()
+        self.__back_button.setFixedSize(BrowserButtonWidget.ButtonWidth, BrowserButtonWidget.ButtonHeight)
+        self.__next_button.setFixedSize(BrowserButtonWidget.ButtonWidth, BrowserButtonWidget.ButtonHeight)
+        self.__back_button.setObjectName("medic_browser_back")
+        self.__next_button.setObjectName("medic_browser_next")
+
+        main_layout.addWidget(self.__back_button)
+        main_layout.addWidget(self.__next_button)
+        main_layout.setSpacing(1)
+
+        self.__back_button.clicked.connect(self.BackClicked.emit)
+        self.__next_button.clicked.connect(self.NextClicked.emit)
+
+    def setBackEnabled(self, v):
+        self.__back_button.setEnabled(v)
+
+    def setNextEnabled(self, v):
+        self.__next_button.setEnabled(v)
+
+
+class CurrentKarteLabel(QtWidgets.QLabel):
+    def __init__(self, parent=None):
+        super(CurrentKarteLabel, self).__init__(parent=parent)
+        self.setObjectName("medic_current_karte")
+
+
+class KarteList(QtWidgets.QListView):
+    KarteChanged = QtCore.Signal("QModelIndex")
+
+    def __init__(self, parent=None):
+        super(KarteList, self).__init__(parent=parent)
+        self.setObjectName("medic_karte_list")
+        self.setAlternatingRowColors(True)
+        self.setUniformItemSizes(True)
+        self.source_model = model.KarteModel()
+        self.delegate = delegate.KarteDelegate()
+        self.setModel(self.source_model)
+        self.setItemDelegate(self.delegate)
+        self.__current_karte = None
+
+    def currentKarte(self):
+        return self.__current_karte
+
+    def mousePressEvent(self, evnt):
+        if QtCore.Qt.MouseButton.LeftButton == evnt.button():
+            index = self.indexAt(evnt.pos())
+            if index.row() < 0:
+                self.clearSelection()
+                self.__current_karte = None
+            else:
+                self.__current_karte = self.source_model.data(index, model.KarteItemRole)
+
+            self.KarteChanged.emit(index)
+            super(KarteList, self).mousePressEvent(evnt)
+
+
+class TesterList(QtWidgets.QListView):
+    def __init__(self, parent=None):
+        super(TesterList, self).__init__(parent=parent)
+        self.setObjectName("medic_tester_list")
+        self.setAlternatingRowColors(True)
+        self.setUniformItemSizes(True)
+        self.source_model = model.TesterModel()
+        self.delegate = delegate.TesterDelegate()
+        self.setItemDelegate(self.delegate)
+        self.setModel(self.source_model)
+
+
+class TopBarWidget(QtWidgets.QFrame):
+    BackClicked = QtCore.Signal()
+    NextClicked = QtCore.Signal()
+
+    def __init__(self, parent=None):
+        super(TopBarWidget, self).__init__(parent=parent)
+        self.setObjectName("medic_top_bar")
+        self.__browser_button_widget = None
+        self.__current_karte_label = None
+
+        self.__makeWidgets()
+
+    def setBrowserButtonEnabled(self, prevValue, nextValue):
+        self.__browser_button_widget.setBackEnabled(prevValue)
+        self.__browser_button_widget.setNextEnabled(nextValue)
+
+    def setCurrentKarteName(self, name):
+        self.__current_karte_label.setText(name)
+        
+    def __makeWidgets(self):
+        main_layout = QtWidgets.QVBoxLayout()
+        main_layout.setContentsMargins(0, 0, 0, 0)
+        self.setLayout(main_layout)
+
+        horizon_layout = QtWidgets.QHBoxLayout()
+        horizon_layout.setContentsMargins(0, 0, 0, 0)
+        self.__browser_button_widget = BrowserButtonWidget()
+        self.__current_karte_label = CurrentKarteLabel()
+        
+        horizon_layout.addWidget(self.__browser_button_widget)
+        horizon_layout.addStretch(9999)
+        horizon_layout.addWidget(self.__current_karte_label)
+
+        main_layout.addLayout(horizon_layout)
+
+        self.__browser_button_widget.BackClicked.connect(self.BackClicked.emit)
+        self.__browser_button_widget.NextClicked.connect(self.NextClicked.emit)
+
+
+class MainWidget(QtWidgets.QWidget):
+    ConditionChanged = QtCore.Signal(bool, bool)
+    KarteChanged = QtCore.Signal(str)
+
+    def __init__(self, parent=None):
+        super(MainWidget, self).__init__(parent=parent)
+        self.setObjectName("medic_main_widget")
+        self.__kartes_widget = None
+        self.__testers_widget = None
+        self.__phase = 0
+        self.__phase_widgets = {}
+
+        self.__makeWidgets()
+        self.setPhase(0)
+
+    def phase(self):
+        return self.__phase
+
+    def next(self):
+        self.setPhase(self.__phase + 1)
+
+    def back(self):
+        self.setPhase(self.__phase - 1)
+
+    def setPhase(self, p):
+        self.__phase = p
+        for phase, widgets in self.__phase_widgets.iteritems():
+            v = (phase == p)
+            if phase is p:
+                for widget in widgets:
+                    widget.show()
+            else:
+                for widget in widgets:
+                    widget.hide()
+
+        if self.__phase is 0:
+            able_back = False
+            able_next = True if self.__kartes_widget.currentKarte() else False
+        else:
+            able_back = True
+            able_next = False
+
+        self.ConditionChanged.emit(able_back, able_next)
+
+    def __makeWidgets(self):
+        main_layout = QtWidgets.QHBoxLayout()
+        main_layout.setContentsMargins(0, 0, 0, 0)
+        main_layout.setSpacing(0)
+        self.setLayout(main_layout)
+        self.__kartes_widget = KarteList()
+        self.__testers_widget = TesterList()
+
+        ## phase 0
+        main_layout.addWidget(self.__kartes_widget)
+        self.__phase_widgets[0] = [self.__kartes_widget]
+
+        ## phase 2
+        v_layout = QtWidgets.QHBoxLayout()
+        v_layout.addWidget(self.__testers_widget)
+        self.__phase_widgets[1] = [self.__testers_widget]
+        main_layout.addLayout(v_layout)
+
+        ## signal
+        self.__kartes_widget.KarteChanged.connect(self.__karteChanged)
+
+    def __reset(self):
+        karte_item = self.__kartes_widget.currentKarte()
+        if karte_item:
+            karte_item.reset()
+
+    def __test(self):
+        karte_item = self.__kartes_widget.currentKarte()
+        if karte_item:
+            karte_item.testAll()
+
+    def __karteChanged(self, current):
+        able_back = False if self.__phase is 0 else True
+        able_next = False
+
+        karte_model = self.__kartes_widget.model()
+        tester_model = self.__testers_widget.model()
+
+        karte_item = karte_model.data(current, model.KarteItemRole)
+        if karte_item:
+            self.KarteChanged.emit(karte_item.name())
+            tester_model.setTesterItems(karte_model.data(current, model.KarteTesterItemsRole))
+            able_next = True
+        else:
+            self.KarteChanged.emit("")
+            tester_model.setTesterItems([])
+
+        self.ConditionChanged.emit(able_back, able_next)

@@ -227,6 +227,17 @@ if custom_py:
                      "install": {os.path.join(package_dir, "plugins/Tester"): custom_py}})
 
 
+prjs.append({"name": "medicUI",
+             "type": "install",
+             "alias": "medic-ui",
+             "install": {out_pydir: ["python/medicUI"]}})
+if do_pacakage:
+    prjs.append({"name": "packageUI",
+                 "type": "install",
+                 "alias": "medic-package",
+                 "install": {os.path.join(package_dir, "py"): ["python/medicUI"]}})
+
+
 if do_pacakage:
     for prj in prjs:
         if prj["type"] != "install":
