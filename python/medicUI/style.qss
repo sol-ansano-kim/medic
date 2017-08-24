@@ -122,6 +122,7 @@ QListView#medic_karte_list::item
 QScrollBar
 {
     border: none;
+    background: rgb(200, 200, 200);
     margin: 0px 0px 0px 0px;
 }
 
@@ -132,14 +133,9 @@ QScrollBar::handle
     border-radius: 6px;
 }
 
-QScrollBar::add-line
-{
-    background: rgb(200, 200, 200);
-    subcontrol-origin: margin;
-    border: none;
-}
-
-QScrollBar::add-page, QScrollBar::sub-page
+QScrollBar::add-page, QScrollBar::sub-page, QScrollBar::add-line, QScrollBar::sub-line, QScrollBar::up-arrow, QScrollBar::down-arrow, QScrollBar::left-arrow, QScrollBar::right-arrow
 {
     background: none;
+    color: none;
+    border: none;
 }
