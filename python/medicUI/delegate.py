@@ -39,7 +39,7 @@ class KarteDelegate(ListItemDelegate):
         
         karte_name = index.data(model.DisplayRole)
         painter.drawPixmap(QtCore.QRect(rect.x() + 10, rect.y(), 50, 50), self.__karte_icon)
-        painter.drawText(rect.x() + 70, rect.y() + rect.height() * 0.5 + font_matrics.height() * 0.5, karte_name)
+        painter.drawText(rect.x() + 80, rect.y() + rect.height() * 0.5 + font_matrics.height() * 0.5, karte_name)
 
         painter.restore()
 
