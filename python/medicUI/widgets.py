@@ -263,9 +263,13 @@ class MainWidget(QtWidgets.QWidget):
     def test(self):
         karte_item = self.__kartes_widget.currentKarte()
         if karte_item:
-            karte_item.testAll()
+            karte_item.testAll(testerCallback=self.forceUpdate)
             self.StatusChanged.emit(karte_item.status())
             self.update()
+
+    def forceUpdate(self):
+        self.update()
+        QtWidgets.QApplication.processEvents()
 
     def __karteChanged(self, current):
         able_back = False if self.__phase is 0 else True
