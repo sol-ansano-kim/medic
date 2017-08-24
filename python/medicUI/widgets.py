@@ -1,4 +1,4 @@
-from Qt import QtWidgets, QtCore
+from Qt import QtWidgets, QtCore, QtGui
 from . import model
 from . import delegate
 import os
@@ -46,6 +46,25 @@ class CurrentKarteLabel(QtWidgets.QLabel):
     def __init__(self, parent=None):
         super(CurrentKarteLabel, self).__init__(parent=parent)
         self.setObjectName("medic_current_karte")
+
+
+class StatusLabel(QtWidgets.QLabel):
+    def __init__(self, parent=None):
+        super(StatusLabel, self).__init__(parent=parent)
+        self.setObjectName("status_label")
+        self.setFixedWidth(50)
+        self.__ready_icon = QtGui.QPixmap(os.path.join(IconDir, "success.png")).scaled(16, 16)
+        self.__success_icon = QtGui.QPixmap(os.path.join(IconDir, "success.png")).scaled(16, 16)
+        self.__failure_icon = QtGui.QPixmap(os.path.join(IconDir, "failure.png")).scaled(16, 16)
+        self.setStatus(model.Ready)
+
+    def setStatus(self, status):
+        if status is model.Ready:
+            self.setText("<font color='#b0b0b0'>Ready</font>")
+        elif status is model.Success:
+            self.setText("<font color='#1cc033'>Success</font>")
+        else:
+            self.setText("<font color='#eb2b66'>Failure</font>")
 
 
 class KarteList(QtWidgets.QListView):
@@ -101,6 +120,7 @@ class TopBarWidget(QtWidgets.QFrame):
         self.__current_karte_label = None
         self.reset_button = None
         self.test_button = None
+        self.status_label = None
         self.__phase_items = {}
         self.__phase = 0
 
@@ -146,14 +166,16 @@ class TopBarWidget(QtWidgets.QFrame):
         self.test_button = QtWidgets.QPushButton()
         self.reset_button.setObjectName("reset_button")
         self.test_button.setObjectName("test_button")
+        self.status_label = StatusLabel()
         self.__current_karte_label = CurrentKarteLabel()
 
-        self.__phase_items[1] = [self.reset_button, self.test_button]
+        self.__phase_items[1] = [self.reset_button, self.test_button, self.status_label]
         
         horizon_layout.addWidget(self.__browser_button_widget)
         horizon_layout.addSpacing(20)
         horizon_layout.addWidget(self.reset_button)
         horizon_layout.addWidget(self.test_button)
+        horizon_layout.addWidget(self.status_label)
         horizon_layout.addStretch(9999)
         horizon_layout.addWidget(self.__current_karte_label)
 
@@ -166,6 +188,7 @@ class TopBarWidget(QtWidgets.QFrame):
 class MainWidget(QtWidgets.QWidget):
     ConditionChanged = QtCore.Signal(bool, bool)
     KarteChanged = QtCore.Signal(str)
+    StatusChanged = QtCore.Signal(int)
 
     def __init__(self, parent=None):
         super(MainWidget, self).__init__(parent=parent)
@@ -204,6 +227,9 @@ class MainWidget(QtWidgets.QWidget):
             able_back = True
             able_next = False
 
+        if self.__phase is 1:
+            self.reset()
+
         self.ConditionChanged.emit(able_back, able_next)
 
     def __makeWidgets(self):
@@ -231,12 +257,14 @@ class MainWidget(QtWidgets.QWidget):
         karte_item = self.__kartes_widget.currentKarte()
         if karte_item:
             karte_item.reset()
+            self.StatusChanged.emit(model.Ready)
             self.update()
 
     def test(self):
         karte_item = self.__kartes_widget.currentKarte()
         if karte_item:
             karte_item.testAll()
+            self.StatusChanged.emit(karte_item.status())
             self.update()
 
     def __karteChanged(self, current):

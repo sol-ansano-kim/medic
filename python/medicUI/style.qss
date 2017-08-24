@@ -11,7 +11,7 @@ QFrame#medic_top_bar
     margin-bottom: 0.1px;
 }
 
-QLabel#medic_current_karte, QFrame#medic_top_bar, QFrame#medic_browser_buttons_widget
+QLabel#medic_current_karte, QLabel#status_label, QFrame#medic_top_bar, QFrame#medic_browser_buttons_widget
 {
     background-color: rgb(235, 235, 235);
 }

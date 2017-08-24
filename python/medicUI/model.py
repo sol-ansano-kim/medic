@@ -30,9 +30,6 @@ class TesterItem(object):
         self.__status = Ready
         self.__reports = []
 
-    def setStatus(self, st):
-        self.__status = st
-
     def status(self):
         return self.__status
 
@@ -72,6 +69,15 @@ class KarteItem(object):
         self.__visitor.reset()
         for tester in self.__tester_items:
             tester.reset()
+
+    def status(self):
+        has_ready = False
+        for tester in self.__tester_items:
+            if tester.status() is Failure:
+                return Failure
+            if tester.status() is Ready:
+                has_ready = True
+        return Success if not has_ready else Ready
 
     def visitor(self):
         return self.__visitor

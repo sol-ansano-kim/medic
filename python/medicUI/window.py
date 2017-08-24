@@ -47,6 +47,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.__top_widget.NextClicked.connect(self.__next)
         self.__top_widget.reset_button.clicked.connect(self.__main_widget.reset)
         self.__top_widget.test_button.clicked.connect(self.__main_widget.test)
+        self.__main_widget.StatusChanged.connect(self.__top_widget.status_label.setStatus)
 
     def __next(self):
         self.__top_widget.next()
