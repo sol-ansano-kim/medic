@@ -64,6 +64,7 @@ class KarteItem(object):
         return self.__tester_items
 
     def testAll(self):
+        self.reset()
         for tester in self.__tester_items:
             tester.test(self.__karte, self.__visitor)
 

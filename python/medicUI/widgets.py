@@ -99,6 +99,8 @@ class TopBarWidget(QtWidgets.QFrame):
         self.setObjectName("medic_top_bar")
         self.__browser_button_widget = None
         self.__current_karte_label = None
+        self.reset_button = None
+        self.test_button = None
         self.__phase_items = {}
         self.__phase = 0
 
@@ -140,18 +142,18 @@ class TopBarWidget(QtWidgets.QFrame):
         horizon_layout.setSpacing(10)
         horizon_layout.setContentsMargins(0, 0, 0, 0)
         self.__browser_button_widget = BrowserButtonWidget()
-        self.__reset_button = QtWidgets.QPushButton()
-        self.__test_button = QtWidgets.QPushButton()
-        self.__reset_button.setObjectName("reset_button")
-        self.__test_button.setObjectName("test_button")
+        self.reset_button = QtWidgets.QPushButton()
+        self.test_button = QtWidgets.QPushButton()
+        self.reset_button.setObjectName("reset_button")
+        self.test_button.setObjectName("test_button")
         self.__current_karte_label = CurrentKarteLabel()
 
-        self.__phase_items[1] = [self.__reset_button, self.__test_button]
+        self.__phase_items[1] = [self.reset_button, self.test_button]
         
         horizon_layout.addWidget(self.__browser_button_widget)
         horizon_layout.addSpacing(20)
-        horizon_layout.addWidget(self.__reset_button)
-        horizon_layout.addWidget(self.__test_button)
+        horizon_layout.addWidget(self.reset_button)
+        horizon_layout.addWidget(self.test_button)
         horizon_layout.addStretch(9999)
         horizon_layout.addWidget(self.__current_karte_label)
 
@@ -225,15 +227,17 @@ class MainWidget(QtWidgets.QWidget):
         ## signal
         self.__kartes_widget.KarteChanged.connect(self.__karteChanged)
 
-    def __reset(self):
+    def reset(self):
         karte_item = self.__kartes_widget.currentKarte()
         if karte_item:
             karte_item.reset()
+            self.update()
 
-    def __test(self):
+    def test(self):
         karte_item = self.__kartes_widget.currentKarte()
         if karte_item:
             karte_item.testAll()
+            self.update()
 
     def __karteChanged(self, current):
         able_back = False if self.__phase is 0 else True

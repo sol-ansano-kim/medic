@@ -45,6 +45,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.__main_widget.KarteChanged.connect(self.__top_widget.setCurrentKarteName)
         self.__top_widget.BackClicked.connect(self.__back)
         self.__top_widget.NextClicked.connect(self.__next)
+        self.__top_widget.reset_button.clicked.connect(self.__main_widget.reset)
+        self.__top_widget.test_button.clicked.connect(self.__main_widget.test)
 
     def __next(self):
         self.__top_widget.next()
