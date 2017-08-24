@@ -50,6 +50,7 @@ class KarteDelegate(ListItemDelegate):
 class TesterDelegate(ListItemDelegate):
     def __init__(self, parent=None):
         super(TesterDelegate, self).__init__(parent=parent)
+        self.__ready_icon = QtGui.QPixmap(os.path.join(IconDir, "ready.png"))
         self.__success_icon = QtGui.QPixmap(os.path.join(IconDir, "success.png"))
         self.__failure_icon = QtGui.QPixmap(os.path.join(IconDir, "failure.png"))
 
@@ -64,11 +65,14 @@ class TesterDelegate(ListItemDelegate):
         
         tester_name = index.data(model.DisplayRole)
         status = index.data(model.StatusRole)
-        if status is not model.Ready:
+        if status is model.Ready:
+            icon = self.__ready_icon
+        elif status is model.Success:
             icon = self.__success_icon
-            if status is model.Failure:
-                icon = self.__failure_icon
-            painter.drawPixmap(QtCore.QRect(rect.x() + 10, rect.y(), 20, 20), icon)
+        elif status is model.Failure:
+            icon = self.__failure_icon
+
+        painter.drawPixmap(QtCore.QRect(rect.x() + 12, rect.y() + 2, 16, 16), icon)
 
         painter.drawText(rect.x() + 40, rect.y() + rect.height() * 0.5 + font_matrics.height() * 0.5, tester_name)
 
