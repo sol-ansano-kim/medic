@@ -23,6 +23,22 @@ class ListItemDelegate(QtWidgets.QStyledItemDelegate):
         return self.__background_color
 
 
+class ReportDelegate(ListItemDelegate):
+    def __init__(self, parent=None):
+        super(ReportDelegate, self).__init__(parent=parent)
+
+    def paint(self, painter, option, index):
+        painter.save()
+        rect = option.rect
+        font_matrics = QtGui.QFontMetrics(option.font)
+        report_name = index.data(model.DisplayRole)
+
+        painter.fillRect(rect, self.getBackgroudColor(option))
+        painter.drawText(rect.x() + 5, rect.y() + 15, report_name)
+
+        painter.restore()
+
+
 class KarteDelegate(ListItemDelegate):
     def __init__(self, parent=None):
         super(KarteDelegate, self).__init__(parent=parent)
@@ -31,13 +47,10 @@ class KarteDelegate(ListItemDelegate):
     def paint(self, painter, option, index):
         painter.save()
         rect = option.rect
+        font_matrics = QtGui.QFontMetrics(option.font)
+        karte_name = index.data(model.DisplayRole)
 
         painter.fillRect(rect, self.getBackgroudColor(option))
-
-        font_matrics = QtGui.QFontMetrics(option.font)
-        font_matrics.height() / 2.0
-        
-        karte_name = index.data(model.DisplayRole)
         painter.drawPixmap(QtCore.QRect(rect.x() + 10, rect.y(), 50, 50), self.__karte_icon)
         painter.drawText(rect.x() + 80, rect.y() + rect.height() * 0.5 + font_matrics.height() * 0.5, karte_name)
 
@@ -57,13 +70,9 @@ class TesterDelegate(ListItemDelegate):
     def paint(self, painter, option, index):
         painter.save()
         rect = option.rect
-
-        painter.fillRect(rect, self.getBackgroudColor(option))
-
         font_matrics = QtGui.QFontMetrics(option.font)
-        font_matrics.height() / 2.0
-        
         tester_name = index.data(model.DisplayRole)
+
         status = index.data(model.StatusRole)
         if status is model.Ready:
             icon = self.__ready_icon
@@ -72,8 +81,8 @@ class TesterDelegate(ListItemDelegate):
         elif status is model.Failure:
             icon = self.__failure_icon
 
+        painter.fillRect(rect, self.getBackgroudColor(option))
         painter.drawPixmap(QtCore.QRect(rect.x() + 12, rect.y() + 2, 16, 16), icon)
-
         painter.drawText(rect.x() + 40, rect.y() + rect.height() * 0.5 + font_matrics.height() * 0.5, tester_name)
 
         painter.restore()

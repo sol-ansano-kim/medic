@@ -11,16 +11,38 @@ QFrame#medic_top_bar
     margin-bottom: 0.1px;
 }
 
-QLabel#medic_current_karte, QLabel#status_label, QFrame#medic_top_bar, QFrame#medic_browser_buttons_widget
+QFrame#detail_frame
+{
+    background-color: rgb(227, 227, 227);
+}
+
+QFrame#medic_top_bar, QFrame#medic_browser_buttons_widget
 {
     background-color: rgb(235, 235, 235);
 }
 
-QLabel#medic_current_karte
+QLabel
 {
     color: rgb(53, 53, 53);
     margin-right: 20px;
     font-size: 18px;
+    background-color: rgb(235, 235, 235);
+}
+
+QLabel#status_label
+{
+    font-size: 14px;
+}
+
+QLabel#detail_tester_label
+{
+    background: transparent;
+}
+
+QLabel#parameter_label
+{
+    background: transparent;
+    font-size: 12px;
 }
 
 QPushButton
@@ -104,19 +126,23 @@ QPushButton#test_button::pressed
     image: url("icons/testPressed.png");
 }
 
-QListView
+QPushButton#detail_button
 {
-    border: none;
+    font-size: 11px;
+    border: 1px solid rgb(100, 100, 100);
+    border-radius: 5px;
+    background-color: rgb(255, 255, 255);
+    color: rgb(0, 12, 20);
 }
 
-QListView#medic_karte_list
+QPushButton#detail_button::disabled
 {
-    font-size: 18px;
+    color: rgb(175, 175, 175);
 }
 
-QListView#medic_karte_list::item
+QPushButton#detail_button::pressed
 {
-    font-size: 30px;
+    background-color: rgb(200, 200, 200);
 }
 
 QScrollBar
@@ -138,4 +164,41 @@ QScrollBar::add-page, QScrollBar::sub-page, QScrollBar::add-line, QScrollBar::su
     background: none;
     color: none;
     border: none;
+}
+
+QListView
+{
+    border: none;
+}
+
+QListView#medic_tester_list
+{
+    font-size: 12px;
+}
+
+QListView#medic_karte_list
+{
+    font-size: 18px;
+}
+
+QListView#detial_report_list
+{
+    font-size: 12px;
+    border: none;
+    border-radius: 5px;
+    padding: 5px;
+    height: 20px;
+}
+
+QListView#detial_report_list::item
+{
+    height: 18px;
+}
+
+QTextEdit#detail_tester_description
+{
+    color: rgb(175, 175, 175);
+    font-size: 14px;
+    border: none;
+    background: transparent;
 }

@@ -39,6 +39,15 @@ class TesterItem(object):
     def name(self):
         return self.__tester.Name()
 
+    def description(self):
+        return self.__tester.Description()
+
+    def parameters(self):
+        return self.__tester.GetParameters()
+
+    def isFixable(self):
+        return self.__tester.IsFixable()
+
     def test(self, karte, visitor):
         self.__status = Ready
 
@@ -165,3 +174,24 @@ class TesterModel(QtCore.QAbstractListModel):
 
         if role == StatusRole:
             return self.__tester_items[index.row()].status()
+
+
+class ReportModel(QtCore.QAbstractListModel):
+    def __init__(self, parent=None):
+        super(ReportModel, self).__init__(parent=parent)
+        self.__reports = []
+
+    def setReports(self, reports):
+        self.beginResetModel()
+        self.__reports = reports
+        self.endResetModel()
+
+    def rowCount(self, parent=None):
+        return len(self.__reports)
+
+    def data(self, index, role):
+        if index.row() < 0 or index.row() > self.rowCount():
+            return None
+
+        if role == DisplayRole:
+            return self.__reports[index.row()].node().name()

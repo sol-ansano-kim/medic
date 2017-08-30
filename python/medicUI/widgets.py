@@ -1,10 +1,81 @@
 from Qt import QtWidgets, QtCore, QtGui
 from . import model
 from . import delegate
+import medic
 import os
+import re
 
 
 IconDir = os.path.abspath(os.path.join(__file__, "../icons"))
+
+
+class ParameterFunctions():
+    @staticmethod
+    def SetParmeterValue(param_container, pram_dict):
+        for prm in pram_dict:
+            if prm["function"]:
+                prm["function"](param_container, prm["name"], prm["widget"])
+
+    @staticmethod
+    def SetInt(param, name, widget):
+        t = widget.text()
+        if not t:
+            t = 0
+        param.set(name, int(t))
+
+    @staticmethod
+    def SetFloat(param, name, widget):
+        t = widget.text()
+        if not t:
+            t = 0
+        param.set(name, float(t))
+
+    @staticmethod
+    def SetBool(param, name, widget):
+        param.set(name, widget.isChecked())
+
+    @staticmethod
+    def SetString(param, name, widget):
+        param.set(name, str(widget.text()))
+
+    @staticmethod
+    def CreateWidget(info):
+        name, label, parm_type, default = info
+
+        if parm_type is medic.Types.Null or\
+           parm_type is medic.Types.BoolArray or\
+           parm_type is medic.Types.IntArray or\
+           parm_type is medic.Types.FloatArray or\
+           parm_type is medic.Types.StringArray:
+            print "This type parameter is not supported yet : %s" % parm_type
+            return None, None
+
+        widget = None
+        function = None
+
+        if parm_type == medic.Types.Bool:
+            widget = QtWidgets.QCheckBox()
+            widget.setChecked(default)
+            function = ParameterFunctions.SetBool
+
+        elif parm_type == medic.Types.Int:
+            widget = NumericLine.CreateIntLine()
+            widget.setText(str(default))
+            function = ParameterFunctions.SetInt
+
+        elif parm_type == medic.Types.Float:
+            widget = NumericLine.CreateFloatLine()
+            widget.setText(str(default))
+            function = ParameterFunctions.SetFloat
+
+        elif parm_type == medic.Types.String:
+            widget = QtWidgets.QLineEdit()
+            widget.setText(default)
+            function = ParameterFunctions.SetString
+
+        widget.setObjectName("parameter_widget")
+
+        return widget, function
 
 
 class BrowserButtonWidget(QtWidgets.QFrame):
@@ -52,7 +123,7 @@ class StatusLabel(QtWidgets.QLabel):
     def __init__(self, parent=None):
         super(StatusLabel, self).__init__(parent=parent)
         self.setObjectName("status_label")
-        self.setFixedWidth(50)
+        self.setFixedWidth(70)
         self.__ready_icon = QtGui.QPixmap(os.path.join(IconDir, "success.png")).scaled(16, 16)
         self.__success_icon = QtGui.QPixmap(os.path.join(IconDir, "success.png")).scaled(16, 16)
         self.__failure_icon = QtGui.QPixmap(os.path.join(IconDir, "failure.png")).scaled(16, 16)
@@ -65,6 +136,40 @@ class StatusLabel(QtWidgets.QLabel):
             self.setText("<font color='#1cc033'>Success</font>")
         else:
             self.setText("<font color='#eb2b66'>Failure</font>")
+
+
+class TesterList(QtWidgets.QListView):
+    TesterChanged = QtCore.Signal("QModelIndex")
+
+    def __init__(self, parent=None):
+        super(TesterList, self).__init__(parent=parent)
+        self.setObjectName("medic_tester_list")
+        self.setAlternatingRowColors(True)
+        self.setUniformItemSizes(True)
+        self.source_model = model.TesterModel()
+        self.delegate = delegate.TesterDelegate()
+        self.setItemDelegate(self.delegate)
+        self.setModel(self.source_model)
+        self.__current_tester = None
+
+    def currentTester(self):
+        return self.__current_tester
+
+    def reset(self):
+        self.clearSelection()
+        self.__current_tester = None
+
+    def mousePressEvent(self, evnt):
+        if QtCore.Qt.MouseButton.LeftButton == evnt.button():
+            index = self.indexAt(evnt.pos())
+            if index.row() < 0:
+                self.clearSelection()
+                self.__current_tester = None
+            else:
+                self.__current_tester = self.source_model.data(index, model.TesterItemRole)
+
+            self.TesterChanged.emit(index)
+            super(TesterList, self).mousePressEvent(evnt)
 
 
 class KarteList(QtWidgets.QListView):
@@ -97,16 +202,225 @@ class KarteList(QtWidgets.QListView):
             super(KarteList, self).mousePressEvent(evnt)
 
 
-class TesterList(QtWidgets.QListView):
+class NumericLine(QtWidgets.QLineEdit):
+    RegexInt = re.compile("[^0-9-]")
+    RegexFloat = re.compile("[^0-9-.]")
+
     def __init__(self, parent=None):
-        super(TesterList, self).__init__(parent=parent)
-        self.setObjectName("medic_tester_list")
-        self.setAlternatingRowColors(True)
-        self.setUniformItemSizes(True)
-        self.source_model = model.TesterModel()
-        self.delegate = delegate.TesterDelegate()
-        self.setItemDelegate(self.delegate)
+        super(NumericLine, self).__init__(parent)
+        self.__regex = None
+        self.textEdited.connect(self.__regexCheck)
+
+    def __regexCheck(self, txt):
+        if self.__regex and txt:
+            self.setText(self.__regex.sub("", txt))
+
+    @staticmethod
+    def CreateIntLine():
+        e = NumericLine()
+        e.__regex = NumericLine.RegexInt
+        return e
+
+    @staticmethod
+    def CreateFloatLine():
+        e = NumericLine()
+        e.__regex = NumericLine.RegexFloat
+        return e
+
+
+class ReportItem(QtWidgets.QListWidgetItem):
+    def __init__(self, report, parent=None):
+        super(ReportItem, self).__init__(parent)
+        self.__report = report
+        self.setText(report.node().name())
+
+    def report(self):
+        return self.__report
+
+
+class ReportList(QtWidgets.QListView):
+    def __init__(self, parent=None):
+        super(ReportList, self).__init__(parent)
+        self.source_model = model.ReportModel()
         self.setModel(self.source_model)
+        self.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
+        self.delegate = delegate.ReportDelegate()
+        self.setItemDelegate(self.delegate)
+        self.setAlternatingRowColors(True)
+
+    def setReports(self, reports):
+        self.source_model.setReports(reports)
+
+
+class TesterDetailWidget(QtWidgets.QWidget):
+    def __init__(self, parent=None):
+        super(TesterDetailWidget, self).__init__(parent)
+        self.setObjectName("tester_detail_widget")
+        self.__tester_item = None
+        self.__params = []
+        self.__param_container = None
+
+        self.__qt_top_layout = None
+        self.__qt_parameter_layout = None
+        self.__qt_bottom_layout = None
+        self.__qt_test_label = None
+        self.__qt_report_list = None
+        self.__qt_fix_selected_button = None
+        self.__qt_fix_all_button = None
+
+        self.__createWidgets()
+        self.__clear()
+
+    def onReset(self):
+        self.__clear()
+
+    def reset(self):
+        self.__clear()
+
+    def setTesterItem(self, testerItem):
+        self.__tester_item = testerItem
+        self.__setTester(self.__tester_item)
+        self.__setReports(self.__tester_item.reports())
+
+    def __setTester(self, testerItem):
+        self.__setTesterName(testerItem.name())
+        self.__setDescription(testerItem.description())
+        self.__clearParameters()
+        self.__setParameters(testerItem.parameters())
+        self.__setFixable(testerItem.isFixable())
+
+    def __setReports(self, reports):
+        self.__qt_report_list.setReports(reports)
+
+    def __createWidgets(self):
+        main_layout = QtWidgets.QVBoxLayout()
+        self.setLayout(main_layout)
+        main_layout.setContentsMargins(0, 0, 0, 0)
+
+        # frame
+        frame = QtWidgets.QFrame()
+        frame.setObjectName("detail_frame")
+        main_layout.addWidget(frame)
+        frame_layout = QtWidgets.QVBoxLayout()
+        frame.setLayout(frame_layout)
+        frame_layout.setContentsMargins(10, 10, 10, 10)
+
+        # layout
+        self.__qt_parameter_layout = QtWidgets.QVBoxLayout()
+        button_layout = QtWidgets.QHBoxLayout()
+
+        # widgets
+        self.__qt_tester_label = QtWidgets.QLabel()
+        self.__qt_description = QtWidgets.QTextEdit()
+        self.__qt_description.setFixedHeight(50)
+        self.__qt_description.setReadOnly(True)
+        self.__qt_tester_label.setObjectName("detail_tester_label")
+        self.__qt_description.setObjectName("detail_tester_description")
+        self.__qt_report_list = ReportList()
+        self.__qt_report_list.setObjectName("detial_report_list")
+        self.__qt_fix_selected_button = QtWidgets.QPushButton("Fix Selected")
+        self.__qt_fix_all_button = QtWidgets.QPushButton("Fix All")
+        self.__qt_fix_selected_button.setObjectName("detail_button")
+        self.__qt_fix_all_button.setObjectName("detail_button")
+        self.__qt_fix_selected_button.setMaximumWidth(100)
+        self.__qt_fix_all_button.setMaximumWidth(100)
+
+        button_layout.addWidget(self.__qt_fix_selected_button)
+        button_layout.addWidget(self.__qt_fix_all_button)
+
+        frame_layout.addWidget(self.__qt_tester_label)
+        frame_layout.addSpacing(20)
+        frame_layout.addWidget(self.__qt_description)
+        frame_layout.addWidget(self.__qt_report_list)
+        frame_layout.addLayout(self.__qt_parameter_layout)
+        frame_layout.addLayout(button_layout)
+
+    def __clear(self):
+        self.__qt_report_list.setReports([])
+        self.__setTesterName("")
+        self.__setFixable(False)
+        self.__setDescription("")
+        self.__clearParameters()
+
+    def __setTesterName(self, name):
+        self.__qt_tester_label.setText(name)
+
+    def __setDescription(self, desc):
+        self.__qt_description.setText(desc)
+
+    def __setFixable(self, enable):
+        self.__qt_fix_selected_button.setEnabled(enable)
+        self.__qt_fix_all_button.setEnabled(enable)
+
+    def __clearLayout(self, layout):
+        while (True):
+            item = layout.takeAt(0)
+            if item:
+                l = item.layout()
+                w = item.widget()
+                if l:
+                    self.__clearLayout(l)
+                if w:
+                    layout.removeWidget(w)
+                    w.setParent(None)
+
+            else:
+                break
+
+    def __clearParameters(self):
+        self.__params = []
+        self.__param_container = None
+        self.__clearLayout(self.__qt_parameter_layout)
+
+    def __setParameters(self, params):
+        self.__param_container = params
+        for info in params.getParamInfos():
+            p_name, p_label, p_type, p_default = info
+            widget, function = ParameterFunctions.CreateWidget(info)
+            if widget:
+                layout = QtWidgets.QHBoxLayout()
+                label = QtWidgets.QLabel(p_label)
+                label.setObjectName("parameter_label")
+                layout.addWidget(label)
+                layout.addWidget(widget)
+
+                self.__params.append({"name": p_name, "widget": widget, "function": function})
+                self.__qt_parameter_layout.addLayout(layout)
+
+    # def __fixAll(self):
+    #     ParameterFunctions.SetParmeterValue(self.__param_container, self.__params)
+    #     failed = []
+    #     while (self.__qt_report_list.count() != 0):
+    #         report_item = self.__qt_report_list.item(0)
+    #         if not self.__plugin.Tester.fix(report_item.report(), self.__param_container):
+    #             failed.append(report_item.report())
+    #         else:
+    #             PyblishFunction.RemoveReport(self.__plugin, report_item.report())
+
+    #         t_i = self.__qt_report_list.takeItem(0)
+    #         del t_i
+
+    #     for report in failed:
+    #         self.__qt_report_list.addReport(report)
+
+    # def __fixSelected(self):
+    #     ParameterFunctions.SetParmeterValue(self.__param_container, self.__params)
+    #     indices = []
+    #     reports = []
+    #     for report_item in self.__qt_report_list.selectedItems():
+    #         report = report_item.report()
+    #         if self.__plugin.Tester.fix(report, self.__param_container):
+    #             indices.append(self.__qt_report_list.indexFromItem(report_item).row())
+    #             reports.append(report)
+
+    #     indices.sort()
+    #     indices.reverse()
+    #     for i in indices:
+    #         t_i = self.__qt_report_list.takeItem(i)
+    #         del t_i
+
+    #     for report in reports:
+    #         PyblishFunction.RemoveReport(self.__plugin, report)
 
 
 class TopBarWidget(QtWidgets.QFrame):
@@ -223,6 +537,7 @@ class MainWidget(QtWidgets.QWidget):
         if self.__phase is 0:
             able_back = False
             able_next = True if self.__kartes_widget.currentKarte() else False
+            self.__testers_widget.reset()
         else:
             able_back = True
             able_next = False
@@ -239,19 +554,22 @@ class MainWidget(QtWidgets.QWidget):
         self.setLayout(main_layout)
         self.__kartes_widget = KarteList()
         self.__testers_widget = TesterList()
+        self.__detail_widget = TesterDetailWidget()
 
         ## phase 0
         main_layout.addWidget(self.__kartes_widget)
         self.__phase_widgets[0] = [self.__kartes_widget]
 
         ## phase 2
-        v_layout = QtWidgets.QHBoxLayout()
-        v_layout.addWidget(self.__testers_widget)
-        self.__phase_widgets[1] = [self.__testers_widget]
-        main_layout.addLayout(v_layout)
+        h_layout = QtWidgets.QHBoxLayout()
+        h_layout.addWidget(self.__testers_widget)
+        h_layout.addWidget(self.__detail_widget)
+        self.__phase_widgets[1] = [self.__testers_widget, self.__detail_widget]
+        main_layout.addLayout(h_layout)
 
         ## signal
         self.__kartes_widget.KarteChanged.connect(self.__karteChanged)
+        self.__testers_widget.TesterChanged.connect(self.__testerChanged)
 
     def reset(self):
         karte_item = self.__kartes_widget.currentKarte()
@@ -260,16 +578,35 @@ class MainWidget(QtWidgets.QWidget):
             self.StatusChanged.emit(model.Ready)
             self.update()
 
+        tester_item = self.__testers_widget.currentTester()
+        self.__detail_widget.reset()
+        if tester_item:
+            self.__detail_widget.setTesterItem(tester_item)
+
     def test(self):
+        self.__detail_widget.reset()
+
         karte_item = self.__kartes_widget.currentKarte()
         if karte_item:
             karte_item.testAll(testerCallback=self.forceUpdate)
             self.StatusChanged.emit(karte_item.status())
             self.update()
 
+        tester_item = self.__testers_widget.currentTester()
+
+        if tester_item:
+            self.__detail_widget.setTesterItem(tester_item)
+
     def forceUpdate(self):
         self.update()
         QtWidgets.QApplication.processEvents()
+
+    def __testerChanged(self, current):
+        tester_item = self.__testers_widget.model().data(current, model.TesterItemRole)
+        if tester_item:
+            self.__detail_widget.setTesterItem(tester_item)
+        else:
+            self.__detail_widget.reset()
 
     def __karteChanged(self, current):
         able_back = False if self.__phase is 0 else True
