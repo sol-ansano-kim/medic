@@ -10,11 +10,28 @@ VisitorRole = QtCore.Qt.UserRole + 4
 TesterRole = QtCore.Qt.UserRole + 5
 TesterItemRole = QtCore.Qt.UserRole + 6
 StatusRole = QtCore.Qt.UserRole + 7
+ReportRole = QtCore.Qt.UserRole + 8
+ReportItemRole = QtCore.Qt.UserRole + 9
+NodeRole = QtCore.Qt.UserRole + 10
 
 
 Ready = 0
 Success = 1
 Failure = 2
+
+
+class ReportItem(object):
+    def __init__(self, report):
+        self.__report = report
+
+    def report(self):
+        return self.__report
+
+    def node(self):
+        return self.__report.node()
+
+    def name(self):
+        return self.__report.node().name()
 
 
 class TesterItem(object):
@@ -52,7 +69,7 @@ class TesterItem(object):
         self.__status = Ready
 
         visitor.test(karte, self.__tester)
-        self.__reports = visitor.report(self.__tester)
+        self.__reports = map(ReportItem, visitor.report(self.__tester))
 
         if not self.__reports:
             self.__status = Success
@@ -179,19 +196,28 @@ class TesterModel(QtCore.QAbstractListModel):
 class ReportModel(QtCore.QAbstractListModel):
     def __init__(self, parent=None):
         super(ReportModel, self).__init__(parent=parent)
-        self.__reports = []
+        self.__report_items = []
 
-    def setReports(self, reports):
+    def setReportItems(self, report_items):
         self.beginResetModel()
-        self.__reports = reports
+        self.__report_items = report_items
         self.endResetModel()
 
     def rowCount(self, parent=None):
-        return len(self.__reports)
+        return len(self.__report_items)
 
     def data(self, index, role):
         if index.row() < 0 or index.row() > self.rowCount():
             return None
 
         if role == DisplayRole:
-            return self.__reports[index.row()].node().name()
+            return self.__report_items[index.row()].name()
+
+        if role == ReportRole:
+            return self.__report_items[index.row()].report()
+
+        if role == ReportItemRole:
+            return self.__report_items[index.row()]
+
+        if role == NodeRole:
+            return self.__report_items[index.row()].node()

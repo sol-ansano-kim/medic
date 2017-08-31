@@ -1,6 +1,7 @@
 from Qt import QtWidgets, QtCore, QtGui
 from . import model
 from . import delegate
+from . import functions
 import medic
 import os
 import re
@@ -246,16 +247,6 @@ class NumericLine(QtWidgets.QLineEdit):
         return e
 
 
-class ReportItem(QtWidgets.QListWidgetItem):
-    def __init__(self, report, parent=None):
-        super(ReportItem, self).__init__(parent)
-        self.__report = report
-        self.setText(report.node().name())
-
-    def report(self):
-        return self.__report
-
-
 class ReportList(QtWidgets.QListView):
     def __init__(self, parent=None):
         super(ReportList, self).__init__(parent)
@@ -266,8 +257,26 @@ class ReportList(QtWidgets.QListView):
         self.setItemDelegate(self.delegate)
         self.setAlternatingRowColors(True)
 
-    def setReports(self, reports):
-        self.source_model.setReports(reports)
+    def setReportItems(self, report_items):
+        self.source_model.setReportItems(report_items)
+
+    def selectionChanged(self, selected, deselected):
+        indexes = selected.indexes()
+        functions.ClearSelection()
+
+        for index in self.selectedIndexes():
+            report = self.source_model.data(index, model.ReportRole)
+            report.addSelection()
+
+        super(ReportList, self).selectionChanged(selected, deselected)
+
+    def mousePressEvent(self, evnt):
+        if QtCore.Qt.MouseButton.LeftButton == evnt.button():
+            index = self.indexAt(evnt.pos())
+            if index.row() < 0:
+                self.clearSelection()
+
+        super(ReportList, self).mousePressEvent(evnt)
 
 
 class TesterDetailWidget(QtWidgets.QWidget):
@@ -298,7 +307,7 @@ class TesterDetailWidget(QtWidgets.QWidget):
     def setTesterItem(self, testerItem):
         self.__tester_item = testerItem
         self.__setTester(self.__tester_item)
-        self.__setReports(self.__tester_item.reports())
+        self.__setReportItems(self.__tester_item.reports())
 
     def __setTester(self, testerItem):
         self.__setTesterName(testerItem.name())
@@ -307,8 +316,8 @@ class TesterDetailWidget(QtWidgets.QWidget):
         self.__setParameters(testerItem.parameters())
         self.__setFixable(testerItem.isFixable())
 
-    def __setReports(self, reports):
-        self.__qt_report_list.setReports(reports)
+    def __setReportItems(self, report_items):
+        self.__qt_report_list.setReportItems(report_items)
 
     def __createWidgets(self):
         main_layout = QtWidgets.QVBoxLayout()
@@ -354,7 +363,7 @@ class TesterDetailWidget(QtWidgets.QWidget):
         frame_layout.addLayout(button_layout)
 
     def __clear(self):
-        self.__qt_report_list.setReports([])
+        self.__qt_report_list.setReportItems([])
         self.__setTesterName("")
         self.__setFixable(False)
         self.__setDescription("")
