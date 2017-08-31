@@ -107,6 +107,12 @@ class KarteItem(object):
             if testerCallback:
                 testerCallback()
 
+    def test(self, tester, testerCallback=None):
+        self.reset()
+        tester.test(self.__karte, self.__visitor)
+        if testerCallback:
+            testerCallback()
+
     def reset(self):
         self.__visitor.reset()
         for tester in self.__tester_items:

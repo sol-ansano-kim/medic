@@ -141,6 +141,7 @@ class StatusLabel(QtWidgets.QLabel):
 
 class TesterList(QtWidgets.QListView):
     TesterChanged = QtCore.Signal("QModelIndex")
+    SingleTestTriggered = QtCore.Signal()
 
     def __init__(self, parent=None):
         super(TesterList, self).__init__(parent=parent)
@@ -173,13 +174,24 @@ class TesterList(QtWidgets.QListView):
         super(TesterList, self).selectionChanged(selected, deselected)
 
     def mousePressEvent(self, evnt):
+        super(TesterList, self).mousePressEvent(evnt)
+
         if QtCore.Qt.MouseButton.LeftButton == evnt.button():
             index = self.indexAt(evnt.pos())
             if index.row() < 0:
                 self.__current_tester = None
                 self.clearSelection()
 
-        super(TesterList, self).mousePressEvent(evnt)
+        elif QtCore.Qt.MouseButton.RightButton == evnt.button():
+            menu = QtWidgets.QMenu(self)
+            test = QtWidgets.QAction("Single Test", menu)
+            menu.addAction(test)
+            pos = self.mapToGlobal(evnt.pos())
+            menu.popup(QtCore.QPoint(pos.x() - 10, pos.y() - 10))
+            test.triggered.connect(self.__testTriggered)
+
+    def __testTriggered(self):
+        self.SingleTestTriggered.emit()
 
 
 class KarteList(QtWidgets.QListView):
@@ -603,6 +615,7 @@ class MainWidget(QtWidgets.QWidget):
         self.__kartes_widget.KarteChanged.connect(self.__karteChanged)
         self.__testers_widget.TesterChanged.connect(self.__testerChanged)
         self.__detail_widget.ReportsChanged.connect(self.__reportsChanged)
+        self.__testers_widget.SingleTestTriggered.connect(self.__singleTest)
 
     def reset(self):
         karte_item = self.__kartes_widget.currentKarte()
@@ -628,6 +641,19 @@ class MainWidget(QtWidgets.QWidget):
         tester_item = self.__testers_widget.currentTester()
 
         if tester_item:
+            self.__detail_widget.setTesterItem(tester_item)
+
+    def __singleTest(self):
+        self.__detail_widget.reset()
+
+        karte_item = self.__kartes_widget.currentKarte()
+        tester_item = self.__testers_widget.currentTester()
+
+        if karte_item and tester_item:
+            karte_item.test(tester_item, testerCallback=self.forceUpdate)
+            self.StatusChanged.emit(karte_item.status())
+            self.update()
+
             self.__detail_widget.setTesterItem(tester_item)
 
     def forceUpdate(self):
