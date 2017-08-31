@@ -159,17 +159,26 @@ class TesterList(QtWidgets.QListView):
         self.clearSelection()
         self.__current_tester = None
 
+    def selectionChanged(self, selected, deselected):
+        indexes = selected.indexes()
+        if not indexes:
+            self.clearSelection()
+            self.__current_tester = None
+            self.TesterChanged.emit(None)
+        else:
+            self.__current_tester = self.source_model.data(indexes[0], model.TesterItemRole)
+            self.TesterChanged.emit(indexes[0])
+
+        super(TesterList, self).selectionChanged(selected, deselected)
+
     def mousePressEvent(self, evnt):
         if QtCore.Qt.MouseButton.LeftButton == evnt.button():
             index = self.indexAt(evnt.pos())
             if index.row() < 0:
-                self.clearSelection()
                 self.__current_tester = None
-            else:
-                self.__current_tester = self.source_model.data(index, model.TesterItemRole)
+                self.clearSelection()
 
-            self.TesterChanged.emit(index)
-            super(TesterList, self).mousePressEvent(evnt)
+        super(TesterList, self).mousePressEvent(evnt)
 
 
 class KarteList(QtWidgets.QListView):
@@ -189,17 +198,26 @@ class KarteList(QtWidgets.QListView):
     def currentKarte(self):
         return self.__current_karte
 
+    def selectionChanged(self, selected, deselected):
+        indexes = selected.indexes()
+        if not indexes:
+            self.clearSelection()
+            self.__current_karte = None
+            self.KarteChanged.emit(None)
+        else:
+            self.__current_karte = self.source_model.data(indexes[0], model.KarteItemRole)
+            self.KarteChanged.emit(indexes[0])
+
+        super(KarteList, self).selectionChanged(selected, deselected)
+
     def mousePressEvent(self, evnt):
         if QtCore.Qt.MouseButton.LeftButton == evnt.button():
             index = self.indexAt(evnt.pos())
             if index.row() < 0:
                 self.clearSelection()
                 self.__current_karte = None
-            else:
-                self.__current_karte = self.source_model.data(index, model.KarteItemRole)
 
-            self.KarteChanged.emit(index)
-            super(KarteList, self).mousePressEvent(evnt)
+        super(KarteList, self).mousePressEvent(evnt)
 
 
 class NumericLine(QtWidgets.QLineEdit):
