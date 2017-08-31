@@ -280,6 +280,8 @@ class ReportList(QtWidgets.QListView):
 
 
 class TesterDetailWidget(QtWidgets.QWidget):
+    ReportsChanged = QtCore.Signal()
+
     def __init__(self, parent=None):
         super(TesterDetailWidget, self).__init__(parent)
         self.setObjectName("tester_detail_widget")
@@ -362,7 +364,11 @@ class TesterDetailWidget(QtWidgets.QWidget):
         frame_layout.addLayout(self.__qt_parameter_layout)
         frame_layout.addLayout(button_layout)
 
+        self.__qt_fix_all_button.clicked.connect(self.__fixAll)
+        self.__qt_fix_selected_button.clicked.connect(self.__fixSelected)
+
     def __clear(self):
+        self.__tester_item = None
         self.__qt_report_list.setReportItems([])
         self.__setTesterName("")
         self.__setFixable(False)
@@ -414,40 +420,39 @@ class TesterDetailWidget(QtWidgets.QWidget):
                 self.__params.append({"name": p_name, "widget": widget, "function": function})
                 self.__qt_parameter_layout.addLayout(layout)
 
-    # def __fixAll(self):
-    #     ParameterFunctions.SetParmeterValue(self.__param_container, self.__params)
-    #     failed = []
-    #     while (self.__qt_report_list.count() != 0):
-    #         report_item = self.__qt_report_list.item(0)
-    #         if not self.__plugin.Tester.fix(report_item.report(), self.__param_container):
-    #             failed.append(report_item.report())
-    #         else:
-    #             PyblishFunction.RemoveReport(self.__plugin, report_item.report())
+    def __fixAll(self):
+        if self.__tester_item:
+            ParameterFunctions.SetParmeterValue(self.__param_container, self.__params)
 
-    #         t_i = self.__qt_report_list.takeItem(0)
-    #         del t_i
+            remove_items = []
 
-    #     for report in failed:
-    #         self.__qt_report_list.addReport(report)
+            for report in self.__tester_item.reports():
+                if self.__tester_item.fix(report, self.__param_container):
+                    remove_items.append(report)
 
-    # def __fixSelected(self):
-    #     ParameterFunctions.SetParmeterValue(self.__param_container, self.__params)
-    #     indices = []
-    #     reports = []
-    #     for report_item in self.__qt_report_list.selectedItems():
-    #         report = report_item.report()
-    #         if self.__plugin.Tester.fix(report, self.__param_container):
-    #             indices.append(self.__qt_report_list.indexFromItem(report_item).row())
-    #             reports.append(report)
+            self.__tester_item.removeReports(remove_items)
 
-    #     indices.sort()
-    #     indices.reverse()
-    #     for i in indices:
-    #         t_i = self.__qt_report_list.takeItem(i)
-    #         del t_i
+            self.__setReportItems(self.__tester_item.reports())
 
-    #     for report in reports:
-    #         PyblishFunction.RemoveReport(self.__plugin, report)
+            self.ReportsChanged.emit()
+
+    def __fixSelected(self):
+        if self.__tester_item:
+            ParameterFunctions.SetParmeterValue(self.__param_container, self.__params)
+
+            remove_items = []
+            all_reports = self.__tester_item.reports()
+
+            for index in map(lambda x: x.row(), self.__qt_report_list.selectedIndexes()):
+                report = all_reports[index]
+                if self.__tester_item.fix(report, self.__param_container):
+                    remove_items.append(report)
+
+            self.__tester_item.removeReports(remove_items)
+
+            self.__setReportItems(self.__tester_item.reports())
+
+            self.ReportsChanged.emit()
 
 
 class TopBarWidget(QtWidgets.QFrame):
@@ -597,6 +602,7 @@ class MainWidget(QtWidgets.QWidget):
         ## signal
         self.__kartes_widget.KarteChanged.connect(self.__karteChanged)
         self.__testers_widget.TesterChanged.connect(self.__testerChanged)
+        self.__detail_widget.ReportsChanged.connect(self.__reportsChanged)
 
     def reset(self):
         karte_item = self.__kartes_widget.currentKarte()
@@ -634,6 +640,11 @@ class MainWidget(QtWidgets.QWidget):
             self.__detail_widget.setTesterItem(tester_item)
         else:
             self.__detail_widget.reset()
+
+    def __reportsChanged(self):
+        self.__testers_widget.update()
+        karte_item = self.__kartes_widget.currentKarte()
+        self.StatusChanged.emit(karte_item.status())
 
     def __karteChanged(self, current):
         able_back = False if self.__phase is 0 else True

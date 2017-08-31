@@ -65,6 +65,20 @@ class TesterItem(object):
     def isFixable(self):
         return self.__tester.IsFixable()
 
+    def fix(self, report, param):
+        if report not in self.__reports:
+            return False
+
+        return self.__tester.fix(report.report(), param)
+
+    def removeReports(self, reports):
+        for report in reports:
+            if report in self.__reports:
+                self.__reports.remove(report)
+
+        if not self.__reports:
+            self.__status = Success
+
     def test(self, karte, visitor):
         self.__status = Ready
 
