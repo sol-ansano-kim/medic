@@ -332,6 +332,8 @@ class TesterDetailWidget(QtWidgets.QWidget):
 
     def __setReportItems(self, report_items):
         self.__qt_report_list.setReportItems(report_items)
+        if not report_items:
+            self.__setFixable(False)
 
     def __createWidgets(self):
         main_layout = QtWidgets.QVBoxLayout()
