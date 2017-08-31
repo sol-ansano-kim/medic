@@ -27,6 +27,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setStyleSheet(style)
 
     def __makeWidgets(self):
+        self.setMinimumWidth(450)
+        self.setMinimumHeight(300)
         self.__central_widget = QtWidgets.QWidget()
         self.__central_layout = QtWidgets.QVBoxLayout()
         self.setCentralWidget(self.__central_widget)
