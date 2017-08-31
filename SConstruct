@@ -3,6 +3,8 @@ from excons.tools import maya
 from excons.tools import python
 import os
 import sys
+import shutil
+import re
 
 
 major = 1
@@ -13,6 +15,9 @@ os.environ["PYTHONPATH"] = os.environ.get("PYTHONPATH", "") + os.pathsep + os.pa
 maya.SetupMscver()
 
 env = excons.MakeBaseEnv()
+
+do_pacakage = int(excons.GetArgument("package", 0)) != 0
+
 
 if sys.platform == "win32":
     excons.SetArgument("with-cython", os.path.abspath("cython/bin/cython.bat"))
@@ -43,6 +48,7 @@ except:
 out_incdir = excons.OutputBaseDirectory() + "/include"
 out_libdir = excons.OutputBaseDirectory() + "/lib/" + mayaver
 out_pydir = excons.OutputBaseDirectory() + "/py/" + mayaver
+package_dir = "%s/package/medic_%s_%s/medic" % (excons.OutputBaseDirectory(), sys.platform, mayaver)
 
 ## cython
 run_cython = False
@@ -75,7 +81,35 @@ if custom_plugins:
 
 
 ## build
-headers = excons.glob("include/*")
+headers = excons.glob("include/medic/*")
+
+
+def Pacakage(target, source, env):
+    path = target[0].get_path()
+    path_split = re.split(r"[\\/]", path)
+
+    dirname = package_dir
+
+    if "include" in path_split:
+        dirname = os.path.join(package_dir, "include/medic")
+    elif "lib" in path_split:
+        dirname = os.path.join(package_dir, "lib")
+    elif "bin" in path_split:
+        dirname = os.path.join(package_dir, "bin")
+    elif "Karte" in path_split:
+        dirname = os.path.join(package_dir, "plugins/Karte")
+    elif "Tester" in path_split:
+        dirname = os.path.join(package_dir, "plugins/Tester")
+    elif "py" in path_split:
+        dirname = os.path.join(package_dir, "py")
+
+    if not os.path.isdir(dirname):
+        os.makedirs(dirname)
+
+    out_path = os.path.join(dirname, os.path.basename(path))
+    if not os.path.isfile(out_path):
+        print "Package : %s -> %s" % (path, out_path)
+        shutil.copy(path, out_path)
 
 
 prjs.append({"name": "medic",
@@ -87,8 +121,15 @@ prjs.append({"name": "medic",
              "prefix": mayaver,
              "srcs": excons.glob("src/core/*.cpp"),
              "symvis": "default",
-             "install": {out_incdir: headers},
+             "install": {out_incdir + "/medic": headers},
              "custom": customs})
+
+if do_pacakage:
+    prjs.append({"name": "packageHeaders",
+                 "type": "install",
+                 "alias": "medic-package",
+                 "install": {os.path.join(package_dir, "include/medic"): headers}})
+
 
 prjs.append({"name": "_medic",
              "type": "dynamicmodule",
@@ -107,8 +148,13 @@ prjs.append({"name": "_medic",
              "install": {out_pydir: ["src/py/medic.py"]},
              "custom": customs + [python.SoftRequire]})
 
-# plugins
+if do_pacakage:
+    prjs.append({"name": "pacakgeMedicPy",
+                 "type": "install",
+                 "alias": "medic-package",
+                 "install": {os.path.join(package_dir, "py"): ["src/py/medic.py"]}})
 
+# plugins
 for plug in excons.glob("plugins/Tester/*.cpp"):
     prjs.append({"name": os.path.splitext(os.path.basename(plug))[0],
                  "type": "dynamicmodule",
@@ -127,17 +173,29 @@ for plug in excons.glob("plugins/Tester/*.cpp"):
 
 py_plugs = excons.glob("plugins/Tester/*.py")
 if py_plugs:
-    prjs.append({"name": "medicPyPlugins",
+    prjs.append({"name": "pyPlugins",
                  "type": "install",
                  "alias": "medic-py-plugins",
                  "install": {"plugins/%s/Tester" % (mayaver): py_plugs}})
+    if do_pacakage:
+        prjs.append({"name": "packagePyPlugins",
+                     "type": "install",
+                     "alias": "medic-package",
+                     "install": {os.path.join(package_dir, "plugins/Tester"): py_plugs}})
+
 
 kartes = excons.glob("plugins/Karte/*.karte")
 if kartes:
-    prjs.append({"name": "medicKartes",
+    prjs.append({"name": "kartes",
                  "type": "install",
                  "alias": "medic-kartes",
                  "install": {"plugins/%s/Karte" % (mayaver): kartes}})
+
+    if do_pacakage:
+        prjs.append({"name": "packageKarte",
+                     "type": "install",
+                     "alias": "medic-package",
+                     "install": {os.path.join(package_dir, "plugins/Karte"): kartes}})
 
 if custom_cpp:
     for cpp in custom_cpp:
@@ -162,6 +220,33 @@ if custom_py:
                  "alias": "medic-custom-py-plugins",
                  "install": {"custom/%s/Tester" % (mayaver): custom_py}})
 
+    if do_pacakage:
+        prjs.append({"name": "packageCustomPyPlugin",
+                     "type": "install",
+                     "alias": "medic-package",
+                     "install": {os.path.join(package_dir, "plugins/Tester"): custom_py}})
+
+
+prjs.append({"name": "medicUI",
+             "type": "install",
+             "alias": "medic-ui",
+             "install": {out_pydir: ["python/medicUI"]}})
+if do_pacakage:
+    prjs.append({"name": "packageUI",
+                 "type": "install",
+                 "alias": "medic-package",
+                 "install": {os.path.join(package_dir, "py"): ["python/medicUI"]}})
+
+
+if do_pacakage:
+    for prj in prjs:
+        if prj["type"] != "install":
+            prj["post"] = Pacakage
+
+    prjs.append({"name": "packageMod",
+                 "type": "install",
+                 "alias": "medic-package",
+                 "install": {os.path.join(package_dir, ".."): ["medic.mod"]}})
 
 
 excons.DeclareTargets(env, prjs)

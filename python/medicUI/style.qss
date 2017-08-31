@@ -1,0 +1,204 @@
+QWidget
+{
+    font-family: Helvetica;
+    background-color: rgb(255, 255, 255);
+    color: rgb(0, 0, 0);
+}
+
+QFrame#medic_top_bar
+{
+    border-bottom: 1px solid gray;
+    margin-bottom: 0.1px;
+}
+
+QFrame#detail_frame
+{
+    background-color: rgb(227, 227, 227);
+}
+
+QFrame#medic_top_bar, QFrame#medic_browser_buttons_widget
+{
+    background-color: rgb(235, 235, 235);
+}
+
+QLabel
+{
+    color: rgb(53, 53, 53);
+    margin-right: 20px;
+    font-size: 18px;
+    background-color: rgb(235, 235, 235);
+}
+
+QLabel#status_label
+{
+    font-size: 14px;
+}
+
+QLabel#detail_tester_label
+{
+    background: transparent;
+}
+
+QLabel#parameter_label
+{
+    background: transparent;
+    font-size: 12px;
+}
+
+QPushButton
+{
+    color: rgb(140, 140, 140);
+    width: 24px;
+    height: 24px;
+}
+
+QPushButton#medic_browser_back
+{
+    background-color: rgb(246, 246, 246);
+    border-style: solid;
+    border-width: 0.5px;
+    border-radius: 4px;
+    border-color: rgb(199, 199, 199);
+    image: url("icons/backOn.png");
+}
+
+QPushButton#medic_browser_back::disabled
+{
+    image: url("icons/backOff.png");
+}
+
+QPushButton#medic_browser_next
+{
+    background-color: rgb(246, 246, 246);
+    border-style: solid;
+    border-width: 0.5px;
+    border-radius: 4px;
+    border-color: rgb(199, 199, 199);
+    image: url("icons/nextOn.png");
+}
+
+QPushButton#medic_browser_next::disabled
+{
+    image: url("icons/nextOff.png");
+}
+
+QPushButton#reset_button
+{
+    border: none;
+    background: transparent;
+    image: url("icons/reset.png");
+}
+
+QPushButton#reset_button::hover
+{
+    image: url("icons/resetHover.png");
+}
+
+QPushButton#reset_button::disabled
+{
+    image: url("icons/resetDisabled.png");
+}
+
+QPushButton#reset_button::pressed
+{
+    image: url("icons/resetPressed.png");
+}
+
+QPushButton#test_button
+{
+    border: none;
+    background: transparent;
+    image: url("icons/test.png");
+}
+
+QPushButton#test_button::hover
+{
+    image: url("icons/testHover.png");
+}
+
+QPushButton#test_button::disabled
+{
+    image: url("icons/testDisabled.png");
+}
+
+QPushButton#test_button::pressed
+{
+    image: url("icons/testPressed.png");
+}
+
+QPushButton#detail_button
+{
+    font-size: 11px;
+    border: 1px solid rgb(100, 100, 100);
+    border-radius: 5px;
+    background-color: rgb(255, 255, 255);
+    color: rgb(0, 12, 20);
+}
+
+QPushButton#detail_button::disabled
+{
+    color: rgb(175, 175, 175);
+}
+
+QPushButton#detail_button::pressed
+{
+    background-color: rgb(200, 200, 200);
+}
+
+QScrollBar
+{
+    border: none;
+    background: rgb(200, 200, 200);
+    margin: 0px 0px 0px 0px;
+}
+
+QScrollBar::handle
+{
+    background: white;
+    border: 1px solid rgb(200, 200, 200);
+    border-radius: 6px;
+}
+
+QScrollBar::add-page, QScrollBar::sub-page, QScrollBar::add-line, QScrollBar::sub-line, QScrollBar::up-arrow, QScrollBar::down-arrow, QScrollBar::left-arrow, QScrollBar::right-arrow
+{
+    background: none;
+    color: none;
+    border: none;
+}
+
+QListView
+{
+    border: none;
+}
+
+QListView#medic_tester_list
+{
+    font-size: 12px;
+}
+
+QListView#medic_karte_list
+{
+    font-size: 18px;
+}
+
+QListView#detial_report_list
+{
+    font-size: 12px;
+    border: none;
+    border-radius: 5px;
+    padding: 5px;
+    height: 20px;
+}
+
+QListView#detial_report_list::item
+{
+    height: 18px;
+}
+
+QTextEdit#detail_tester_description
+{
+    color: rgb(175, 175, 175);
+    font-size: 14px;
+    border: none;
+    background: transparent;
+}
