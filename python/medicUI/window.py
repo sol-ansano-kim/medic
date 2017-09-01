@@ -5,9 +5,13 @@ import os
 
 
 class MainWindow(QtWidgets.QMainWindow):
+    Name = "medic_main_window"
+    Title = "MEDIC"
+
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent=parent)
-        self.setObjectName("medic_main_window")
+        self.setObjectName(MainWindow.Name)
+        self.setWindowTitle(MainWindow.Title)
         self.__makeWidgets()
         self.__setStyleSheet()
 
