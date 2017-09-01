@@ -17,6 +17,7 @@ maya.SetupMscver()
 env = excons.MakeBaseEnv()
 
 do_pacakage = int(excons.GetArgument("package", 0)) != 0
+include_qt = int(excons.GetArgument("include-qt", 1)) != 0
 
 
 if sys.platform == "win32":
@@ -237,6 +238,17 @@ if do_pacakage:
                  "alias": "medic-package",
                  "install": {os.path.join(package_dir, "py"): ["python/medicUI"]}})
 
+if include_qt:
+    prjs.append({"name": "Qt",
+                 "type": "install",
+                 "alias": "Qt",
+                 "install": {os.path.join(out_pydir, "medicUI/qt"): ["Qt.py/Qt.py"]}})
+
+    if do_pacakage:
+        prjs.append({"name": "packageQt",
+                     "type": "install",
+                     "alias": "qt-package",
+                     "install": {os.path.join(package_dir, "py/medicUI/qt"): ["Qt.py/Qt.py"]}})
 
 if do_pacakage:
     for prj in prjs:
