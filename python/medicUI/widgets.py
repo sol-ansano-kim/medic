@@ -153,6 +153,10 @@ class TesterList(QtWidgets.QListView):
         self.setModel(self.source_model)
         self.__current_tester = None
 
+    def updateSelected(self):
+        for index in self.selectedIndexes():
+            self.update(index)
+
     def currentTester(self):
         return self.__current_tester
 
@@ -554,6 +558,7 @@ class MainWidget(QtWidgets.QWidget):
         self.__testers_widget = None
         self.__phase = 0
         self.__phase_widgets = {}
+        self.__callback_ids = []
 
         self.__makeWidgets()
         self.setPhase(0)
@@ -616,6 +621,17 @@ class MainWidget(QtWidgets.QWidget):
         self.__detail_widget.ReportsChanged.connect(self.__reportsChanged)
         self.__testers_widget.SingleTestTriggered.connect(self.__singleTest)
 
+        ## set maya event callback
+        self.__callback_ids.append(functions.registSceneOpenCallback(self.__sceneChanged))
+        self.__callback_ids.append(functions.registNewSceneOpenCallback(self.__sceneChanged))
+        self.destroyed.connect(self.__removeCallbacks)
+
+    def __removeCallbacks(self):
+        functions.removeCallbacks(self.__callback_ids)
+
+    def __sceneChanged(self, *args):
+        self.reset()
+
     def reset(self):
         karte_item = self.__kartes_widget.currentKarte()
         if karte_item:
@@ -667,7 +683,8 @@ class MainWidget(QtWidgets.QWidget):
             self.__detail_widget.reset()
 
     def __reportsChanged(self):
-        self.__testers_widget.update()
+        self.__testers_widget.updateSelected()
+
         karte_item = self.__kartes_widget.currentKarte()
         self.StatusChanged.emit(karte_item.status())
 
