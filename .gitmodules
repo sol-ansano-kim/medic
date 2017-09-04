@@ -6,4 +6,4 @@
 	url = https://github.com/cython/cython
 [submodule "Qt.py"]
 	path = Qt.py
-	url = git@github.com:mottosso/Qt.py.git
+	url = https://github.com/mottosso/Qt.py.git

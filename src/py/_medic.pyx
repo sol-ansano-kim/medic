@@ -436,6 +436,7 @@ cdef class Visitor:
 
     def test(self, karte, tester):
         if karte.hasPyTester(tester):
+            self.__report_cache.pop(tester, [])
             nodes = self.__nodes()
             for n in nodes:
                 if tester.Match(n):
@@ -453,6 +454,7 @@ cdef class Visitor:
         nodes = self.__nodes()
 
         for t in karte.pyTesters():
+            self.__report_cache.pop(t, [])
             for n in nodes:
                 if t.Match(n):
                     r = t.test(n)
