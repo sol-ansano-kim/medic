@@ -189,9 +189,13 @@ class TesterModel(QtCore.QAbstractListModel):
         self.__tester_items = []
 
     def setTesterItems(self, testerItems):
-        self.beginResetModel()
+        self.beginRemoveRows(QtCore.QModelIndex(), 0, len(self.__tester_items))
+        self.__tester_items = []
+        self.endRemoveRows()
+
+        self.beginInsertRows(QtCore.QModelIndex(), 0, len(testerItems))
         self.__tester_items = testerItems
-        self.endResetModel()
+        self.endInsertRows()
 
     def rowCount(self, parent=None):
         return len(self.__tester_items)
@@ -219,9 +223,13 @@ class ReportModel(QtCore.QAbstractListModel):
         self.__report_items = []
 
     def setReportItems(self, report_items):
-        self.beginResetModel()
+        self.beginRemoveRows(QtCore.QModelIndex(), 0, len(self.__report_items))
+        self.__report_items = []
+        self.endRemoveRows()
+
+        self.beginInsertRows(QtCore.QModelIndex(), 0, len(report_items))
         self.__report_items = report_items
-        self.endResetModel()
+        self.endInsertRows()
 
     def rowCount(self, parent=None):
         return len(self.__report_items)
