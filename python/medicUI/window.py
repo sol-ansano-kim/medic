@@ -26,7 +26,7 @@ class MainWindow(QtWidgets.QMainWindow):
         style = ""
         with open(qss_path, "r") as f:
             style = f.read()
-            style = style.replace('url("', 'url("%s/' % current_dir)
+            style = style.replace('url("', 'url("%s/' % current_dir.replace("\\", "/"))
 
         self.setStyleSheet(style)
 

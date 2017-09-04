@@ -146,7 +146,6 @@ class TesterList(QtWidgets.QListView):
     def __init__(self, parent=None):
         super(TesterList, self).__init__(parent=parent)
         self.setObjectName("medic_tester_list")
-        self.setAlternatingRowColors(True)
         self.setUniformItemSizes(True)
         self.source_model = model.TesterModel()
         self.delegate = delegate.TesterDelegate()
@@ -200,7 +199,6 @@ class KarteList(QtWidgets.QListView):
     def __init__(self, parent=None):
         super(KarteList, self).__init__(parent=parent)
         self.setObjectName("medic_karte_list")
-        self.setAlternatingRowColors(True)
         self.setUniformItemSizes(True)
         self.source_model = model.KarteModel()
         self.delegate = delegate.KarteDelegate()
@@ -267,7 +265,6 @@ class ReportList(QtWidgets.QListView):
         self.setSelectionMode(QtWidgets.QAbstractItemView.ExtendedSelection)
         self.delegate = delegate.ReportDelegate()
         self.setItemDelegate(self.delegate)
-        self.setAlternatingRowColors(True)
 
     def setReportItems(self, report_items):
         self.source_model.setReportItems(report_items)
