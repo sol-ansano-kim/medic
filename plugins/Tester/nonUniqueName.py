@@ -50,8 +50,8 @@ class NonUniqueName(medic.PyTester):
         rename_target = node
 
         if not node.dg().hasUniqueName():
-            if node.object().hasFn(OpenMaya.MFn.kShape):
-                parents = node.dg().parents()
+            if node.object().hasFn(OpenMaya.MFn.kShape) and node.isDag():
+                parents = node.parents()
                 if parents:
                     parent = parents[0]
                     if not parent.dg().hasUniqueName():
