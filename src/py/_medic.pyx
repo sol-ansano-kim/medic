@@ -789,6 +789,9 @@ class PyReport(object):
     def node(self):
         return self.__node
 
+    def components(self):
+        return self.__components
+
     def hasComponents(self):
         return self.__has_components
 
