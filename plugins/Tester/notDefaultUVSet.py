@@ -12,7 +12,7 @@ class NotDefaultUVSet(medic.PyTester):
         return "NotDefaultUVSet"
 
     def Description(self):
-        return "Mesh(s) is not setted default uv set(map1)"
+        return "The first uvSet is not 'map1'"
 
     def Match(self, node):
         return node.object().hasFn(OpenMaya.MFn.kMesh)
