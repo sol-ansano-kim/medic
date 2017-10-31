@@ -11,10 +11,10 @@ namespace MEDIC
 	{
         public:
             MdNode();
-            MdNode(std::string name, std::string type);
+            MdNode(const std::string &name, const std::string &type);
             virtual ~MdNode();
-            virtual std::string name() const;
-            virtual std::string type() const;
+            virtual const std::string &name() const;
+            virtual const std::string &type() const;
 
         protected:
             std::string m_name;
