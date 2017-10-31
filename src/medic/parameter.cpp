@@ -1,5 +1,4 @@
 #include "medic/parameter.h"
-#include <cstring>
 
 
 using namespace MEDIC;
