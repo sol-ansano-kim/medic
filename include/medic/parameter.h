@@ -6,7 +6,6 @@
 #include <map>
 #include <cstdlib>
 #include "medic/action.h"
-#include "medic/platform.h"
 
 
 namespace MEDIC
@@ -55,36 +54,36 @@ namespace MEDIC
             MdParameter(const MdParameter &p);
             MdParameter &operator=(const MdParameter &p);
             ~MdParameter();
-            MEDIC_EXPORT bool setType(MdTypes type);
-            MEDIC_EXPORT MdTypes getType() const;
+            bool setType(MdTypes type);
+            MdTypes getType() const;
             void setName(std::string);
             std::string getName() const;
             void setLabel(std::string);
-            MEDIC_EXPORT std::string getLabel() const;
-            MEDIC_EXPORT bool set(const bool &v, size_t index=0);
-            MEDIC_EXPORT bool get(bool &v, size_t index=0) const;
-            MEDIC_EXPORT bool set(const int &v, size_t index=0);
-            MEDIC_EXPORT bool set(const long &v, size_t index=0);
-            MEDIC_EXPORT bool get(int &v, size_t index=0) const;
-            MEDIC_EXPORT bool set(const float &v, size_t index=0);
-            MEDIC_EXPORT bool set(const double &v, size_t index=0);
-            MEDIC_EXPORT bool get(float &v, size_t index=0) const;
-            MEDIC_EXPORT bool set(const std::string &v, size_t index=0);
-            MEDIC_EXPORT bool set(const char *v, size_t index=0);
-            MEDIC_EXPORT bool get(std::string &v, size_t index=0) const;
-            MEDIC_EXPORT bool setDefault(const bool &v);
-            MEDIC_EXPORT bool getDefault(bool &v) const;
-            MEDIC_EXPORT bool setDefault(const int &v);
-            MEDIC_EXPORT bool getDefault(int &v) const;
-            MEDIC_EXPORT bool setDefault(const long &v);
-            MEDIC_EXPORT bool getDefault(long &v) const;
-            MEDIC_EXPORT bool setDefault(const float &v);
-            MEDIC_EXPORT bool getDefault(float &v) const;
-            MEDIC_EXPORT bool setDefault(const double &v);
-            MEDIC_EXPORT bool getDefault(double &v) const;
-            MEDIC_EXPORT bool setDefault(const std::string &v);
-            MEDIC_EXPORT bool setDefault(const char *v);
-            MEDIC_EXPORT bool getDefault(std::string &v) const;
+            std::string getLabel() const;
+            bool set(const bool &v, size_t index=0);
+            bool get(bool &v, size_t index=0) const;
+            bool set(const int &v, size_t index=0);
+            bool set(const long &v, size_t index=0);
+            bool get(int &v, size_t index=0) const;
+            bool set(const float &v, size_t index=0);
+            bool set(const double &v, size_t index=0);
+            bool get(float &v, size_t index=0) const;
+            bool set(const std::string &v, size_t index=0);
+            bool set(const char *v, size_t index=0);
+            bool get(std::string &v, size_t index=0) const;
+            bool setDefault(const bool &v);
+            bool getDefault(bool &v) const;
+            bool setDefault(const int &v);
+            bool getDefault(int &v) const;
+            bool setDefault(const long &v);
+            bool getDefault(long &v) const;
+            bool setDefault(const float &v);
+            bool getDefault(float &v) const;
+            bool setDefault(const double &v);
+            bool getDefault(double &v) const;
+            bool setDefault(const std::string &v);
+            bool setDefault(const char *v);
+            bool getDefault(std::string &v) const;
             bool resize(size_t s);
             size_t size() const;
             bool isArray() const;
@@ -123,14 +122,14 @@ namespace MEDIC
     class MdParamContainer
     {
         public:
-            MEDIC_EXPORT MdParamContainer();
-            MEDIC_EXPORT ~MdParamContainer();
-            MEDIC_EXPORT bool append(MdParameter *p);
+            MdParamContainer();
+            ~MdParamContainer();
+            bool append(MdParameter *p);
             bool remove(MdParameter *p);
-            MEDIC_EXPORT MdParameter *getParam(std::string name);
+            MdParameter *getParam(std::string name);
             void clear();
             size_t size() const;
-            MEDIC_EXPORT std::vector<std::string> names();
+            std::vector<std::string> names();
 
             template <typename T>
             bool set(std::string paramName, const T &v, size_t index=0);

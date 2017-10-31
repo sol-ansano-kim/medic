@@ -8,7 +8,7 @@ MdAction::MdAction() {}
 
 MdAction::~MdAction() {}
 
-MdAction *MdAction::Create()
+MdAction *MdAction::Create() const
 {
     return new MdAction();
 }

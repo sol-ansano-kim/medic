@@ -1,70 +1,21 @@
-#ifndef MEDIC_RESULT_INCLUDED
-#define MEDIC_RESULT_INCLUDED
-
-
-#include <maya/MObject.h>
-#include <vector>
-#include "medic/node.h"
-#include "medic/platform.h"
-#include "maya/MSelectionList.h"
-#include "maya/MGlobal.h"
+#ifndef MEDIC_REPORT_INCLUDED
+#define MEDIC_REPORT_INCLUDED
 
 
 namespace MEDIC
 {
-    class MdReport;
-    class MdReportContainer;
-    class MdReportIterator;
-    static MSelectionList selection_list;
+    class MdNode;
 
     class MdReport
     {
         public:
-            MEDIC_EXPORT MdReport(MdNode *node, MObject &compObj);
-            MEDIC_EXPORT MdReport(MdNode *node);
-            MEDIC_EXPORT ~MdReport();
-            MEDIC_EXPORT void addSelection() const;
-            MEDIC_EXPORT MdNode *node();
-            MEDIC_EXPORT MObject &components();
-            bool hasComponents() const;
+            MdReport(MdNode *node);
+            virtual ~MdReport();
+            MdNode *node() const;
+            virtual void addSelection() const = 0;
 
         private:
             MdNode *m_node;
-            MObject m_comp;
-            bool m_has_components;
-    };
-
-    typedef std::vector<MdReport *> ReportPtrVec;
-
-    class MdReportContainer
-    {
-        friend class MdReportIterator;
-        public:
-            MdReportContainer();
-            ~MdReportContainer();
-            bool append(MdReport *n);
-            bool remove(MdReport *n);
-            void clear();
-            size_t size() const;
-            MdReportIterator iterator();
-
-        private:
-            ReportPtrVec m_reports;
-            
-    };
-
-    class MdReportIterator
-    {
-        public:
-            MEDIC_EXPORT MdReportIterator();
-            MdReportIterator(MdReportContainer *container);
-            MEDIC_EXPORT ~MdReportIterator();
-            MEDIC_EXPORT MdReport *next();
-            MEDIC_EXPORT bool isDone();
-
-        private:
-            MdReportContainer *m_container;
-            ReportPtrVec::iterator m_cur;
     };
 }
 
