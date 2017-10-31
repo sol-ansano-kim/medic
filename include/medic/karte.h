@@ -11,14 +11,19 @@ namespace MEDIC
     class MdKarte
     {
         public:
-            MdKarte(std::string name, std::string desc);
+            MdKarte(const std::string &name, const std::string &desc);
+            MdKarte(const std::string &name, const std::string &desc, const std::string &file);
             ~MdKarte();
-            std::string Name() const;
-            std::string Description() const;
+            const std::string &Name() const;
+            const std::string &Description() const;
+            const std::string &File() const;
+            const std::vector<std::string>& patterns() const;
+            void addPattern(std::string pattern);
 
         private:
             std::string m_name;
             std::string m_description;
+            std::string m_file;
             std::vector<std::string> m_patterns;
     };
 }
