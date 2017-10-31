@@ -39,9 +39,22 @@ prjs.append({"name": "medic",
              "cppflags": cppflags,
              "incdirs": [out_incdir],
              "srcs": excons.glob("src/medic/*.cpp"),
-             "symvis": "hidden",
+             "symvis": "default",
              "install": {out_incdir + "/medic": headers},
              "custom": customs})
+
+for test in excons.glob("test/*.cpp"):
+    test_base = os.path.splitext(os.path.basename(test))[0]
+
+    prjs.append({"name": test_base,
+                 "type": "testprograms",
+                 "defs": defs,
+                 "cppflags": cppflags,
+                 "incdirs": [out_incdir],
+                 "srcs": [test],
+                 "libdirs": [out_libdir],
+                 "libs": ["medic"],
+                 "custom": customs})
 
 
 excons.DeclareTargets(env, prjs)
