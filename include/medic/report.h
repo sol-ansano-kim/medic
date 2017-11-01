@@ -11,8 +11,7 @@ namespace MEDIC
         public:
             MdReport(MdNode *node);
             virtual ~MdReport();
-            MdNode *node() const;
-            virtual void addSelection() const = 0;
+            const MdNode *node() const;
 
         private:
             MdNode *m_node;
