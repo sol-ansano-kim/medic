@@ -17,13 +17,16 @@ namespace MEDIC
         public:
             MdTester();
             virtual ~MdTester();
-            virtual std::string Name() const;
-            virtual std::string Description() const;
+            virtual const std::string &Name() const;
+            virtual const std::string &Description() const;
             virtual bool Match(MdNode *node) const;
             virtual bool IsFixable() const;
             virtual MdParamContainer *GetParameters() const;
-            virtual MdReport *test(MdNode *node) const;
+            virtual MdReport *test(const MdNode *node) const;
             virtual bool fix(MdReport *report, MdParamContainer *params) const;
+
+        private:
+            static const std::string m_unknown;
     };
 }
 

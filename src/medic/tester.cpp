@@ -4,18 +4,21 @@
 using namespace MEDIC;
 
 
+const std::string MdTester::m_unknown("UNKNOWN");
+
+
 MdTester::MdTester() {}
 
 MdTester::~MdTester() {}
 
-std::string MdTester::Name() const
+const std::string &MdTester::Name() const
 {
-    return "Tester";
+    return m_unknown;
 }
 
-std::string MdTester::Description() const
+const std::string &MdTester::Description() const
 {
-    return "";
+    return m_unknown;
 };
 
 bool MdTester::Match(MdNode *node) const
@@ -33,12 +36,12 @@ MdParamContainer *MdTester::GetParameters() const
     return new MdParamContainer();
 };
 
-MdReport *MdTester::test(MdNode *node) const
+MdReport *MdTester::test(const MdNode *node) const
 {
-    return 0;
+    return NULL;
 };
 
 bool MdTester::fix(MdReport *report, MdParamContainer *params) const
 {
-    return true;
+    return false;
 };
