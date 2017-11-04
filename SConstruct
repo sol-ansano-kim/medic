@@ -42,7 +42,7 @@ if not mayaver:
 try:
     float(mayaver)
 except:
-    print "ERROR : Set Maya version with 'mayaver'"
+    print("ERROR : Set Maya version with 'mayaver'")
     sys.exit(1)
 
 
@@ -67,7 +67,7 @@ else:
             break
 
 if run_cython:
-    print "=== generating python wrapper sources ==="
+    print("=== generating python wrapper sources ===")
     python.CythonGenerate(env, cython_source, cpp=True, incdirs=["include"])
 
 
@@ -109,7 +109,7 @@ def Pacakage(target, source, env):
 
     out_path = os.path.join(dirname, os.path.basename(path))
     if not os.path.isfile(out_path):
-        print "Package : %s -> %s" % (path, out_path)
+        print("Package : %s -> %s" % (path, out_path))
         shutil.copy(path, out_path)
 
 
