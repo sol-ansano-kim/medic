@@ -749,7 +749,6 @@ cdef class __PluginManager:
 
 class PluginManager(object):
     __Instance = None
-    __Manager = None
 
     def __new__(cls):
         if not cls.__Instance:
