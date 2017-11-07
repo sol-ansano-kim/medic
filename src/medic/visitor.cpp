@@ -4,18 +4,100 @@
 using namespace MEDIC;
 
 
-MdVisitor::MdVisitor(MdKarte *karte) : m_karte(karte) {}
+MdVisitor::MdVisitor(const MdKarte *karte) : m_karte(karte) {}
 
 MdVisitor::~MdVisitor()
 {
-    reset();
+    clearAllReports();
+    clearNodes();
 }
 
-void MdVisitor::visit()
+const MdTester *MdVisitor::tester(const std::string &name)
 {
-    reset();
+    NameTesterMap::iterator it = m_testers.find(name);
+    if (it == m_testers.end())
+    {
+        return NULL;
+    }
+
+    return it->second;
 }
 
-void MdVisitor::visit(MdTester *tester) {}
+std::vector<const MdTester *> MdVisitor::testers()
+{
+    std::vector<const MdTester *> testers;
+    for (NameTesterMap::iterator it = m_testers.begin(); it != m_testers.end(); ++it)
+    {
+        testers.push_back(it->second);
+    }
 
-void MdVisitor::reset() {}
+    return testers;
+}
+
+bool MdVisitor::hasTester(const MdTester *tester)
+{
+    NameTesterMap::iterator it = m_testers.find(tester->Name());
+    if (it == m_testers.end())
+    {
+        return false;
+    }
+
+    return true;
+}
+
+void MdVisitor::test(const std::string &name) {}
+
+void MdVisitor::testAll() {}
+
+void MdVisitor::reset()
+{
+    clearAllReports();
+    clearNodes();
+}
+
+void MdVisitor::collectNodes() {}
+
+void MdVisitor::clearNodes() {}
+
+void MdVisitor::addReport(const MdTester *tester, MdReport *report)
+{
+    TesterReportsMap::iterator it = m_reports.find(tester);
+    if (it == m_reports.end())
+    {
+        ReportPtrVec report_vec;
+        m_reports[tester] = report_vec;
+    }
+
+    return m_reports[tester].push_back(report);
+}
+
+void MdVisitor::clearReports(const MdTester *tester)
+{
+    TesterReportsMap::iterator tit = m_reports.find(tester);
+    if (tit == m_reports.end())
+    {
+        return;
+    }
+
+    for (ReportPtrVec::iterator rit = tit->second.begin(); rit != tit->second.end(); ++rit)
+    {
+        delete (*rit);
+    }
+
+    tit->second.clear();
+}
+
+void MdVisitor::clearAllReports()
+{
+    for (TesterReportsMap::iterator tit = m_reports.begin(); tit != m_reports.end(); ++tit)
+    {
+        for (ReportPtrVec::iterator rit = tit->second.begin(); rit != tit->second.end(); ++rit)
+        {
+            delete (*rit);
+        }
+
+        tit->second.clear();
+    }
+
+    m_reports.clear();
+}
