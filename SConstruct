@@ -41,7 +41,7 @@ prjs.append({"name": "medic",
              "srcs": excons.glob("src/medic/*.cpp"),
              "symvis": "default",
              "install": {out_incdir + "/medic": headers},
-             "custom": customs})
+             "custom": [python.SoftRequire]})
 
 for test in excons.glob("test/*.cpp"):
     test_base = os.path.splitext(os.path.basename(test))[0]
@@ -54,7 +54,7 @@ for test in excons.glob("test/*.cpp"):
                  "srcs": [test],
                  "libdirs": [out_libdir],
                  "libs": ["medic"],
-                 "custom": customs})
+                 "custom": [python.Require]})
 
 
 excons.DeclareTargets(env, prjs)
