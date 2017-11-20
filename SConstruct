@@ -31,6 +31,9 @@ if sys.platform == "win32":
     cppflags = " /wd4100 /wd4505 /wd4701 /wd4127 /wd4189 /wd4005 /wd4510 /wd4512 /wd4610 /wd4211 /wd4702 /wd4706 /wd4310"
 else:
     cppflags = " -Wno-unused-parameter -Wunused-variable"
+    if maya.Version(asString=False, nice=True) >= 2018:
+        cppflags += " -std=c++11"
+
 prjs = []
 customs = [excons.tools.maya.Require]
 
