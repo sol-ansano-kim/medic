@@ -24,8 +24,9 @@ namespace MEDIC
             virtual MdReport *test(const MdNode *node) const;
             virtual bool fix(MdReport *report, MdParamContainer *params) const;
 
-        private:
-            static const std::string m_unknown;
+        protected:
+            std::string m_name;
+            std::string m_description;
     };
 }
 

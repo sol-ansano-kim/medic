@@ -4,21 +4,19 @@
 using namespace MEDIC;
 
 
-const std::string MdTester::m_unknown("UNKNOWN");
-
-
-MdTester::MdTester() {}
+MdTester::MdTester()
+    : m_name("UNKNOWN"), m_description("UNKNOWN") {}
 
 MdTester::~MdTester() {}
 
 const std::string &MdTester::Name() const
 {
-    return m_unknown;
+    return m_name;
 }
 
 const std::string &MdTester::Description() const
 {
-    return m_unknown;
+    return m_description;
 };
 
 bool MdTester::Match(MdNode *node) const
