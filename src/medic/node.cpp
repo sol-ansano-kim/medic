@@ -4,9 +4,8 @@
 using namespace MEDIC;
 
 
-MdNode::MdNode() {}
-
-MdNode::MdNode(const std::string &name, const std::string &type) : m_name(name), m_type(type) {}
+MdNode::MdNode(const std::string &name, const std::string &type)
+    : m_name(name), m_type(type) {}
 
 MdNode::~MdNode() {}
 

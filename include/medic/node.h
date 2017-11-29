@@ -10,7 +10,6 @@ namespace MEDIC
 	class MdNode
 	{
         public:
-            MdNode();
             MdNode(const std::string &name, const std::string &type);
             virtual ~MdNode();
             virtual const std::string &name() const;
