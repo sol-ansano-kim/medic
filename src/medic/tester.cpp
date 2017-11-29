@@ -5,7 +5,7 @@ using namespace MEDIC;
 
 
 MdTester::MdTester()
-    : m_name("UNKNOWN"), m_description("UNKNOWN") {}
+    : m_name("UNKNOWN"), m_description("UNKNOWN"), m_isfixable(false) {}
 
 MdTester::~MdTester() {}
 
@@ -26,7 +26,7 @@ bool MdTester::Match(MdNode *node) const
 
 bool MdTester::IsFixable() const
 {
-    return false;
+    return m_isfixable;
 };
 
 MdParamContainer *MdTester::GetParameters() const

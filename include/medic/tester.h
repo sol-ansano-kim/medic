@@ -4,6 +4,7 @@
 
 #include <string>
 #include "medic/parameter.h"
+#include "medic/node.h"
 
 
 namespace MEDIC
@@ -27,6 +28,7 @@ namespace MEDIC
         protected:
             std::string m_name;
             std::string m_description;
+            bool m_isfixable;
     };
 }
 
