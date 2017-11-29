@@ -13,7 +13,7 @@ namespace MEDIC
             virtual ~MdReport();
             const MdNode *node() const;
 
-        private:
+        protected:
             MdNode *m_node;
     };
 }

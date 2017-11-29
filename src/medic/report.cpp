@@ -5,9 +5,7 @@ using namespace MEDIC;
 
 
 MdReport::MdReport(MdNode *node)
-{
-    m_node = node;
-}
+    : m_node(node) {};
 
 MdReport::~MdReport() {};
 
