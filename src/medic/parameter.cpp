@@ -5,7 +5,7 @@ using namespace MEDIC;
 
 
 template <typename T> MdArray<T>::MdArray()
-: m_size(0) {}
+    : m_size(0) {}
 
 template <typename T> MdArray<T>::~MdArray()
 {
@@ -47,7 +47,7 @@ template <typename T> bool MdArray<T>::get(size_t index, T &v) const
 
 
 MdParameter::MdParameter()
-: m_name(""), m_label(""), m_value(0), m_default(0), m_size(0), m_type(MdNull), m_action(0) {}
+    : m_name(""), m_label(""), m_value(0), m_default(0), m_size(0), m_type(MdNull), m_action(0) {}
 
 MdParameter &MdParameter::operator=(const MdParameter &p)
 {
