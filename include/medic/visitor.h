@@ -43,4 +43,4 @@ namespace MEDIC
 }
 
 
-#endif
+#endif // MEDIC_VISITOR_INCLUDED

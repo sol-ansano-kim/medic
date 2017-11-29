@@ -17,4 +17,4 @@ namespace MEDIC
 }
 
 
-#endif
+#endif // MEDIC_ACTION_INCLUDED

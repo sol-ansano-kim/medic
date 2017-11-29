@@ -187,4 +187,4 @@ bool SetValue(void *data, const T &v, size_t index, bool isArray);
 template <typename T>
 bool GetValue(void *data, T &v, size_t index, bool isArray);
 
-#endif
+#endif // MEDIC_PARAMETER_INCLUDED

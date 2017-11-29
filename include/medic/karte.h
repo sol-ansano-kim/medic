@@ -29,4 +29,4 @@ namespace MEDIC
 }
 
 
-#endif
+#endif // MEDIC_KARTE_INCLUDED

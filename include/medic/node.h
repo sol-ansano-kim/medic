@@ -22,4 +22,4 @@ namespace MEDIC
 }
 
 
-#endif
+#endif // MEDIC_NODE_INCLUDED

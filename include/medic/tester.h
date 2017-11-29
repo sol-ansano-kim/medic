@@ -33,4 +33,4 @@ namespace MEDIC
 }
 
 
-#endif
+#endif // MEDIC_TESTER_INCLUDED

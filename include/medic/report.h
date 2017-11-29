@@ -19,4 +19,4 @@ namespace MEDIC
 }
 
 
-#endif
+#endif // MEDIC_REPORT_INCLUDED
