@@ -26,9 +26,9 @@ namespace MEDIC
             virtual bool fix(MdReport *report, MdParamContainer *params) const;
 
         protected:
+            bool m_isfixable;
             std::string m_name;
             std::string m_description;
-            bool m_isfixable;
     };
 }
 

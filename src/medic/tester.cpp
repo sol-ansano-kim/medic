@@ -5,7 +5,7 @@ using namespace MEDIC;
 
 
 MdTester::MdTester()
-    : m_name("UNKNOWN"), m_description("UNKNOWN"), m_isfixable(false) {}
+    : m_isfixable(false), m_name("UNKNOWN"), m_description("UNKNOWN") {}
 
 MdTester::~MdTester() {}
 
