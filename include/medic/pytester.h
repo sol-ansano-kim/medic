@@ -2,34 +2,42 @@
 #define MEDIC_PYTESTER_INCLUDED
 
 
-#include "medic/tester.h"
+#include <string>
 #include <Python.h>
+#include "medic/py.h"
 
 
 namespace MEDIC
 {
+    typedef MdPyContainer MdPyNode;
+    typedef MdPyContainer MdPyReport;
+    typedef MdPyContainer MdPyParamContainer;
+
     class MdPyTester
     {
         public:
             MdPyTester(PyObject *tester);
-            virtual ~MdPyTester();
+            ~MdPyTester();
+            const std::string &Name() const;
+            const std::string &Description() const;
+            bool Match(MdPyNode *node) const;
+            bool IsFixable() const;
+            MdPyParamContainer *GetParameters() const;
+            MdPyReport *test(MdPyNode *node) const;
+            bool fix(MdPyReport *report, MdPyParamContainer *params) const;
             static bool IsValidTester(PyObject *instance, PyObject *baseClass=NULL);
-            // virtual const std::string &Name() const;
-            // virtual const std::string &Description() const;
-            // virtual bool Match(MdNode *node) const;
-            // virtual bool IsFixable() const;
-            // virtual MdParamContainer *GetParameters() const;
-            // virtual MdReport *test(const MdNode *node) const;
-            // virtual bool fix(MdReport *report, MdParamContainer *params) const;
 
         private:
-            static bool hasFunction(PyObject *instance, const char* funcName);
-
-        private:
+            bool m_isfixable;
+            std::string m_name;
+            std::string m_description;
             PyObject *m_tester;
-            static const std::string m_unknown;
+            PyObject *m_func_match;
+            PyObject *m_func_get_parameters;
+            PyObject *m_func_test;
+            PyObject *m_func_fix;
     };
 }
 
 
-#endif
+#endif // MEDIC_PYTESTER_INCLUDED
