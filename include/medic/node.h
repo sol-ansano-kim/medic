@@ -2,6 +2,7 @@
 #define MEDIC_NODE_INCLUDED
 
 
+#include <Python.h>
 #include <string>
 
 
@@ -10,14 +11,16 @@ namespace MEDIC
 	class MdNode
 	{
         public:
-            MdNode(const std::string &name, const std::string &type);
+            MdNode();
             virtual ~MdNode();
             virtual std::string name() const;
             virtual std::string type() const;
+            virtual PyObject *getPythonObject() const;
 
         protected:
             std::string m_name;
             std::string m_type;
+            PyObject *m_pyobj;
 	};
 }
 

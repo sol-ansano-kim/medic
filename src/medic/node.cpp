@@ -4,17 +4,28 @@
 using namespace MEDIC;
 
 
-MdNode::MdNode(const std::string &name, const std::string &type)
-    : m_name(name), m_type(type) {}
+MdNode::MdNode()
+    : m_pyobj(NULL) {}
 
-MdNode::~MdNode() {}
+MdNode::~MdNode()
+{
+    if (m_pyobj != NULL)
+    {
+        Py_DECREF(m_pyobj);
+    }
+}
 
 std::string MdNode::name() const
 {
-    return m_name;
+    return "UNKNOWN";
 }
 
 std::string MdNode::type() const
 {
-    return m_type;
+    return "UNKNOWN";
+}
+
+PyObject *MdNode::getPythonObject() const
+{
+    return m_pyobj;
 }
