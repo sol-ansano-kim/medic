@@ -5,32 +5,25 @@
 #include <string>
 #include <Python.h>
 #include "medic/py.h"
+#include "medic/node.h"
+#include "medic/report.h"
+#include "medic/tester.h"
 
 
 namespace MEDIC
 {
-    typedef MdPyContainer MdPyNode;
-    typedef MdPyContainer MdPyReport;
-    typedef MdPyContainer MdPyParamContainer;
-
-    class MdPyTester
+    class MdPyTester : public MdTester
     {
         public:
             MdPyTester(PyObject *tester);
             ~MdPyTester();
-            const std::string &Name() const;
-            const std::string &Description() const;
-            bool Match(MdPyNode *node) const;
-            bool IsFixable() const;
-            MdPyParamContainer *GetParameters() const;
-            MdPyReport *test(MdPyNode *node) const;
-            bool fix(MdPyReport *report, MdPyParamContainer *params) const;
+            bool Match(MdNode *node) const;
+            // MdParamContainer *GetParameters() const;
+            virtual MdReport *test(MdNode *node) const;
+            bool fix(MdReport *report, MdParamContainer *params) const;
             static bool IsValidTester(PyObject *instance, PyObject *baseClass=NULL);
 
         private:
-            bool m_isfixable;
-            std::string m_name;
-            std::string m_description;
             PyObject *m_tester;
             PyObject *m_func_match;
             PyObject *m_func_get_parameters;

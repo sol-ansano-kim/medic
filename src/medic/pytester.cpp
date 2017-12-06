@@ -41,26 +41,26 @@ MdPyTester::~MdPyTester()
     Py_DECREF(m_tester);
 }
 
-const std::string &MdPyTester::Name() const
-{
-    return m_name;
-}
-
-const std::string &MdPyTester::Description() const
-{
-    return m_description;
-}
-
-bool MdPyTester::Match(MdPyNode *node) const
+bool MdPyTester::Match(MdNode *node) const
 {
     bool result = false;
     PyObject *res;
     PyObject *arg;
     PyObject *py_node;
 
-    arg = PyTuple_New(1);
-    py_node = node->object();
+    py_node = node->getPythonObject();
+    if (py_node == NULL)
+    {
+        #ifdef _DEBUG
+        std::cout << "[MEDIC] WARNING - Failed to get python object.\n";
+        #endif // _DEBUG
+
+        return false;
+    }
+
     Py_INCREF(py_node);
+
+    arg = PyTuple_New(1);
     PyTuple_SetItem(arg, 0, py_node);
 
     res = PyObject_CallObject(m_func_match, arg);
@@ -86,40 +86,45 @@ bool MdPyTester::Match(MdPyNode *node) const
     return result;
 }
 
-bool MdPyTester::IsFixable() const
-{
-    return m_isfixable;
-}
+// MdParamContainer *MdPyTester::GetParameters() const
+// {
+//     PyObject *param = PyObject_CallObject(m_func_get_parameters, PyBlankTuple);
 
-MdPyParamContainer *MdPyTester::GetParameters() const
-{
-    PyObject *param = PyObject_CallObject(m_func_get_parameters, PyBlankTuple);
+//     if (param == NULL)
+//     {
+//         #ifdef _DEBUG
+//         if (PyErr_Occurred())
+//         {
+//             PyErr_Print();
+//         }
+//         #endif // _DEBUG
 
-    if (param == NULL)
+//         return NULL;
+//     }
+
+//     return new MdParamContainer(param);
+// }
+
+MdReport *MdPyTester::test(MdNode *node) const
+{
+    MdReport *report = NULL;
+    PyObject *res;
+    PyObject *arg;
+    PyObject *py_node;
+
+    py_node = node->getPythonObject();
+    if (py_node == NULL)
     {
         #ifdef _DEBUG
-        if (PyErr_Occurred())
-        {
-            PyErr_Print();
-        }
+        std::cout << "[MEDIC] WARNING - Failed to get python object.\n";
         #endif // _DEBUG
 
         return NULL;
     }
 
-    return new MdPyParamContainer(param);
-}
-
-MdPyReport *MdPyTester::test(MdPyNode *node) const
-{
-    MdPyReport *report = NULL;
-    PyObject *res;
-    PyObject *arg;
-    PyObject *py_node;
+    Py_INCREF(py_node);
 
     arg = PyTuple_New(1);
-    py_node = node->object();
-    Py_INCREF(py_node);
     PyTuple_SetItem(arg, 0, py_node);
 
     res = PyObject_CallObject(m_func_test, arg);
@@ -140,7 +145,7 @@ MdPyReport *MdPyTester::test(MdPyNode *node) const
 
     if (res != Py_None)
     {
-        report = new MdPyReport(res);
+        report = new MdReport(node);
     }
 
     Py_DECREF(res);
@@ -148,10 +153,11 @@ MdPyReport *MdPyTester::test(MdPyNode *node) const
     return report;
 }
 
-bool MdPyTester::fix(MdPyReport *report, MdPyParamContainer *params) const
+bool MdPyTester::fix(MdReport *report, MdParamContainer *params) const
 {
     PyObject *res;
     PyObject *arg;
+    PyObject *py_node;
     bool result = false;
 
     if (!m_isfixable)
@@ -159,9 +165,22 @@ bool MdPyTester::fix(MdPyReport *report, MdPyParamContainer *params) const
         return false;
     }
 
+    py_node = report->node()->getPythonObject();
+    if (py_node == NULL)
+    {
+        #ifdef _DEBUG
+        std::cout << "[MEDIC] WARNING - Failed to get python object.\n";
+        #endif // _DEBUG
+
+        return false;
+    }
+
+    Py_INCREF(py_node);
+
     arg = PyTuple_New(2);
-    PyTuple_SetItem(arg, 0, report->object());
-    PyTuple_SetItem(arg, 1, params->object());
+    PyTuple_SetItem(arg, 0, py_node);
+    // TODO : set a correct python MdParamContainer
+    PyTuple_SetItem(arg, 1, Py_None);
 
     res = PyObject_CallObject(m_func_fix, arg);
     Py_DECREF(arg);
