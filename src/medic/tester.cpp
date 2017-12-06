@@ -34,7 +34,7 @@ MdParamContainer *MdTester::GetParameters() const
     return new MdParamContainer();
 };
 
-MdReport *MdTester::test(const MdNode *node) const
+MdReport *MdTester::test(MdNode *node) const
 {
     return NULL;
 };
