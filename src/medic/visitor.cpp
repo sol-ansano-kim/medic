@@ -12,7 +12,7 @@ MdVisitor::~MdVisitor()
     clearNodes();
 }
 
-const MdTester *MdVisitor::tester(const std::string &name)
+const MdTester *MdVisitor::getTester(const std::string &name)
 {
     NameTesterMap::iterator it = m_testers.find(name);
     if (it == m_testers.end())
@@ -23,7 +23,7 @@ const MdTester *MdVisitor::tester(const std::string &name)
     return it->second;
 }
 
-std::vector<const MdTester *> MdVisitor::testers()
+std::vector<const MdTester *> MdVisitor::getTesters()
 {
     std::vector<const MdTester *> testers;
     for (NameTesterMap::iterator it = m_testers.begin(); it != m_testers.end(); ++it)
@@ -37,17 +37,74 @@ std::vector<const MdTester *> MdVisitor::testers()
 bool MdVisitor::hasTester(const MdTester *tester)
 {
     NameTesterMap::iterator it = m_testers.find(tester->Name());
-    if (it == m_testers.end())
-    {
-        return false;
-    }
 
-    return true;
+    return it != m_testers.end();
 }
 
-void MdVisitor::test(const std::string &name) {}
+bool MdVisitor::hasTester(const std::string &name)
+{
+    NameTesterMap::iterator it = m_testers.find(name);
 
-void MdVisitor::testAll() {}
+    return it != m_testers.end();
+}
+
+void MdVisitor::test(const std::string &name)
+{
+    const MdTester *tester = getTester(name);
+    if (tester == NULL)
+    {
+        return;
+    }
+
+    test(tester);
+}
+
+void MdVisitor::test(const MdTester *tester)
+{
+    if (!hasTester(tester))
+    {
+        return;
+    }
+
+    clearReports(tester);
+
+    for (NodePtrVec::iterator it = m_nodes.begin(); it != m_nodes.end(); ++it)
+    {
+        if (!tester->Match(*it))
+        {
+            continue;
+        }
+
+        MdReport *report = tester->test(*it);
+        if (report != NULL)
+        {
+            addReport(tester, report);
+        }
+    }
+}
+
+void MdVisitor::testAll()
+{
+    clearAllReports();
+
+    for (NameTesterMap::iterator it = m_testers.begin(); it != m_testers.end(); ++it)
+    {
+        const MdTester *tester = it->second;
+        for (NodePtrVec::iterator nit = m_nodes.begin(); nit != m_nodes.end(); ++nit)
+        {
+            if (!tester->Match(*nit))
+            {
+                continue;
+            }
+
+            MdReport *report = tester->test(*nit);
+            if (report != NULL)
+            {
+                addReport(tester, report);
+            }
+        }
+    }
+}
 
 void MdVisitor::reset()
 {
@@ -57,7 +114,15 @@ void MdVisitor::reset()
 
 void MdVisitor::collectNodes() {}
 
-void MdVisitor::clearNodes() {}
+void MdVisitor::clearNodes()
+{
+    for (NodePtrVec::iterator it = m_nodes.begin(); it != m_nodes.end(); ++it)
+    {
+        delete (*it);
+    }
+
+    m_nodes.clear();
+}
 
 void MdVisitor::addReport(const MdTester *tester, MdReport *report)
 {
