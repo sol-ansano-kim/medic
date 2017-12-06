@@ -9,7 +9,7 @@ MdReport::MdReport(MdNode *node)
 
 MdReport::~MdReport() {};
 
-const MdNode *MdReport::node() const
+MdNode *MdReport::node() const
 {
     return m_node;
 }

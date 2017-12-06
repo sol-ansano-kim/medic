@@ -11,7 +11,7 @@ namespace MEDIC
         public:
             MdReport(MdNode *node);
             virtual ~MdReport();
-            const MdNode *node() const;
+            MdNode *node() const;
 
         protected:
             MdNode *m_node;
