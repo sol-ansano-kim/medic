@@ -25,27 +25,3 @@ PyObject *MEDIC::getPyFunction(PyObject *instance, const char* funcName)
 
     return func;
 }
-
-
-
-MdPyContainer::MdPyContainer(PyObject *obj)
-    : m_object(obj)
-{
-    Py_INCREF(m_object);
-}
-
-MdPyContainer::MdPyContainer(const MdPyContainer* pycon)
-    : m_object(pycon->m_object)
-{
-    Py_INCREF(m_object);
-}
-
-MdPyContainer::~MdPyContainer()
-{
-    Py_DECREF(m_object);
-}
-
-PyObject *MdPyContainer::object()
-{
-    return m_object;
-}
