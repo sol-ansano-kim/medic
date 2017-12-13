@@ -6,5 +6,6 @@ src/py/*.cpp
 release/
 debug/
 test/
+testPlugin/
 *.dylib
 excons.cache
