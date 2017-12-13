@@ -54,7 +54,24 @@ for test in excons.glob("test/*.cpp"):
                  "srcs": [test],
                  "libdirs": [out_libdir],
                  "libs": ["medic"],
+                 "rpath": out_libdir,
                  "custom": [python.Require]})
+
+for test_plugin in excons.glob("testPlugin/*.cpp"):
+    plug_base = os.path.splitext(os.path.basename(test_plugin))[0]
+
+    prjs.append({"name": plug_base,
+                 "type": "dynamicmodule",
+                 "defs": defs,
+                 "cppflags": cppflags,
+                 "incdirs": [out_incdir],
+                 "srcs": [test_plugin],
+                 "libs": ["medic"],
+                 "libdirs": [out_libdir],
+                 "prefix": "tester",
+                 "symvis": "default",
+                 "rpath": out_libdir,
+                 "custom": [python.SoftRequire]})
 
 
 excons.DeclareTargets(env, prjs)

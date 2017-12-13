@@ -16,7 +16,6 @@ PyObject *MEDIC::getPyFunction(PyObject *instance, const char* funcName)
         if (PyErr_Occurred())
         {
             PyErr_Print();
-            std::cout << "[MEDIC] ERROR - Failed to function check\n";
         }
         #endif // _DEBUG
 

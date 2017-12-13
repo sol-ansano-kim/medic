@@ -17,6 +17,11 @@ MdPyTester::MdPyTester(PyObject *tester)
     m_func_test = getPyFunction(tester, "test");
     m_func_fix = getPyFunction(tester, "fix");
 
+    Py_INCREF(m_func_match);
+    Py_INCREF(m_func_get_parameters);
+    Py_INCREF(m_func_test);
+    Py_INCREF(m_func_fix);
+
     PyObject *res;
     PyObject *func;
 
@@ -38,6 +43,10 @@ MdPyTester::MdPyTester(PyObject *tester)
 
 MdPyTester::~MdPyTester()
 {
+    Py_DECREF(m_func_match);
+    Py_DECREF(m_func_get_parameters);
+    Py_DECREF(m_func_test);
+    Py_DECREF(m_func_fix);
     Py_DECREF(m_tester);
 }
 
