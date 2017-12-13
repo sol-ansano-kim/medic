@@ -5,6 +5,7 @@
 #include <vector>
 #include <map>
 #include <cstdlib>
+#include <cstring>
 #include "medic/action.h"
 
 

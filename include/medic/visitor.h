@@ -2,18 +2,18 @@
 #define MEDIC_VISITOR_INCLUDED
 
 
-#include <map>
-#include <vector>
-#include <string>
 #include "medic/node.h"
 #include "medic/report.h"
 #include "medic/tester.h"
 #include "medic/karte.h"
+#include <map>
+#include <vector>
+#include <string>
 
 
 namespace MEDIC
 {
-    typedef std::map<const std::string &, const MdTester *> NameTesterMap;
+    typedef std::map<std::string, const MdTester *> NameTesterMap;
     typedef std::vector<MdReport *> ReportPtrVec;
     typedef std::map<const MdTester *, ReportPtrVec> TesterReportsMap;
     typedef std::vector<MdNode *> NodePtrVec;

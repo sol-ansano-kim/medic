@@ -2,8 +2,8 @@
 #define MEDIC_PYTESTER_INCLUDED
 
 
-#include <string>
 #include <Python.h>
+#include <string>
 #include "medic/py.h"
 #include "medic/node.h"
 #include "medic/report.h"
