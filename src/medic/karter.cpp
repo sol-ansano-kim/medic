@@ -34,5 +34,9 @@ const std::vector<std::string>& MdKarte::patterns() const
 
 void MdKarte::addPattern(std::string pattern)
 {
-    m_patterns.push_back(pattern);
+    std::vector<std::string>::iterator it = std::find(m_patterns.begin(), m_patterns.end(), pattern);
+    if (it == m_patterns.end())
+    {
+        m_patterns.push_back(pattern);
+    }
 }
