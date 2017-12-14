@@ -17,10 +17,10 @@ namespace MEDIC
         public:
             MdPyTester(PyObject *tester);
             ~MdPyTester();
-            bool Match(MdNode *node) const;
+            bool Match(const MdNode *node) const;
             // MdParamContainer *GetParameters() const;
-            virtual MdReport *test(MdNode *node) const;
-            bool fix(MdReport *report, MdParamContainer *params) const;
+            virtual MdReport *test(const MdNode *node) const;
+            bool fix(const MdReport *report, MdParamContainer *params) const;
             static bool IsValidTester(PyObject *instance, PyObject *baseClass=NULL);
 
         private:

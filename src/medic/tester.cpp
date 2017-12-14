@@ -19,7 +19,7 @@ const std::string &MdTester::Description() const
     return m_description;
 };
 
-bool MdTester::Match(MdNode *node) const
+bool MdTester::Match(const MdNode *node) const
 {
     return false;
 }
@@ -34,12 +34,12 @@ MdParamContainer *MdTester::GetParameters() const
     return new MdParamContainer();
 };
 
-MdReport *MdTester::test(MdNode *node) const
+MdReport *MdTester::test(const MdNode *node) const
 {
     return NULL;
 };
 
-bool MdTester::fix(MdReport *report, MdParamContainer *params) const
+bool MdTester::fix(const MdReport *report, MdParamContainer *params) const
 {
     return false;
 };

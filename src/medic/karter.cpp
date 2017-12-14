@@ -27,14 +27,14 @@ const std::string &MdKarte::File() const
     return m_file;
 }
 
-const std::vector<std::string>& MdKarte::patterns() const
+const std::vector<const std::string>& MdKarte::patterns() const
 {
     return m_patterns;
 }
 
-void MdKarte::addPattern(std::string pattern)
+void MdKarte::addPattern(const std::string pattern)
 {
-    std::vector<std::string>::iterator it = std::find(m_patterns.begin(), m_patterns.end(), pattern);
+    std::vector<const std::string>::iterator it = std::find(m_patterns.begin(), m_patterns.end(), pattern);
     if (it == m_patterns.end())
     {
         m_patterns.push_back(pattern);

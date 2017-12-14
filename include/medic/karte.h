@@ -17,14 +17,14 @@ namespace MEDIC
             const std::string &Name() const;
             const std::string &Description() const;
             const std::string &File() const;
-            const std::vector<std::string>& patterns() const;
-            void addPattern(std::string pattern);
+            const std::vector<const std::string>& patterns() const;
+            void addPattern(const std::string pattern);
 
         private:
-            std::string m_name;
-            std::string m_description;
-            std::string m_file;
-            std::vector<std::string> m_patterns;
+            const std::string m_name;
+            const std::string m_description;
+            const std::string m_file;
+            std::vector<const std::string> m_patterns;
     };
 }
 

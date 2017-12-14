@@ -3,6 +3,7 @@
 #include <regex>
 #include "medic/py.h"
 #include "dirent.h"
+#include <fnmatch.h>
 #include "medic/pluginManager.h"
 
 #ifdef _DEBUG
@@ -63,6 +64,47 @@ void MdPluginManager::reloadPlugins()
     loadPlugins();
 }
 
+const MdKarte *MdPluginManager::getKarte(const std::string &name) const
+{
+    std::map<const std::string, const MdKarte *>::const_iterator it = m_kartes.find(name);
+    if (it != m_kartes.end())
+    {
+        return it->second;
+    }
+
+    return NULL;
+}
+
+std::vector<std::string> MdPluginManager::getKartes() const
+{
+    std::vector<std::string> kartes;
+    for (std::map<const std::string, const MdKarte *>::const_iterator it = m_kartes.begin(); it != m_kartes.end(); ++it)
+    {
+        kartes.push_back(it->first);
+    }
+
+    return kartes;
+}
+
+std::vector<const MdTester *> MdPluginManager::getTesters(const MdKarte *karte) const
+{
+    std::vector<const MdTester *> testers;
+
+    for (std::map<const std::string, const MdTester *>::const_iterator tit = m_testers.begin(); tit != m_testers.end(); ++tit)
+    {
+        for (std::vector<std::string>::const_iterator pit = karte->patterns().begin(); pit != karte->patterns().end(); ++pit)
+        {
+            if (fnmatch(pit->c_str(), tit->first.c_str(), 0) == 0)
+            {
+                testers.push_back(tit->second);
+                break;
+            }
+        }
+    }
+
+    return testers;
+}
+
 MdPluginManager::MdPluginManager()
 {
     loadPlugins();
@@ -90,7 +132,7 @@ void MdPluginManager::searchKartes()
 
         if (readKarte(*it, name, description, patterns))
         {
-            std::map<std::string, MdKarte *>::iterator kit = m_kartes.find(name);
+            std::map<const std::string, const MdKarte *>::iterator kit = m_kartes.find(name);
             if (kit != m_kartes.end())
             {
                 #ifdef _DEBUG
@@ -156,7 +198,7 @@ void MdPluginManager::searchTesters()
         MdTester *tester = regFunc();
         std::string name = tester->Name();
 
-        std::map<std::string, MdTester *>::iterator tit = m_testers.find(name);
+        std::map<const std::string, const MdTester *>::iterator tit = m_testers.find(name);
         if (tit != m_testers.end())
         {
             #ifdef _DEBUG
@@ -179,6 +221,11 @@ void MdPluginManager::searchTesters()
     #ifdef _DEBUG
     std::cout << "[MEDIC] Search py testers...\n";
     #endif // _DEBUG
+
+    if (!Py_IsInitialized())
+    {
+        Py_Initialize();
+    }
 
     searchFiles("MEDIC_TESTER_PATH", regex_ext_py, py_files);
 
@@ -323,7 +370,7 @@ void MdPluginManager::searchTesters()
             MdTester *tester = new MdPyTester(instance);
             std::string name = tester->Name();
 
-            std::map<std::string, MdTester*>::iterator tit = m_testers.find(name);
+            std::map<const std::string, const MdTester *>::iterator tit = m_testers.find(name);
             if (tit != m_testers.end())
             {
                 #ifdef _DEBUG
@@ -362,13 +409,13 @@ void MdPluginManager::loadPlugins()
 
 void MdPluginManager::unloadPlugins()
 {
-    for (std::map<std::string, MdKarte *>::iterator it = m_kartes.begin(); it != m_kartes.end(); ++it)
+    for (std::map<const std::string, const MdKarte *>::iterator it = m_kartes.begin(); it != m_kartes.end(); ++it)
     {
         delete (it->second);
     }
     m_kartes.clear();
 
-    for (std::map<std::string, MdTester *>::iterator it = m_testers.begin(); it != m_testers.end(); ++it)
+    for (std::map<const std::string, const MdTester *>::iterator it = m_testers.begin(); it != m_testers.end(); ++it)
     {
         delete (it->second);
     }    

@@ -4,12 +4,12 @@
 using namespace MEDIC;
 
 
-MdReport::MdReport(MdNode *node)
+MdReport::MdReport(const MdNode *node)
     : m_node(node) {};
 
 MdReport::~MdReport() {};
 
-MdNode *MdReport::node() const
+const MdNode *MdReport::node() const
 {
     return m_node;
 }

@@ -18,8 +18,6 @@ namespace MEDIC
             virtual PyObject *getPythonObject() const;
 
         protected:
-            std::string m_name;
-            std::string m_type;
             PyObject *m_pyobj;
 	};
 }

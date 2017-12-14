@@ -9,12 +9,12 @@ namespace MEDIC
     class MdReport
     {
         public:
-            MdReport(MdNode *node);
+            MdReport(const MdNode *node);
             virtual ~MdReport();
-            MdNode *node() const;
+            const MdNode *node() const;
 
         protected:
-            MdNode *m_node;
+            const MdNode *m_node;
     };
 }
 

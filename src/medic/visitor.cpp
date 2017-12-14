@@ -4,12 +4,42 @@
 using namespace MEDIC;
 
 
-MdVisitor::MdVisitor(const MdKarte *karte) : m_karte(karte) {}
+MdVisitor::MdVisitor(const MdPluginManager *manager)
+    : m_manager(manager), m_karte(NULL) {}
 
 MdVisitor::~MdVisitor()
 {
     clearAllReports();
     clearNodes();
+}
+
+bool MdVisitor::setKarte(const std::string &name)
+{
+    const MdKarte *karte = m_manager->getKarte(name);
+    if (karte == NULL)
+    {
+        return false;
+    }
+
+    setKarte(karte);
+
+    return true;
+}
+
+bool MdVisitor::setKarte(const MdKarte *karte)
+{
+    clearAllReports();
+    m_testers.clear();
+
+    m_karte = karte;
+
+    std::vector<const MdTester *> testers = m_manager->getTesters(karte);
+    for (std::vector<const MdTester *>::iterator it = testers.begin(); it != testers.end(); ++it)
+    {
+        m_testers[(*it)->Name()] = *it;
+    }
+
+    return true;
 }
 
 const MdTester *MdVisitor::getTester(const std::string &name)

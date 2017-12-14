@@ -50,7 +50,7 @@ MdPyTester::~MdPyTester()
     Py_DECREF(m_tester);
 }
 
-bool MdPyTester::Match(MdNode *node) const
+bool MdPyTester::Match(const MdNode *node) const
 {
     bool result = false;
     PyObject *res;
@@ -114,7 +114,7 @@ bool MdPyTester::Match(MdNode *node) const
 //     return new MdParamContainer(param);
 // }
 
-MdReport *MdPyTester::test(MdNode *node) const
+MdReport *MdPyTester::test(const MdNode *node) const
 {
     MdReport *report = NULL;
     PyObject *res;
@@ -162,7 +162,7 @@ MdReport *MdPyTester::test(MdNode *node) const
     return report;
 }
 
-bool MdPyTester::fix(MdReport *report, MdParamContainer *params) const
+bool MdPyTester::fix(const MdReport *report, MdParamContainer *params) const
 {
     PyObject *res;
     PyObject *arg;
