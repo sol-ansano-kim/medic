@@ -35,9 +35,9 @@ namespace MEDIC
             virtual void testAll();
             virtual void reset();
             virtual void collectNodes();
-            virtual void clearNodes();
 
         protected:
+            virtual void clearNodes();
             virtual void addReport(const MdTester *tester, MdReport *report);
             virtual void clearReports(const MdTester *tester);
             virtual void clearAllReports();

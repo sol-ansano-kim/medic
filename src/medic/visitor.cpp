@@ -1,4 +1,5 @@
 #include "medic/visitor.h"
+#include "medic/debug.h"
 
 
 using namespace MEDIC;
@@ -32,10 +33,12 @@ bool MdVisitor::setKarte(const MdKarte *karte)
     m_testers.clear();
 
     m_karte = karte;
+    debug("Set karte : " + karte->Name());
 
     std::vector<const MdTester *> testers = m_manager->getTesters(karte);
     for (std::vector<const MdTester *>::iterator it = testers.begin(); it != testers.end(); ++it)
     {
+        debug("Add tester : " + (*it)->Name());
         m_testers[(*it)->Name()] = *it;
     }
 
@@ -91,6 +94,8 @@ void MdVisitor::test(const std::string &name)
 
 void MdVisitor::test(const MdTester *tester)
 {
+    debug("Test start : " + tester->Name());
+
     if (!hasTester(tester))
     {
         return;
@@ -115,6 +120,8 @@ void MdVisitor::test(const MdTester *tester)
 
 void MdVisitor::testAll()
 {
+    debug("Test all start");
+
     clearAllReports();
 
     for (NameTesterMap::iterator it = m_testers.begin(); it != m_testers.end(); ++it)
@@ -142,10 +149,15 @@ void MdVisitor::reset()
     clearNodes();
 }
 
-void MdVisitor::collectNodes() {}
+void MdVisitor::collectNodes()
+{
+    debug("Collect nodes");
+}
 
 void MdVisitor::clearNodes()
 {
+    debug("Clear nodes");
+
     for (NodePtrVec::iterator it = m_nodes.begin(); it != m_nodes.end(); ++it)
     {
         delete (*it);
@@ -156,6 +168,8 @@ void MdVisitor::clearNodes()
 
 void MdVisitor::addReport(const MdTester *tester, MdReport *report)
 {
+    debug("add report : " + tester->Name() + ", " + report->node()->name());
+
     TesterReportsMap::iterator it = m_reports.find(tester);
     if (it == m_reports.end())
     {
@@ -168,6 +182,8 @@ void MdVisitor::addReport(const MdTester *tester, MdReport *report)
 
 void MdVisitor::clearReports(const MdTester *tester)
 {
+    debug("Clear reports : " + tester->Name());
+
     TesterReportsMap::iterator tit = m_reports.find(tester);
     if (tit == m_reports.end())
     {
@@ -184,6 +200,8 @@ void MdVisitor::clearReports(const MdTester *tester)
 
 void MdVisitor::clearAllReports()
 {
+    debug("clear all reports");
+
     for (TesterReportsMap::iterator tit = m_reports.begin(); tit != m_reports.end(); ++tit)
     {
         for (ReportPtrVec::iterator rit = tit->second.begin(); rit != tit->second.end(); ++rit)
