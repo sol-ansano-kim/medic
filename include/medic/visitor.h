@@ -23,7 +23,7 @@ namespace MEDIC
     {
         public:
             MdVisitor(const MdPluginManager *manager);
-            ~MdVisitor();
+            virtual ~MdVisitor();
             bool setKarte(const std::string &name);
             bool setKarte(const MdKarte *karte);
             const MdTester *getTester(const std::string &name);
