@@ -5,10 +5,7 @@
 #include "dirent.h"
 #include <fnmatch.h>
 #include "medic/pluginManager.h"
-
-#ifdef _DEBUG
-#include <iostream>
-#endif // _DEBUG
+#include "medic/debug.h"
 
 
 namespace MEDIC
@@ -75,7 +72,18 @@ const MdKarte *MdPluginManager::getKarte(const std::string &name) const
     return NULL;
 }
 
-std::vector<std::string> MdPluginManager::getKartes() const
+const MdTester *MdPluginManager::getTester(const std::string &name) const
+{
+    std::map<const std::string, const MdTester *>::const_iterator it = m_testers.find(name);
+    if (it != m_testers.end())
+    {
+        return it->second;
+    }
+
+    return NULL;
+}
+
+std::vector<std::string> MdPluginManager::getKarteNames() const
 {
     std::vector<std::string> kartes;
     for (std::map<const std::string, const MdKarte *>::const_iterator it = m_kartes.begin(); it != m_kartes.end(); ++it)
@@ -84,6 +92,17 @@ std::vector<std::string> MdPluginManager::getKartes() const
     }
 
     return kartes;
+}
+
+std::vector<std::string> MdPluginManager::getTesterNames() const
+{
+    std::vector<std::string> testers;
+    for (std::map<const std::string, const MdTester *>::const_iterator it = m_testers.begin(); it != m_testers.end(); ++it)
+    {
+        testers.push_back(it->first);
+    }
+
+    return testers;
 }
 
 std::vector<const MdTester *> MdPluginManager::getTesters(const MdKarte *karte) const
@@ -118,9 +137,7 @@ MdPluginManager::~MdPluginManager()
 void MdPluginManager::searchKartes()
 {
     std::vector<std::string> files;
-    #ifdef _DEBUG
-    std::cout << "[MEDIC] Search kartes...\n";
-    #endif // _DEBUG
+    debug("Search kartes...");
 
     searchFiles("MEDIC_KARTE_PATH", regex_ext_karte, files);
 
@@ -135,24 +152,18 @@ void MdPluginManager::searchKartes()
             std::map<const std::string, const MdKarte *>::iterator kit = m_kartes.find(name);
             if (kit != m_kartes.end())
             {
-                #ifdef _DEBUG
-                std::cout << "[MEDIC] '" << name << "' is already registered. Ignore : " << *it << std::endl;
-                #endif // _DEBUG
+                warn("'" + name + "' is already registered. Ignore : " + *it);
             }
             else
             {
-                #ifdef _DEBUG
-                std::cout << "[MEDIC] Register a karte : " << name << std::endl;
-                #endif // _DEBUG
+                debug("Register a karte : " + name);
 
-                MdKarte *karte = new MdKarte(name, description);
+                MdKarte *karte = new MdKarte(name, description, *it);
                 m_kartes[name] = karte;
 
                 for (std::vector<std::string>::iterator pit = patterns.begin(); pit != patterns.end(); ++pit)
                 {
-                    #ifdef _DEBUG
-                    std::cout << "   add pattern : " << *pit << std::endl;
-                    #endif // _DEBUG
+                    debug("   add pattern : " + *pit);
                     
                     karte->addPattern(*pit);
                 }
@@ -166,9 +177,7 @@ void MdPluginManager::searchTesters()
     std::vector<std::string> dl_files;
     std::vector<std::string> py_files;
 
-    #ifdef _DEBUG
-    std::cout << "[MEDIC] Search dl testers...\n";
-    #endif // _DEBUG
+    debug("Search dl testers...");
 
     searchFiles("MEDIC_TESTER_PATH", regex_ext_dl, dl_files);
 
@@ -177,9 +186,7 @@ void MdPluginManager::searchTesters()
         void *dl = dlopen((*it).c_str(), RTLD_LAZY | RTLD_LOCAL);
         if (!dl)
         {
-            #ifdef _DEBUG
-            std::cout << "[MEDIC] failed to dlopen : " << dlerror() << std::endl;
-            #endif
+            debug((std::string)"Failed to dlopen : " + dlerror());
 
             continue;
         }
@@ -187,9 +194,7 @@ void MdPluginManager::searchTesters()
         CreateTesterFuncType regFunc = (CreateTesterFuncType) dlsym(dl, "Create");
         if (!regFunc)
         {
-            #ifdef _DEBUG
-            std::cout << "[MEDIC] failed to dlsym : " << dlerror() << std::endl;
-            #endif
+            debug((std::string)"Failed to dlsym : " + dlerror());
 
             dlclose(dl);
             continue;
@@ -201,26 +206,20 @@ void MdPluginManager::searchTesters()
         std::map<const std::string, const MdTester *>::iterator tit = m_testers.find(name);
         if (tit != m_testers.end())
         {
-            #ifdef _DEBUG
-            std::cout << "[MEDIC] '" << name << "' is already registered. Ignore : " << *it << std::endl;
-            #endif // _DEBUG
+            warn(name + "' is already registered. Ignore : " + *it);
 
             delete tester;
             dlclose(dl);
             continue;
         }
 
-        #ifdef _DEBUG
-        std::cout << "[MEDIC] Register a tester : " << name << std::endl;
-        #endif // _DEBUG
+        debug("Register a tester : " + name);
 
         m_testers[name] = tester;
         m_dls.push_back(dl);
     }
 
-    #ifdef _DEBUG
-    std::cout << "[MEDIC] Search py testers...\n";
-    #endif // _DEBUG
+    debug("Search py testers...");
 
     if (!Py_IsInitialized())
     {
@@ -238,9 +237,9 @@ void MdPluginManager::searchTesters()
         {
             PyErr_Print();
         }
-
-        std::cout << "[MEDIC] Failed to load module 'imp'\n";
         #endif // _DEBUG
+
+        error("Failed to load module 'imp'");
 
         return;
     }
@@ -255,9 +254,9 @@ void MdPluginManager::searchTesters()
         {
             PyErr_Print();
         }
-
-        std::cout << "[MEDIC] Failed to get function 'load_source'\n";
         #endif // _DEBUG
+
+        error("Failed to get function 'load_source'");
 
         return;
     }
@@ -269,17 +268,15 @@ void MdPluginManager::searchTesters()
         std::smatch m;
         if (!std::regex_search(*it, m, regex_py_base))
         {
-            #ifdef _DEBUG
-            std::cout << "[MEDIC] Failed to read python file : " << *it << std::endl;
-            #endif // _DEBUG
+            debug("Failed to read python file" + *it);
+
             continue;
         }
 
         if (m.size() != 2)
         {
-            #ifdef _DEBUG
-            std::cout << "[MEDIC] Failed to read python file : " << *it << std::endl;
-            #endif // _DEBUG
+            debug("Failed to read python file" + *it);
+
             continue;
         }
 
@@ -295,13 +292,12 @@ void MdPluginManager::searchTesters()
         PyObject *module = PyObject_CallObject(load_source, args);
         if (module == NULL)
         {
-            #ifdef _DEBUG
-            std::cout << "[MEDIC] Failed to import python file : " << *it << std::endl;
-            #endif // _DEBUG
+            debug("Failed to import python file" + *it);
 
             Py_DECREF(arg1);
             Py_DECREF(arg2);
             Py_DECREF(args);
+
             continue;
         }
 
@@ -316,13 +312,14 @@ void MdPluginManager::searchTesters()
             {
                 PyErr_Print();
             }
-            std::cout << "[MEDIC] Cannot find the 'Create' function : " << *it << std::endl;
             #endif // _DEBUG
+            debug("Ignore : " + *it);
 
             Py_DECREF(arg1);
             Py_DECREF(arg2);
             Py_DECREF(args);
             Py_DECREF(module);
+
             continue;
         }
 
@@ -335,9 +332,8 @@ void MdPluginManager::searchTesters()
             {
                 PyErr_Print();
             }
-
-            std::cout << "[MEDIC] 'Create' function is not callable : " << *it << std::endl;
             #endif // _DEBUG
+            debug("'Create' function is not callable. Ignore : " + *it);
 
             Py_DECREF(arg1);
             Py_DECREF(arg2);
@@ -356,6 +352,7 @@ void MdPluginManager::searchTesters()
                 PyErr_Print();
             }
             #endif // _DEBUG
+            debug("Failed to get a Tester instance : " + *it);
 
             Py_DECREF(arg1);
             Py_DECREF(arg2);
@@ -373,18 +370,14 @@ void MdPluginManager::searchTesters()
             std::map<const std::string, const MdTester *>::iterator tit = m_testers.find(name);
             if (tit != m_testers.end())
             {
-                #ifdef _DEBUG
-                std::cout << "[MEDIC] '" << name << "' is already registered. Ignore : " << *it << std::endl;
-                #endif // _DEBUG
+                warn("'" + name + "' is already registered. Ignore : " + *it);
 
                 delete tester;
                 Py_DECREF(instance);
             }
             else
             {
-                #ifdef _DEBUG
-                std::cout << "[MEDIC] Register a tester : " << name << std::endl;
-                #endif // _DEBUG
+                debug("Register a karte : " + name);
 
                 m_testers[name] = tester;
             }
@@ -464,9 +457,7 @@ void MEDIC::searchFiles(const char* envname, const std::regex& ext, std::vector<
 
                         finded += fname;
 
-                        #ifdef _DEBUG
-                            std::cout << "[MEDIC] Found '"<< finded << "'\n";
-                        #endif // _DEBUG
+                        debug("Found '" + finded + "'");
 
                         files.push_back(finded);
                     }
@@ -572,9 +563,7 @@ bool MEDIC::readKarte(std::string filename, std::string &name, std::string &desc
 
     if (!is_valid_tester)
     {
-        #ifdef _DEBUG
-        std::cout << "[MEDIC] Invalid karte file : " << filename << std::endl;
-        #endif // _DEBUG
+        warn("Invalid karte file : " + filename);
     }
 
     return is_valid_tester;

@@ -19,7 +19,9 @@ namespace MEDIC
             static MdPluginManager *Instance();
             void reloadPlugins();
             const MdKarte *getKarte(const std::string &name) const;
-            std::vector<std::string> getKartes() const;
+            const MdTester *getTester(const std::string &name) const;
+            std::vector<std::string> getKarteNames() const;
+            std::vector<std::string> getTesterNames() const;
             std::vector<const MdTester *> getTesters(const MdKarte *karte) const;
 
         private:
