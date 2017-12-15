@@ -1,6 +1,4 @@
-#ifdef _DEBUG
-#include <iostream>
-#endif // _DEBUG
+#include "medic/debug.h"
 #include "medic/pytester.h"
 
 
@@ -60,9 +58,7 @@ bool MdPyTester::Match(const MdNode *node) const
     py_node = node->getPythonObject();
     if (py_node == NULL)
     {
-        #ifdef _DEBUG
-        std::cout << "[MEDIC] WARNING - Failed to get python object.\n";
-        #endif // _DEBUG
+        warn("Failed to get python object");
 
         return false;
     }
@@ -124,9 +120,7 @@ MdReport *MdPyTester::test(const MdNode *node) const
     py_node = node->getPythonObject();
     if (py_node == NULL)
     {
-        #ifdef _DEBUG
-        std::cout << "[MEDIC] WARNING - Failed to get python object.\n";
-        #endif // _DEBUG
+        warn("Failed to get python object.");
 
         return NULL;
     }
@@ -177,9 +171,7 @@ bool MdPyTester::fix(const MdReport *report, MdParamContainer *params) const
     py_node = report->node()->getPythonObject();
     if (py_node == NULL)
     {
-        #ifdef _DEBUG
-        std::cout << "[MEDIC] WARNING - Failed to get python object.\n";
-        #endif // _DEBUG
+        warn("Failed to get python object");
 
         return false;
     }
@@ -220,9 +212,7 @@ bool MdPyTester::IsValidTester(PyObject *instance, PyObject *baseClass)
 
     if (instance == NULL)
     {
-        #ifdef _DEBUG
-        std::cout << "[MEDIC] ERROR - NULL object\n";
-        #endif // _DEBUG
+        error("NULL object");
 
         return false;
     }
@@ -234,9 +224,8 @@ bool MdPyTester::IsValidTester(PyObject *instance, PyObject *baseClass)
         {
             PyErr_Print();
         }
-
-        std::cout << "[MEDIC] ERROR - Given object is not a instance of base class\n";
         #endif //_DEBUG
+        warn("Given object is not a instance of base class");
 
         return false;
     }
@@ -253,17 +242,15 @@ bool MdPyTester::IsValidTester(PyObject *instance, PyObject *baseClass)
         if (PyErr_Occurred())
         {
             PyErr_Print();
-            std::cout << "[MEDIC] ERROR - Invalid function : Name()\n";
         }
         #endif // _DEBUG
+        warn("Invalid function : Name()");
 
         return false;
     }
     if (!PyObject_TypeCheck(res, &PyBaseString_Type))
     {
-        #ifdef _DEBUG
-        std::cout << "[MEDIC] WARNING - Invalid return variable type : Name()\n";
-        #endif // _DEBUG
+        warn("Invalid return variable type : Name()");
 
         Py_DECREF(res);
         return false;
@@ -283,17 +270,15 @@ bool MdPyTester::IsValidTester(PyObject *instance, PyObject *baseClass)
         if (PyErr_Occurred())
         {
             PyErr_Print();
-            std::cout << "[MEDIC] ERROR - Invalid function : Description()\n";
         }
         #endif // _DEBUG
+        warn("Invalid function : Description()");
 
         return false;
     }
     if (!PyObject_TypeCheck(res, &PyBaseString_Type))
     {
-        #ifdef _DEBUG
-        std::cout << "[MEDIC] WARNING - Invalid return variable type : Description()\n";
-        #endif // _DEBUG
+        warn("Invalid return variable type : Description()");
 
         Py_DECREF(res);
         return false;
@@ -319,17 +304,15 @@ bool MdPyTester::IsValidTester(PyObject *instance, PyObject *baseClass)
         if (PyErr_Occurred())
         {
             PyErr_Print();
-            std::cout << "[MEDIC] ERROR - Invalid function : IsFixable()\n";
         }
         #endif // _DEBUG
+        warn("Invalid function : IsFixable()");
 
         return false;
     }
     if (!PyObject_TypeCheck(res, &PyBool_Type))
     {
-        #ifdef _DEBUG
-        std::cout << "[MEDIC] WARNING - Invalid return variable type : IsFixable()\n";
-        #endif // _DEBUG
+        warn("Invalid return variable type : IsFixable()");
 
         Py_DECREF(res);
         return false;
