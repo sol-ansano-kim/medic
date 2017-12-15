@@ -122,7 +122,7 @@ MdParameter::~MdParameter()
     destroy();
 }
 
-bool MdParameter::setType(MdTypes type)
+bool MdParameter::setType(MdParamType type)
 {
     destroy();
     m_type = type;
@@ -130,7 +130,7 @@ bool MdParameter::setType(MdTypes type)
     return allocate();
 }
 
-MdTypes MdParameter::getType() const
+MdParamType MdParameter::getType() const
 {
     return m_type;
 }
@@ -495,6 +495,13 @@ MdParameter *MdParamContainer::getParam(std::string name)
     return 0;
 }
 
+bool MdParamContainer::hasParam(std::string name)
+{
+    ParamPtrMap::iterator it = m_params.find(name);
+
+    return it != m_params.end();
+}
+
 std::vector<std::string> MdParamContainer::names()
 {
     std::vector<std::string> param_names;
@@ -504,6 +511,70 @@ std::vector<std::string> MdParamContainer::names()
     }
 
     return param_names;
+}
+
+bool MdParamContainer::getBool(std::string paramName, size_t index)
+{
+    bool v = false;
+    get(paramName, v, index);
+
+    return v;
+}
+
+int MdParamContainer::getInt(std::string paramName, size_t index)
+{
+    int v = 0;
+    get(paramName, v, index);
+
+    return v;
+}
+
+float MdParamContainer::getFloat(std::string paramName, size_t index)
+{
+    float v = 0.f;
+    get(paramName, v, index);
+
+    return v;
+}
+
+std::string MdParamContainer::getString(std::string paramName, size_t index)
+{
+    std::string v("");
+    get(paramName, v, index);
+
+    return v;
+}
+
+bool MdParamContainer::getDefaultBool(std::string paramName)
+{
+    bool v = false;
+    getDefault(paramName, v);
+
+    return v;
+}
+
+int MdParamContainer::getDefaultInt(std::string paramName)
+{
+    int v = 1;
+    getDefault(paramName, v);
+
+    return v;
+}
+
+float MdParamContainer::getDefaultFloat(std::string paramName)
+{
+    float v = 0.0f;
+    getDefault(paramName, v);
+
+    return v;
+}
+
+std::string MdParamContainer::getDefaultString(std::string paramName)
+{
+    std::string v("");
+    getDefault(paramName, v);
+
+    return v;
 }
 
 template <typename T>void CopyArrayValue(void *dst, void *src)

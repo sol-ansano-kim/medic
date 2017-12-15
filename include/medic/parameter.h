@@ -30,7 +30,7 @@ namespace MEDIC
             size_t m_size;
     };
 
-    enum MdTypes
+    enum MdParamType
     {
         MdNull = 0,
         MdBool,
@@ -49,14 +49,12 @@ namespace MEDIC
         public:
             MdParameter();
             template <typename T>
-            MdParameter(std::string name, std::string label, MdTypes type, const T &defaultValue, MdAction *action=0);
-            template <typename T>
-            static MdParameter *Create(std::string name, std::string label, MdTypes type, const T &defaultValue, MdAction *action=0);
+            MdParameter(std::string name, std::string label, MdParamType type, T defaultValue, MdAction *action=0);
             MdParameter(const MdParameter &p);
             MdParameter &operator=(const MdParameter &p);
             ~MdParameter();
-            bool setType(MdTypes type);
-            MdTypes getType() const;
+            bool setType(MdParamType type);
+            MdParamType getType() const;
             void setName(std::string);
             std::string getName() const;
             void setLabel(std::string);
@@ -100,23 +98,17 @@ namespace MEDIC
             void *m_value;
             void *m_default;
             size_t m_size;
-            MdTypes m_type;
+            MdParamType m_type;
             MdAction *m_action;
     };
 
     template <typename T>
-    MdParameter::MdParameter(std::string name, std::string label, MdTypes type, const T &defaultValue, MdAction *action)
+    MdParameter::MdParameter(std::string name, std::string label, MdParamType type, T defaultValue, MdAction *action)
     : m_name(name), m_label(label), m_value(0), m_default(0)
     {
         setType(type);
         m_action = action;
         setDefault(defaultValue);
-    }
-
-    template <typename T>
-    MdParameter *MdParameter::Create(std::string name, std::string label, MdTypes type, const T &defaultValue, MdAction *action)
-    {
-        return new MdParameter(name, label, type, defaultValue, action);
     }
 
 
@@ -126,25 +118,53 @@ namespace MEDIC
             MdParamContainer();
             ~MdParamContainer();
             bool append(MdParameter *p);
+            template <typename T>
+            bool append(std::string name, std::string label, MdParamType type, T defaultValue, MdAction *action=NULL);
+            template <typename T>
+            bool append(std::string name, std::string label, MdParamType type, T defaultValue);
             bool remove(MdParameter *p);
             MdParameter *getParam(std::string name);
+            bool hasParam(std::string name);
             void clear();
             size_t size() const;
             std::vector<std::string> names();
 
             template <typename T>
-            bool set(std::string paramName, const T &v, size_t index=0);
+            bool set(std::string paramName, T v, size_t index=0);
             template <typename T>
             bool get(std::string paramName, T &v, size_t index=0);
             template <typename T>
             bool getDefault(std::string paramName, T &v);
+
+            bool getBool(std::string paramName, size_t index=0);
+            int getInt(std::string paramName, size_t index=0);
+            float getFloat(std::string paramName, size_t index=0);
+            std::string getString(std::string paramName, size_t index=0);
+            bool getDefaultBool(std::string paramName);
+            int getDefaultInt(std::string paramName);
+            float getDefaultFloat(std::string paramName);
+            std::string getDefaultString(std::string paramName);
 
         private:
             ParamPtrMap m_params;
     };
 
     template <typename T>
-    bool MdParamContainer::set(std::string paramName, const T &v, size_t index)
+    bool MdParamContainer::append(std::string name, std::string label, MdParamType type, T defaultValue, MdAction *action)
+    {
+        MdParameter *param = new MdParameter(name, label, type, defaultValue, action);
+        return append(param);
+    }
+
+    template <typename T>
+    bool MdParamContainer::append(std::string name, std::string label, MdParamType type, T defaultValue)
+    {
+        MdParameter *param = new MdParameter(name, label, type, defaultValue, NULL);
+        return append(param);
+    }
+
+    template <typename T>
+    bool MdParamContainer::set(std::string paramName, T v, size_t index)
     {
         MdParameter *p = getParam(paramName);
         if (p)
