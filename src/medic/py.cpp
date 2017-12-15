@@ -1,7 +1,4 @@
 #include "medic/py.h"
-#ifdef _DEBUG
-#include <iostream>
-#endif // _DEBUG
 
 
 using namespace MEDIC;
