@@ -1,0 +1,5 @@
+{
+    "Name": "py",
+    "Description": "py testers",
+    "Testers": ["*PY"],
+}

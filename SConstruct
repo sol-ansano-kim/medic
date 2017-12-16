@@ -63,13 +63,14 @@ for test in excons.glob("test/*.cpp"):
                  "defs": defs,
                  "cppflags": cppflags,
                  "incdirs": ["include"],
+                 "prefix": "test",
                  "srcs": [test],
                  "libdirs": [out_libdir],
                  "libs": ["medic"],
                  "rpath": out_libdir,
                  "custom": [python.Require]})
 
-for test_plugin in excons.glob("testPlugin/*.cpp"):
+for test_plugin in excons.glob("test/testers/*.cpp"):
     plug_base = os.path.splitext(os.path.basename(test_plugin))[0]
 
     prjs.append({"name": plug_base,
@@ -80,7 +81,7 @@ for test_plugin in excons.glob("testPlugin/*.cpp"):
                  "srcs": [test_plugin],
                  "libs": ["medic"],
                  "libdirs": [out_libdir],
-                 "prefix": "tester",
+                 "prefix": "test/testers",
                  "symvis": "default",
                  "rpath": out_libdir,
                  "custom": [python.SoftRequire]})

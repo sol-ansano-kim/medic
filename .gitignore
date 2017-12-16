@@ -4,7 +4,7 @@
 .build
 release/
 debug/
-test/
-testPlugin/
 *.dylib
+*.so
+*.dll
 excons.cache
