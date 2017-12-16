@@ -5,7 +5,7 @@
 #include "dirent.h"
 #include <fnmatch.h>
 #include "medic/pluginManager.h"
-#include "medic/debug.h"
+#include "medic/logger.h"
 
 
 namespace MEDIC
@@ -292,7 +292,7 @@ void MdPluginManager::searchTesters()
         PyObject *module = PyObject_CallObject(load_source, args);
         if (module == NULL)
         {
-            debug("Failed to import python file" + *it);
+            debug("Failed to import python file : " + *it);
 
             Py_DECREF(arg1);
             Py_DECREF(arg2);

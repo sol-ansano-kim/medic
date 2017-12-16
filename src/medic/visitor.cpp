@@ -1,5 +1,5 @@
 #include "medic/visitor.h"
-#include "medic/debug.h"
+#include "medic/logger.h"
 
 
 using namespace MEDIC;

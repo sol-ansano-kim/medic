@@ -1,7 +1,7 @@
 #ifndef MEDIC_DEBUG_INCLUDED
 #define MEDIC_DEBUG_INCLUDED
 
-#include <string.h>
+#include <string>
 
 #ifdef _DEBUG
 #include <iostream>

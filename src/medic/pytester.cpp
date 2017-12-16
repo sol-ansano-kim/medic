@@ -1,4 +1,4 @@
-#include "medic/debug.h"
+#include "medic/logger.h"
 #include "medic/pytester.h"
 
 
