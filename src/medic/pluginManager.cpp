@@ -377,7 +377,7 @@ void MdPluginManager::searchTesters()
             }
             else
             {
-                debug("Register a karte : " + name);
+                debug("Register a pyteser : " + name);
 
                 m_testers[name] = tester;
             }
