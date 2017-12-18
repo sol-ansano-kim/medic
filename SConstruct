@@ -1,5 +1,6 @@
 import excons
 from excons.tools import python
+from excons.tools import maya
 import os
 import sys
 import shutil
@@ -11,7 +12,13 @@ minor = 0
 patch = 0
 
 
+maya.SetupMscver()
 env = excons.MakeBaseEnv()
+
+
+mayaver = excons.GetArgument("mayaver", None)
+if not mayaver:
+    mayaver = excons.GetArgument("with-maya", None)
 
 
 defs = []
@@ -53,6 +60,20 @@ prjs.append({"name": "_medic",
              "libdirs": [out_libdir],
              "libs": ["medic"],
              "custom": [python.SoftRequire]})
+
+
+if mayaver:
+    ## build maya
+    prjs.append({"name": "mayaMedic",
+                 "type": "sharedlib",
+                 "alias": "medic-maya",
+                 "defs": defs,
+                 "cppflags": cppflags,
+                 "incdirs": ["include"],
+                 "srcs": excons.glob("src/medic/maya/*.cpp"),
+                 "symvis": "default",
+                 "install": {out_incdir + "/medic/maya": excons.glob("include/medic/maya/*.h")},
+                 "custom": [python.SoftRequire, maya.Require]})
 
 
 for test in excons.glob("test/*.cpp"):
