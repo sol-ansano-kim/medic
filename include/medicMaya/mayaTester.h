@@ -2,8 +2,8 @@
 #define MEDIC_MAYA_MAYATESTER_INCLUDED
 
 
-#include "medic/maya/mayaNode.h"
-#include "medic/maya/mayaReport.h"
+#include "medicMaya/mayaNode.h"
+#include "medicMaya/mayaReport.h"
 #include "medic/tester.h"
 
 

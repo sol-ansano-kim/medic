@@ -1,4 +1,4 @@
-#include "medic/maya/mayaReport.h"
+#include "medicMaya/mayaReport.h"
 
 
 using namespace MEDIC;

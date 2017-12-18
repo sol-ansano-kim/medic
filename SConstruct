@@ -70,9 +70,9 @@ if mayaver:
                  "defs": defs,
                  "cppflags": cppflags,
                  "incdirs": ["include"],
-                 "srcs": excons.glob("src/medic/maya/*.cpp"),
+                 "srcs": excons.glob("src/medicMaya/*.cpp"),
                  "symvis": "default",
-                 "install": {out_incdir + "/medic/maya": excons.glob("include/medic/maya/*.h")},
+                 "install": {out_incdir + "/medicMaya": excons.glob("include/medicMaya/*.h")},
                  "custom": [python.SoftRequire, maya.Require]})
 
 

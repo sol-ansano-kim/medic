@@ -1,5 +1,5 @@
 #include "medic/py.h"
-#include "medic/maya/mayaAPI.h"
+#include "medicMaya/mayaAPI.h"
 #include <maya/MFn.h>
 #include <maya/MFnDependencyNode.h>
 #include <maya/MItDependencyNodes.h>

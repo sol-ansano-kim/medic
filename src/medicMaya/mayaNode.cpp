@@ -1,6 +1,6 @@
 #include <Python.h>
-#include "medic/maya/mayaNode.h"
-#include "medic/maya/mayaAPI.h"
+#include "medicMaya/mayaNode.h"
+#include "medicMaya/mayaAPI.h"
 
 
 using namespace MEDIC;

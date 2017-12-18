@@ -1,5 +1,5 @@
 #include <maya/MObjectArray.h>
-#include "medic/maya/mayaVisitor.h"
+#include "medicMaya/mayaVisitor.h"
 
 
 using namespace MEDIC;

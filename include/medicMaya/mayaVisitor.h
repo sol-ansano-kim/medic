@@ -2,8 +2,8 @@
 #define MEDIC_MAYA_MAYAVISITOR_INCLUDED
 
 
-#include "medic/maya/mayaAPI.h"
-#include "medic/maya/mayaNode.h"
+#include "medicMaya/mayaAPI.h"
+#include "medicMaya/mayaNode.h"
 #include "medic/pluginManager.h"
 #include "medic/visitor.h"
 
