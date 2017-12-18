@@ -286,6 +286,7 @@ void MdPluginManager::searchTesters()
         PyObject *arg2 = PyString_FromString(it->c_str());
         Py_INCREF(arg1);
         Py_INCREF(arg2);
+        Py_INCREF(args);
         PyTuple_SetItem(args, 0, arg1);
         PyTuple_SetItem(args, 1, arg2);
 
