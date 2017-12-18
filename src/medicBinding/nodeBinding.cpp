@@ -1,4 +1,4 @@
-#include "medic/py/nodeBind.h"
+#include "medicBinding/nodeBinding.h"
 
 
 using namespace pybind11;

@@ -56,7 +56,7 @@ prjs.append({"name": "_medic",
              "rpath": out_libdir,
              "cppflags": cppflags,
              "incdirs": ["pybind11/include", "include"],
-             "srcs": excons.glob("src/medic/py/*.cpp"),
+             "srcs": excons.glob("src/medicBinding/*.cpp"),
              "libdirs": [out_libdir],
              "libs": ["medic"],
              "custom": [python.SoftRequire]})

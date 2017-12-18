@@ -1,4 +1,4 @@
-#include "medic/py/reportBind.h"
+#include "medicBinding/reportBinding.h"
 
 
 using namespace pybind11;

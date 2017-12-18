@@ -1,4 +1,4 @@
-#include "medic/py/testerBind.h"
+#include "medicBinding/testerBinding.h"
 
 
 using namespace pybind11;
