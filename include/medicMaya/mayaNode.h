@@ -25,20 +25,22 @@ namespace MEDIC
             bool isDag() const;
             // void parents(MdNodeContainer *container) const;
             // void children(MdNodeContainer *container) const;
-            MDagPath getPath();
             MObject &object();
             MFnDependencyNode &dg();
             MFnDagNode &dag();
-            PyObject *pyGetPath();
+            MDagPath path();
             PyObject *pyObject();
             PyObject *pyDg();
             PyObject *pyDag();
+            PyObject *pyPath();
 
         private:
-            bool m_is_dag;
+            void clearPyObjects();
+        private:
             MObject m_obj;
             MFnDependencyNode m_dg;
             MFnDagNode m_dag;
+            bool m_is_dag;
             PyObject *m_py_obj;
             PyObject *m_py_dg;
             PyObject *m_py_dag;

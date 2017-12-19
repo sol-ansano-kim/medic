@@ -7,14 +7,13 @@ using namespace MEDIC;
 
 
 MdMayaNode::MdMayaNode()
-    : MdNode(), m_is_dag(false) {}
+    : MdNode(), m_is_dag(false), m_py_obj(NULL), m_py_dg(NULL), m_py_dag(NULL), m_py_path(NULL) {}
 
 MdMayaNode::MdMayaNode(MObject &obj)
-    : MdNode()
+    : MdNode(), m_is_dag(false), m_py_obj(NULL), m_py_dg(NULL), m_py_dag(NULL), m_py_path(NULL)
 {
     m_obj = obj;
     m_dg.setObject(obj);
-    m_is_dag = false;
 
     if (obj.hasFn(MFn::kDagNode))
     {
@@ -24,11 +23,10 @@ MdMayaNode::MdMayaNode(MObject &obj)
 }
 
 MdMayaNode::MdMayaNode(std::string name)
-      : MdNode()
+      : MdNode(), m_is_dag(false), m_py_obj(NULL), m_py_dg(NULL), m_py_dag(NULL), m_py_path(NULL)
 {
     GetMayaObject(name, m_obj);
     m_dg.setObject(m_obj);
-    m_is_dag = false;
 
     if (m_obj.hasFn(MFn::kDagNode))
     {
@@ -39,25 +37,7 @@ MdMayaNode::MdMayaNode(std::string name)
 
 MdMayaNode::~MdMayaNode()
 {
-    if (m_py_obj != NULL)
-    {
-        Py_DECREF(m_py_obj);
-    }
-
-    if (m_py_dg != NULL)
-    {
-        Py_DECREF(m_py_dg);
-    }
-
-    if (m_py_dag != NULL)
-    {
-        Py_DECREF(m_py_dag);
-    }
-
-    if (m_py_path != NULL)
-    {
-        Py_DECREF(m_py_path);
-    }
+    clearPyObjects();
 }
 
 std::string MdMayaNode::name() const
@@ -80,19 +60,6 @@ bool MdMayaNode::isDag() const
     return m_is_dag;
 }
 
-MDagPath MdMayaNode::getPath()
-{
-    if (!isDag())
-    {
-        return MDagPath();
-    }
-
-    MDagPath path;
-    m_dag.getPath(path);
-
-    return path;
-}
-
 MObject &MdMayaNode::object()
 {
     return m_obj;
@@ -108,28 +75,31 @@ MFnDagNode &MdMayaNode::dag()
     return m_dag;
 }
 
-
-PyObject *MdMayaNode::pyGetPath()
+MDagPath MdMayaNode::path()
 {
-    if (m_py_path == NULL)
+    if (!isDag())
     {
-        if (!isDag())
-        {
-            m_py_path = GetPythonMayaBlankDag();
-        }
-        else
-        {
-            m_py_path = pyObject();
-        }
+        return MDagPath();
     }
 
-    return m_py_path;
+    MDagPath path;
+    m_dag.getPath(path);
+
+    return path;
 }
 
 PyObject *MdMayaNode::pyObject()
 {
+    if (m_py_obj != NULL)
+    {
+        return m_py_obj;
+    }
 
-    if (m_py_obj == NULL)
+    if (!IsValidObject(m_obj))
+    {
+        m_py_obj = GetPythonMayaBlankObject();
+    }
+    else
     {
         m_py_obj = GetPythonMayaObject(name());
     }
@@ -139,7 +109,16 @@ PyObject *MdMayaNode::pyObject()
 
 PyObject *MdMayaNode::pyDg()
 {
-    if (m_py_dg == NULL)
+    if (m_py_dg != NULL)
+    {
+        return m_py_dg;
+    }
+
+    if (!IsValidObject(m_obj))
+    {
+        m_py_dg = GetPythonMayaBlankDg();
+    }
+    else
     {
         m_py_dg = GetPythonMayaDg(pyObject());
     }
@@ -149,11 +128,80 @@ PyObject *MdMayaNode::pyDg()
 
 PyObject *MdMayaNode::pyDag()
 {
-    if (m_py_dag == NULL)
+    if (m_py_dag != NULL)
     {
-        m_py_dag = GetPythonMayaDag(pyObject());
+        return m_py_dag;
+    }
+
+    if (!IsValidObject(m_obj))
+    {
+        m_py_dag = GetPythonMayaBlankDag();
+    }
+    else
+    {
+        if (!isDag())
+        {
+            m_py_dag = GetPythonMayaBlankDag();
+        }
+        else
+        {
+            m_py_dag = GetPythonMayaDag(pyObject());
+        }
     }
 
     return m_py_dag;
+}
+
+PyObject *MdMayaNode::pyPath()
+{
+    if (m_py_path != NULL)
+    {
+        return m_py_path;
+    }
+
+    if (!IsValidObject(m_obj))
+    {
+        m_py_path =  GetPythonMayaBlankDagPath();
+    }
+    else
+    {
+        if (!isDag())
+        {
+            m_py_path = GetPythonMayaBlankDagPath();
+        }
+        else
+        {
+            m_py_path = GetPythonMayaDagPath(pyDag());
+        }
+    }
+
+    return m_py_path;
+}
+
+void MdMayaNode::clearPyObjects()
+{
+    if (m_py_obj != NULL)
+    {
+        Py_DECREF(m_py_obj);
+        m_py_obj = NULL;
+    }
+
+    if (m_py_dg != NULL)
+    {
+        Py_DECREF(m_py_dg);
+        m_py_dg = NULL;
+    }
+
+    if (m_py_dag != NULL)
+    {
+        Py_DECREF(m_py_dag);
+        m_py_dag = NULL;
+    }
+
+    if (m_py_path != NULL)
+    {
+        Py_DECREF(m_py_path);
+        m_py_path = NULL;
+    }
 }
 

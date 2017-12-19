@@ -75,6 +75,19 @@ if mayaver:
                  "install": {out_incdir + "/medicMaya": excons.glob("include/medicMaya/*.h")},
                  "custom": [python.SoftRequire, maya.Require]})
 
+    prjs.append({"name": "_medicMaya",
+                 "type": "dynamicmodule",
+                 "alias": "medic-maya-py",
+                 "ext": python.ModuleExtension(),
+                 "prefix": "py",
+                 "rpath": out_libdir,
+                 "cppflags": cppflags,
+                 "incdirs": ["pybind11/include", "include"],
+                 "srcs": excons.glob("src/medicMayaBinding/*.cpp"),
+                 "libdirs": [out_libdir],
+                 "libs": ["medic", "mayaMedic"],
+                 "custom": [python.SoftRequire, maya.Require]})
+
 
 for test in excons.glob("test/*.cpp"):
     test_base = os.path.splitext(os.path.basename(test))[0]
