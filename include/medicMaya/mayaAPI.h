@@ -20,8 +20,12 @@ namespace MEDIC
             PyObject *getObject(std::string name);
             PyObject *getDg(PyObject *mobject);
             PyObject *getDag(PyObject *mobject);
-            PyObject *getBlankDag();
             PyObject *getDagPath(PyObject *mdagnode);
+
+            PyObject *getBlankObject();
+            PyObject *getBlankDg();
+            PyObject *getBlankDag();
+            PyObject *getBlankDagPath();
 
         private:
             MdPyMayaSelectionList();
@@ -34,6 +38,7 @@ namespace MEDIC
             PyObject *m_class_object;
             PyObject *m_class_mfn_dep;
             PyObject *m_class_mfn_dag;
+            PyObject *m_class_dagpath;
     };
 
     static MSelectionList Selection;
@@ -43,8 +48,11 @@ namespace MEDIC
     PyObject *GetPythonMayaObject(std::string name);
     PyObject *GetPythonMayaDg(PyObject *mobject);
     PyObject *GetPythonMayaDag(PyObject *mobject);
-    PyObject *GetPythonMayaBlankDag();
     PyObject *GetPythonMayaDagPath(PyObject *mdagnode);
+    PyObject *GetPythonMayaBlankObject();
+    PyObject *GetPythonMayaBlankDg();
+    PyObject *GetPythonMayaBlankDag();
+    PyObject *GetPythonMayaBlankDagPath();
     bool IsValidObject(MObject &obj);
     MObjectArray CollectNodes();
 }

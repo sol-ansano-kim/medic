@@ -19,6 +19,7 @@ MdPyMayaSelectionList *MdPyMayaSelectionList::Instance()
     PyObject *mobj;
     PyObject *mfn_dg;
     PyObject *mfn_dag;
+    PyObject *dagpath;
 
     if (!Py_IsInitialized())
     {
@@ -89,6 +90,23 @@ MdPyMayaSelectionList *MdPyMayaSelectionList::Instance()
         #endif // _DEBUG
 
         error("Cannot find 'MFnDagNode'");
+
+        Py_DECREF(pyapi);
+
+        return NULL;
+    }
+
+    dagpath = getPyFunction(pyapi, "MDagPath");
+    if (dagpath == NULL)
+    {
+        #ifdef _DEBUG
+        if (PyErr_Occurred())
+        {
+            PyErr_Print();
+        }
+        #endif // _DEBUG
+
+        error("Cannot find 'MDagPath'");
 
         Py_DECREF(pyapi);
 
@@ -193,6 +211,11 @@ MdPyMayaSelectionList *MdPyMayaSelectionList::Instance()
 
     Py_INCREF(get_dep);
 
+    Py_INCREF(mobj);
+    Py_INCREF(mfn_dg);
+    Py_INCREF(mfn_dag);
+    Py_INCREF(dagpath);
+
     MdPyMayaSelectionList *pysel = new MdPyMayaSelectionList();
     pysel->m_sel = selection;
     pysel->m_func_add = add;
@@ -201,6 +224,7 @@ MdPyMayaSelectionList *MdPyMayaSelectionList::Instance()
     pysel->m_class_mfn_dep = mfn_dg;
     pysel->m_class_mfn_dag = mfn_dag;
     pysel->m_class_object = mobj;
+    pysel->m_class_dagpath = dagpath;
 
     return pysel;
 }
@@ -339,26 +363,6 @@ PyObject *MdPyMayaSelectionList::getDag(PyObject *mobject)
     return res;
 }
 
-PyObject *MdPyMayaSelectionList::getBlankDag()
-{
-    PyObject *res;
-
-    res = PyObject_CallObject(m_class_mfn_dag, PyBlankTuple);
-
-    if (res == NULL || PyErr_Occurred())
-    {
-        #ifdef _DEBUG
-        PyErr_Print();
-        #endif // _DEBUG
-
-        return NULL;
-    }
-
-    Py_INCREF(res);
-
-    return res;
-}
-
 PyObject *MdPyMayaSelectionList::getDagPath(PyObject *mdagnode)
 {
     PyObject *dagpath = NULL;
@@ -378,6 +382,20 @@ PyObject *MdPyMayaSelectionList::getDagPath(PyObject *mdagnode)
         return NULL;
     }
 
+    dagpath = PyObject_CallObject(m_class_dagpath, PyBlankTuple);
+    if (dagpath == NULL)
+    {
+        #ifdef _DEBUG
+        if (PyErr_Occurred())
+        {
+            PyErr_Print();
+        }
+        #endif // _DEBUG
+
+        return NULL;
+    }
+
+    Py_INCREF(dagpath);
     Py_INCREF(fn_getpath);
 
     args = PyTuple_New(1);
@@ -402,6 +420,86 @@ PyObject *MdPyMayaSelectionList::getDagPath(PyObject *mdagnode)
     Py_INCREF(dagpath);
 
     return dagpath;
+}
+
+PyObject *MdPyMayaSelectionList::getBlankObject()
+{
+    PyObject *res;
+
+    res = PyObject_CallObject(m_class_object, PyBlankTuple);
+
+    if (res == NULL || PyErr_Occurred())
+    {
+        #ifdef _DEBUG
+        PyErr_Print();
+        #endif // _DEBUG
+
+        return NULL;
+    }
+
+    Py_INCREF(res);
+
+    return res;
+}
+
+PyObject *MdPyMayaSelectionList::getBlankDg()
+{
+    PyObject *res;
+
+    res = PyObject_CallObject(m_class_mfn_dep, PyBlankTuple);
+
+    if (res == NULL || PyErr_Occurred())
+    {
+        #ifdef _DEBUG
+        PyErr_Print();
+        #endif // _DEBUG
+
+        return NULL;
+    }
+
+    Py_INCREF(res);
+
+    return res;
+}
+
+PyObject *MdPyMayaSelectionList::getBlankDag()
+{
+    PyObject *res;
+
+    res = PyObject_CallObject(m_class_mfn_dag, PyBlankTuple);
+
+    if (res == NULL || PyErr_Occurred())
+    {
+        #ifdef _DEBUG
+        PyErr_Print();
+        #endif // _DEBUG
+
+        return NULL;
+    }
+
+    Py_INCREF(res);
+
+    return res;
+}
+
+PyObject *MdPyMayaSelectionList::getBlankDagPath()
+{
+    PyObject *res;
+
+    res = PyObject_CallObject(m_class_dagpath, PyBlankTuple);
+
+    if (res == NULL || PyErr_Occurred())
+    {
+        #ifdef _DEBUG
+        PyErr_Print();
+        #endif // _DEBUG
+
+        return NULL;
+    }
+
+    Py_INCREF(res);
+
+    return res;
 }
 
 MdPyMayaSelectionList::MdPyMayaSelectionList() {}
@@ -488,18 +586,6 @@ PyObject *MEDIC::GetPythonMayaDag(PyObject *mobject)
 }
 
 
-PyObject *MEDIC::GetPythonMayaBlankDag()
-{
-    MdPyMayaSelectionList *inst = MdPyMayaSelectionList::Instance();
-    if (inst == NULL)
-    {
-        return NULL;
-    }
-
-    return inst->getBlankDag();
-}
-
-
 PyObject *MEDIC::GetPythonMayaDagPath(PyObject *mdagnode)
 {
     if (mdagnode == NULL)
@@ -514,6 +600,54 @@ PyObject *MEDIC::GetPythonMayaDagPath(PyObject *mdagnode)
     }
 
     return inst->getDagPath(mdagnode);
+}
+
+
+PyObject *MEDIC::GetPythonMayaBlankObject()
+{
+    MdPyMayaSelectionList *inst = MdPyMayaSelectionList::Instance();
+    if (inst == NULL)
+    {
+        return NULL;
+    }
+
+    return inst->getBlankObject();
+}
+
+
+PyObject *MEDIC::GetPythonMayaBlankDg()
+{
+    MdPyMayaSelectionList *inst = MdPyMayaSelectionList::Instance();
+    if (inst == NULL)
+    {
+        return NULL;
+    }
+
+    return inst->getBlankDg();
+}
+
+
+PyObject *MEDIC::GetPythonMayaBlankDag()
+{
+    MdPyMayaSelectionList *inst = MdPyMayaSelectionList::Instance();
+    if (inst == NULL)
+    {
+        return NULL;
+    }
+
+    return inst->getBlankDag();
+}
+
+
+PyObject *MEDIC::GetPythonMayaBlankDagPath()
+{
+    MdPyMayaSelectionList *inst = MdPyMayaSelectionList::Instance();
+    if (inst == NULL)
+    {
+        return NULL;
+    }
+
+    return inst->getBlankDagPath();
 }
 
 
