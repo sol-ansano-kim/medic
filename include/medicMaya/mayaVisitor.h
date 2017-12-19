@@ -4,6 +4,7 @@
 
 #include "medicMaya/mayaAPI.h"
 #include "medicMaya/mayaNode.h"
+#include "medicMaya/mayaTester.h"
 #include "medic/pluginManager.h"
 #include "medic/visitor.h"
 
@@ -15,7 +16,7 @@ namespace MEDIC
         public:
             MdMayaVisitor(const MdPluginManager *manager);
             virtual ~MdMayaVisitor();
-            virtual bool setKarte(const MdKarte *karte);
+            bool setKarte(const MdKarte *karte);
             virtual void collectNodes();
     };
 }
