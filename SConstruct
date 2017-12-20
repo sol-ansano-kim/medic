@@ -83,7 +83,7 @@ if mayaver:
                  "rpath": out_libdir,
                  "cppflags": cppflags,
                  "incdirs": ["pybind11/include", "include"],
-                 "srcs": excons.glob("src/medicMayaBinding/*.cpp"),
+                 "srcs": excons.glob("src/medicBinding/*.cpp") + excons.glob("src/medicMayaBinding/*.cpp"),
                  "libdirs": [out_libdir],
                  "libs": ["medic", "mayaMedic"],
                  "custom": [python.SoftRequire, maya.Require]})

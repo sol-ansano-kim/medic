@@ -14,9 +14,9 @@ namespace MEDIC
     {
         public:
             MdMayaReport(const MdMayaNode *node);
-            MdMayaReport(const MdMayaNode *node, MObject &component);
+            MdMayaReport(const MdMayaNode *node, MObject &components);
             virtual ~MdMayaReport();
-            const MObject &component() const;
+            const MObject &components() const;
             bool hasComponents() const;
 
         private:
