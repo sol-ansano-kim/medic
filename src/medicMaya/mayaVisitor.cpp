@@ -10,6 +10,19 @@ MdMayaVisitor::MdMayaVisitor(const MdPluginManager *manager)
 
 MdMayaVisitor::~MdMayaVisitor() {}
 
+bool MdMayaVisitor::setKarte(const std::string &name)
+{
+    const MdKarte *karte = m_manager->getKarte(name);
+    if (karte == NULL)
+    {
+        return false;
+    }
+
+    setKarte(karte);
+
+    return true;
+}
+
 bool MdMayaVisitor::setKarte(const MdKarte *karte)
 {
     clearAllReports();
