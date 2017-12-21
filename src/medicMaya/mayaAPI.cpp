@@ -43,8 +43,6 @@ MdPyMayaSelectionList *MdPyMayaSelectionList::Instance()
         return NULL;
     }
 
-    Py_INCREF(pyapi);
-
     mobj = getPyFunction(pyapi, "MObject");
     if (mobj == NULL)
     {
@@ -75,6 +73,7 @@ MdPyMayaSelectionList *MdPyMayaSelectionList::Instance()
         error("Cannot find 'MFnDependencyNode'");
 
         Py_DECREF(pyapi);
+        Py_DECREF(mobj);
 
         return NULL;
     }
@@ -92,6 +91,8 @@ MdPyMayaSelectionList *MdPyMayaSelectionList::Instance()
         error("Cannot find 'MFnDagNode'");
 
         Py_DECREF(pyapi);
+        Py_DECREF(mobj);
+        Py_DECREF(mfn_dg);
 
         return NULL;
     }
@@ -109,6 +110,9 @@ MdPyMayaSelectionList *MdPyMayaSelectionList::Instance()
         error("Cannot find 'MDagPath'");
 
         Py_DECREF(pyapi);
+        Py_DECREF(mobj);
+        Py_DECREF(mfn_dg);
+        Py_DECREF(mfn_dag);
 
         return NULL;
     }
@@ -126,13 +130,17 @@ MdPyMayaSelectionList *MdPyMayaSelectionList::Instance()
         error("Cannot find 'MSelectionList'");
 
         Py_DECREF(pyapi);
+        Py_DECREF(mobj);
+        Py_DECREF(mfn_dg);
+        Py_DECREF(mfn_dag);
+        Py_DECREF(dagpath);
 
         return NULL;
     }
 
-    Py_INCREF(sel_class);
-
     selection = PyObject_CallObject(sel_class, PyBlankTuple);
+    Py_DECREF(sel_class);
+
     if (selection == NULL)
     {
         #ifdef _DEBUG
@@ -143,16 +151,17 @@ MdPyMayaSelectionList *MdPyMayaSelectionList::Instance()
         #endif // _DEBUG
 
         error("Failed to create 'MSelectionList'");
+
         Py_DECREF(pyapi);
-        Py_DECREF(sel_class);
+        Py_DECREF(mobj);
+        Py_DECREF(mfn_dg);
+        Py_DECREF(mfn_dag);
+        Py_DECREF(dagpath);
 
         return NULL;
     }
 
-    Py_DECREF(sel_class);
     Py_DECREF(pyapi);
-
-    Py_INCREF(selection);
 
     add = getPyFunction(selection, "add");
     if (add == NULL)
@@ -165,12 +174,15 @@ MdPyMayaSelectionList *MdPyMayaSelectionList::Instance()
         #endif // _DEBUG
 
         error("Cannot find 'MSelectionList.add'");
+
+        Py_DECREF(mobj);
+        Py_DECREF(mfn_dg);
+        Py_DECREF(mfn_dag);
+        Py_DECREF(dagpath);
         Py_DECREF(selection);
 
         return NULL;
     }
-
-    Py_INCREF(add);
 
     clear = getPyFunction(selection, "clear");
     if (clear == NULL)
@@ -183,13 +195,16 @@ MdPyMayaSelectionList *MdPyMayaSelectionList::Instance()
         #endif // _DEBUG
 
         error("Cannot find 'MSelectionList.clear'");
-        Py_DECREF(add);
+
+        Py_DECREF(mobj);
+        Py_DECREF(mfn_dg);
+        Py_DECREF(mfn_dag);
+        Py_DECREF(dagpath);
         Py_DECREF(selection);
+        Py_DECREF(add);
 
         return NULL;
     }
-
-    Py_INCREF(clear);
 
     get_dep = getPyFunction(selection, "getDependNode");
     if (get_dep == NULL)
@@ -202,29 +217,27 @@ MdPyMayaSelectionList *MdPyMayaSelectionList::Instance()
         #endif // _DEBUG
 
         error("Cannot find 'MSelectionList.getDependNode'");
-        Py_DECREF(add);
-        Py_INCREF(clear);
+
+        Py_DECREF(mobj);
+        Py_DECREF(mfn_dg);
+        Py_DECREF(mfn_dag);
+        Py_DECREF(dagpath);
         Py_DECREF(selection);
+        Py_DECREF(add);
+        Py_DECREF(clear);
 
         return NULL;
     }
 
-    Py_INCREF(get_dep);
-
-    Py_INCREF(mobj);
-    Py_INCREF(mfn_dg);
-    Py_INCREF(mfn_dag);
-    Py_INCREF(dagpath);
-
     MdPyMayaSelectionList *pysel = new MdPyMayaSelectionList();
+    pysel->m_class_object = mobj;
+    pysel->m_class_mfn_dep = mfn_dg;
+    pysel->m_class_mfn_dag = mfn_dag;
+    pysel->m_class_dagpath = dagpath;
     pysel->m_sel = selection;
     pysel->m_func_add = add;
     pysel->m_func_clear = clear;
     pysel->m_func_get_dep = get_dep;
-    pysel->m_class_mfn_dep = mfn_dg;
-    pysel->m_class_mfn_dag = mfn_dag;
-    pysel->m_class_object = mobj;
-    pysel->m_class_dagpath = dagpath;
 
     return pysel;
 }
@@ -234,8 +247,6 @@ PyObject *MdPyMayaSelectionList::getObject(std::string name)
     PyObject *arg1;
     PyObject *arg2;
     PyObject *res;
-    PyObject *arg_name;
-    PyObject *arg_index;
 
     PyObject_CallObject(m_func_clear, PyBlankTuple);
     if (PyErr_Occurred())
@@ -248,26 +259,19 @@ PyObject *MdPyMayaSelectionList::getObject(std::string name)
     }
 
     arg1 = PyTuple_New(1);
-    arg_name = PyString_FromString(name.c_str());
-    PyTuple_SetItem(arg1, 0, arg_name);
-    Py_INCREF(arg1);
-    Py_INCREF(arg_name);
+    PyTuple_SetItem(arg1, 0, PyString_FromString(name.c_str()));
 
     PyObject_CallObject(m_func_add, arg1);
+    Py_DECREF(arg1);
+
     if (PyErr_Occurred())
     {
         #ifdef _DEBUG
         PyErr_Print();
         #endif // _DEBUG
 
-        Py_DECREF(arg1);
-        Py_DECREF(arg_name);
-
         return NULL;
     }
-
-    Py_DECREF(arg1);
-    Py_DECREF(arg_name);
 
     res = PyObject_CallObject(m_class_object, PyBlankTuple);
     if (res == NULL)
@@ -285,18 +289,12 @@ PyObject *MdPyMayaSelectionList::getObject(std::string name)
     }
 
     arg2 = PyTuple_New(2);
-    arg_index = PyInt_FromLong(0);
-    PyTuple_SetItem(arg2, 0, arg_index);
+    PyTuple_SetItem(arg2, 0, PyInt_FromLong(0));
     PyTuple_SetItem(arg2, 1, res);
-
-    Py_INCREF(arg2);
-    Py_INCREF(res);
-    Py_INCREF(arg_index);
 
     PyObject_CallObject(m_func_get_dep, arg2);
 
     Py_DECREF(arg2);
-    Py_DECREF(arg_index);
 
     if (PyErr_Occurred())
     {
@@ -304,7 +302,7 @@ PyObject *MdPyMayaSelectionList::getObject(std::string name)
         PyErr_Print();
         #endif // _DEBUG
 
-        Py_DECREF(res);
+        Py_XDECREF(res);
         return NULL;
     }    
 
@@ -318,7 +316,6 @@ PyObject *MdPyMayaSelectionList::getDg(PyObject *mobject)
 
     args = PyTuple_New(1);
     PyTuple_SetItem(args, 0, mobject);
-    Py_INCREF(args);
 
     res = PyObject_CallObject(m_class_mfn_dep, args);
     Py_DECREF(args);
@@ -329,10 +326,10 @@ PyObject *MdPyMayaSelectionList::getDg(PyObject *mobject)
         PyErr_Print();
         #endif // _DEBUG
 
+        Py_XDECREF(res);
+
         return NULL;
     }
-
-    Py_INCREF(res);
 
     return res;
 }
@@ -344,7 +341,6 @@ PyObject *MdPyMayaSelectionList::getDag(PyObject *mobject)
 
     args = PyTuple_New(1);
     PyTuple_SetItem(args, 0, mobject);
-    Py_INCREF(args);
 
     res = PyObject_CallObject(m_class_mfn_dag, args);
     Py_DECREF(args);
@@ -355,10 +351,10 @@ PyObject *MdPyMayaSelectionList::getDag(PyObject *mobject)
         PyErr_Print();
         #endif // _DEBUG
 
+        Py_XDECREF(res);
+
         return NULL;
     }
-
-    Py_INCREF(res);
 
     return res;
 }
@@ -395,14 +391,11 @@ PyObject *MdPyMayaSelectionList::getDagPath(PyObject *mdagnode)
         return NULL;
     }
 
-    Py_INCREF(dagpath);
-    Py_INCREF(fn_getpath);
-
     args = PyTuple_New(1);
     PyTuple_SetItem(args, 0, dagpath);
 
-    Py_INCREF(args);
     PyObject_CallObject(fn_getpath, args);
+    Py_DECREF(fn_getpath);
     Py_DECREF(args);
 
     if (PyErr_Occurred())
@@ -411,13 +404,10 @@ PyObject *MdPyMayaSelectionList::getDagPath(PyObject *mdagnode)
         PyErr_Print();
         #endif // _DEBUG
 
-        Py_DECREF(fn_getpath);
+        Py_XDECREF(dagpath);
+
         return NULL;
     }
-
-    Py_DECREF(fn_getpath);
-
-    Py_INCREF(dagpath);
 
     return dagpath;
 }
@@ -437,8 +427,6 @@ PyObject *MdPyMayaSelectionList::getBlankObject()
         return NULL;
     }
 
-    Py_INCREF(res);
-
     return res;
 }
 
@@ -456,8 +444,6 @@ PyObject *MdPyMayaSelectionList::getBlankDg()
 
         return NULL;
     }
-
-    Py_INCREF(res);
 
     return res;
 }
@@ -477,8 +463,6 @@ PyObject *MdPyMayaSelectionList::getBlankDag()
         return NULL;
     }
 
-    Py_INCREF(res);
-
     return res;
 }
 
@@ -496,8 +480,6 @@ PyObject *MdPyMayaSelectionList::getBlankDagPath()
 
         return NULL;
     }
-
-    Py_INCREF(res);
 
     return res;
 }
@@ -524,6 +506,26 @@ MdPyMayaSelectionList::~MdPyMayaSelectionList()
     if (m_func_get_dep != NULL)
     {
         Py_DECREF(m_func_get_dep);
+    }
+
+    if (m_class_object != NULL)
+    {
+        Py_DECREF(m_class_object);
+    }
+
+    if (m_class_mfn_dep != NULL)
+    {
+        Py_DECREF(m_class_mfn_dep);
+    }
+
+    if (m_class_mfn_dag != NULL)
+    {
+        Py_DECREF(m_class_mfn_dag);
+    }
+
+    if (m_class_dagpath != NULL)
+    {
+        Py_DECREF(m_class_dagpath);
     }
 }
 

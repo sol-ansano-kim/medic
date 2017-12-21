@@ -244,9 +244,9 @@ void MdPluginManager::searchTesters()
         return;
     }
 
-    Py_INCREF(imp);
-
     PyObject *load_source = getPyFunction(imp, "load_source");
+    Py_DECREF(imp);
+
     if (load_source == NULL)
     {
         #ifdef _DEBUG
@@ -258,10 +258,10 @@ void MdPluginManager::searchTesters()
 
         error("Failed to get function 'load_source'");
 
+        Py_DECREF(load_source);
+
         return;
     }
-
-    Py_INCREF(load_source);    
 
     for (std::vector<std::string>::iterator it = py_files.begin(); it != py_files.end(); ++it)
     {
@@ -282,27 +282,19 @@ void MdPluginManager::searchTesters()
 
         std::string base = m[1].str();
         PyObject *args = PyTuple_New(2);
-        PyObject *arg1 = PyString_FromString(base.c_str());
-        PyObject *arg2 = PyString_FromString(it->c_str());
-        Py_INCREF(arg1);
-        Py_INCREF(arg2);
-        Py_INCREF(args);
-        PyTuple_SetItem(args, 0, arg1);
-        PyTuple_SetItem(args, 1, arg2);
+
+        PyTuple_SetItem(args, 0, PyString_FromString(base.c_str()));
+        PyTuple_SetItem(args, 1, PyString_FromString(it->c_str()));
 
         PyObject *module = PyObject_CallObject(load_source, args);
+        Py_DECREF(args);
+
         if (module == NULL)
         {
             debug("Failed to import python file : " + *it);
 
-            Py_DECREF(arg1);
-            Py_DECREF(arg2);
-            Py_DECREF(args);
-
             continue;
         }
-
-        Py_INCREF(module);
 
         PyObject *create_func = PyObject_GetAttrString(module, "Create");
 
@@ -316,15 +308,10 @@ void MdPluginManager::searchTesters()
             #endif // _DEBUG
             debug("Ignore : " + *it);
 
-            Py_DECREF(arg1);
-            Py_DECREF(arg2);
-            Py_DECREF(args);
             Py_DECREF(module);
 
             continue;
         }
-
-        Py_INCREF(create_func);
 
         if (!PyCallable_Check(create_func))
         {
@@ -336,11 +323,9 @@ void MdPluginManager::searchTesters()
             #endif // _DEBUG
             debug("'Create' function is not callable. Ignore : " + *it);
 
-            Py_DECREF(arg1);
-            Py_DECREF(arg2);
-            Py_DECREF(args);
             Py_DECREF(module);
             Py_DECREF(create_func);
+
             continue;                        
         }
 
@@ -355,11 +340,9 @@ void MdPluginManager::searchTesters()
             #endif // _DEBUG
             debug("Failed to get a Tester instance : " + *it);
 
-            Py_DECREF(arg1);
-            Py_DECREF(arg2);
-            Py_DECREF(args);
             Py_DECREF(module);
             Py_DECREF(create_func);
+
             continue;
         }
 
@@ -384,15 +367,12 @@ void MdPluginManager::searchTesters()
             }
         }
 
-        Py_DECREF(arg1);
-        Py_DECREF(arg2);
-        Py_DECREF(args);
-        Py_DECREF(module);
         Py_DECREF(create_func);
+        Py_DECREF(module);
+
     }
 
     Py_DECREF(load_source);
-    Py_DECREF(imp);
 }
 
 void MdPluginManager::loadPlugins()

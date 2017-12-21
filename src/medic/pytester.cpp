@@ -8,17 +8,10 @@ using namespace MEDIC;
 MdPyTester::MdPyTester(PyObject *tester)
     : m_tester(tester)
 {
-    Py_INCREF(m_tester);
-
     m_func_match = getPyFunction(tester, "Match");
     m_func_get_parameters = getPyFunction(tester, "GetParameters");
     m_func_test = getPyFunction(tester, "test");
     m_func_fix = getPyFunction(tester, "fix");
-
-    Py_INCREF(m_func_match);
-    Py_INCREF(m_func_get_parameters);
-    Py_INCREF(m_func_test);
-    Py_INCREF(m_func_fix);
 
     PyObject *res;
     PyObject *func;
@@ -26,16 +19,19 @@ MdPyTester::MdPyTester(PyObject *tester)
     func = getPyFunction(tester, "Name");
     res = PyObject_CallObject(func, PyBlankTuple);
     m_name = (std::string)PyString_AsString(res);
+    Py_DECREF(func);
     Py_DECREF(res);
 
     func = getPyFunction(tester, "Description");
     res = PyObject_CallObject(func, PyBlankTuple);
     m_description = (std::string)PyString_AsString(res);
+    Py_DECREF(func);
     Py_DECREF(res);
 
     func = getPyFunction(tester, "IsFixable");
     res = PyObject_CallObject(func, PyBlankTuple);
     m_isfixable = (PyObject_IsTrue(res)) ? true : false;
+    Py_DECREF(func);
     Py_DECREF(res);
 }
 
@@ -63,14 +59,11 @@ bool MdPyTester::Match(const MdNode *node) const
         return false;
     }
 
-    Py_INCREF(py_node);
-
     arg = PyTuple_New(1);
     PyTuple_SetItem(arg, 0, py_node);
 
     res = PyObject_CallObject(m_func_match, arg);
     Py_DECREF(arg);
-    Py_DECREF(py_node);
 
     if (res == NULL)
     {
@@ -125,14 +118,11 @@ MdReport *MdPyTester::test(const MdNode *node) const
         return NULL;
     }
 
-    Py_INCREF(py_node);
-
     arg = PyTuple_New(1);
     PyTuple_SetItem(arg, 0, py_node);
 
     res = PyObject_CallObject(m_func_test, arg);
     Py_DECREF(arg);
-    Py_DECREF(py_node);
 
     if (res == NULL)
     {
@@ -175,8 +165,6 @@ bool MdPyTester::fix(const MdReport *report, MdParamContainer *params) const
 
         return false;
     }
-
-    Py_INCREF(py_node);
 
     arg = PyTuple_New(2);
     PyTuple_SetItem(arg, 0, py_node);
@@ -235,7 +223,10 @@ bool MdPyTester::IsValidTester(PyObject *instance, PyObject *baseClass)
     {
         return false;
     }
+
     res = PyObject_CallObject(func, PyBlankTuple);
+    Py_DECREF(func);
+
     if (res == NULL)
     {
         #ifdef _DEBUG
@@ -263,7 +254,10 @@ bool MdPyTester::IsValidTester(PyObject *instance, PyObject *baseClass)
     {
         return false;
     }
+
     res = PyObject_CallObject(func, PyBlankTuple);
+    Py_DECREF(func);
+
     if (res == NULL)
     {
         #ifdef _DEBUG
@@ -292,12 +286,17 @@ bool MdPyTester::IsValidTester(PyObject *instance, PyObject *baseClass)
         return false;
     }
 
+    Py_DECREF(func);
+
     func = getPyFunction(instance, "IsFixable");
     if (func == NULL)
     {
         return false;
     }
+
     res = PyObject_CallObject(func, PyBlankTuple);
+    Py_DECREF(func);
+
     if (res == NULL)
     {
         #ifdef _DEBUG
@@ -326,17 +325,23 @@ bool MdPyTester::IsValidTester(PyObject *instance, PyObject *baseClass)
         return false;
     }
 
+    Py_DECREF(func);
+
     func = getPyFunction(instance, "test");
     if (func == NULL)
     {
         return false;
     }
 
+    Py_DECREF(func);
+
     func = getPyFunction(instance, "fix");
     if (func == NULL)
     {
         return false;
     }
+
+    Py_DECREF(func);
 
     return true;
 }
