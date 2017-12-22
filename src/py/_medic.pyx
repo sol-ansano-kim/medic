@@ -781,7 +781,7 @@ class PyReport(object):
             else:
                 Statics.SelectionList.add(self.__node.getPath())
         else:
-            Statics.SelectionList.add(self.__node.getPath())
+            Statics.SelectionList.add(self.__node.object())
 
         OpenMaya.MGlobal.setActiveSelectionList(Statics.SelectionList, OpenMaya.MGlobal.kAddToList)
 
