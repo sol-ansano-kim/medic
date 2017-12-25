@@ -149,3 +149,5 @@ for test_plugin in excons.glob("test/testers/*.cpp"):
 
 
 excons.DeclareTargets(env, prjs)
+
+Export("MedicName MedicPath RequireMedic")
