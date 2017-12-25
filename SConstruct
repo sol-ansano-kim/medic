@@ -16,7 +16,8 @@ maya.SetupMscver()
 env = excons.MakeBaseEnv()
 
 
-medic_static = (excons.GetArgument("medic-static", 1, int) != 0)
+medic_static = (excons.GetArgument("medic-static", 0, int) != 0)
+
 mayaver = excons.GetArgument("mayaver", None)
 if not mayaver:
     mayaver = excons.GetArgument("with-maya", None)
@@ -41,7 +42,7 @@ out_pydir = excons.OutputBaseDirectory() + "/py/"
 
 ## build
 prjs.append({"name": "medic",
-             "type": "staticlib",
+             "type": ("staticlib" if medic_static else "sharedlib"),
              "alias": "medic-lib",
              "defs": defs,
              "cppflags": cppflags,
@@ -90,9 +91,8 @@ prjs.append({"name": "_medic",
              "cppflags": cppflags,
              "incdirs": ["pybind11/include", "include"],
              "srcs": excons.glob("src/medicBinding/*.cpp"),
-             "libdirs": [out_libdir],
-             "libs": ["medic"],
-             "custom": [python.SoftRequire]})
+             "deps": ["medic"],
+             "custom": [python.SoftRequire, RequireMedic]})
 
 
 if mayaver:
@@ -105,6 +105,7 @@ if mayaver:
                  "incdirs": ["include"],
                  "srcs": excons.glob("src/medicMaya/*.cpp"),
                  "symvis": "default",
+                 "deps": ["medic"],
                  "install": {out_incdir + "/medicMaya": excons.glob("include/medicMaya/*.h")},
                  "custom": [python.SoftRequire, maya.Require, RequireMedic]})
 
@@ -117,9 +118,10 @@ if mayaver:
                  "cppflags": cppflags,
                  "incdirs": ["pybind11/include", "include"],
                  "srcs": excons.glob("src/medicMayaBinding/*.cpp"),
+                 "deps": ["medic"],
                  "libdirs": [out_libdir],
                  "libs": ["mayaMedic"],
-                 "custom": [python.SoftRequire, maya.Require]})
+                 "custom": [python.SoftRequire, maya.Require, RequireMedic]})
 
 
 for test in excons.glob("test/*.cpp"):
@@ -132,6 +134,7 @@ for test in excons.glob("test/*.cpp"):
                  "prefix": "test",
                  "srcs": [test],
                  "rpath": out_libdir,
+                 "deps": ["medic"],
                  "custom": [python.Require, RequireMedic]})
 
 for test_plugin in excons.glob("test/testers/*.cpp"):
@@ -144,6 +147,7 @@ for test_plugin in excons.glob("test/testers/*.cpp"):
                  "srcs": [test_plugin],
                  "prefix": "test/testers",
                  "symvis": "default",
+                 "deps": ["medic"],
                  "rpath": out_libdir,
                  "custom": [python.SoftRequire, RequireMedic]})
 
