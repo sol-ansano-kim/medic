@@ -1,4 +1,5 @@
 #include "medicMayaBinding/mayaVisitorBinding.h"
+#include <pybind11/stl.h>
 
 
 using namespace pybind11;
@@ -12,7 +13,7 @@ void bindMayaVisitor(pybind11::module mod)
         .def("setKarte", static_cast<bool (MdMayaVisitor::*)(const MdKarte*)>(&MdMayaVisitor::setKarte))
         .def("setKarte", static_cast<bool (MdMayaVisitor::*)(const std::string&)>(&MdMayaVisitor::setKarte))
         .def("getTester", &MdMayaVisitor::getTester)
-        .def("getTesters", &MdMayaVisitor::getTesters)
+        .def("getTesters", &MdVisitor::getTesters)
         .def("hasTester", static_cast<bool (MdMayaVisitor::*)(const std::string&)>(&MdMayaVisitor::hasTester))
         .def("hasTester", static_cast<bool (MdMayaVisitor::*)(const MdTester*)>(&MdMayaVisitor::hasTester))
         .def("test", static_cast<void (MdMayaVisitor::*)(const std::string &)>(&MdMayaVisitor::test))

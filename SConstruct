@@ -16,12 +16,16 @@ maya.SetupMscver()
 env = excons.MakeBaseEnv()
 
 
+medic_static = (excons.GetArgument("medic-static", 1, int) != 0)
 mayaver = excons.GetArgument("mayaver", None)
 if not mayaver:
     mayaver = excons.GetArgument("with-maya", None)
 
 
 defs = []
+if medic_static:
+    defs.append("MEDIC_DLL")
+
 if sys.platform == "win32":
     cppflags = " /wd4100 /wd4505 /wd4701 /wd4127 /wd4189 /wd4005 /wd4510 /wd4512 /wd4610 /wd4211 /wd4702 /wd4706 /wd4310"
 else:
@@ -37,7 +41,7 @@ out_pydir = excons.OutputBaseDirectory() + "/py/"
 
 ## build
 prjs.append({"name": "medic",
-             "type": "sharedlib",
+             "type": "staticlib",
              "alias": "medic-lib",
              "defs": defs,
              "cppflags": cppflags,
@@ -46,6 +50,35 @@ prjs.append({"name": "medic",
              "symvis": "default",
              "install": {out_incdir + "/medic": excons.glob("include/medic/*.h")},
              "custom": [python.SoftRequire]})
+
+
+def MedicName():
+    name = "medic"
+    if sys.platform == "win32" and medic_static:
+        name = "lib" + name
+
+    return name
+
+
+def MedicPath():
+    name = MedicName()
+
+    if sys.platform == "win32":
+        libname = name + ".lib"
+    else:
+        libname = "lib" + name + (".a" if medic_static else excons.SharedLibraryLinkExt())
+
+    return out_libdir + "/" + libname
+
+
+def RequireMedic(env):
+    if not medic_static:
+        env.Append(CPPDEFINES=["MEDIC_DLL"])
+
+    env.Append(CPPPATH=[out_incdir])
+    env.Append(LIBPATH=[out_libdir])
+    excons.Link(env, MedicPath(), static=medic_static, force=True, silent=True)
+
 
 
 prjs.append({"name": "_medic",
@@ -73,7 +106,7 @@ if mayaver:
                  "srcs": excons.glob("src/medicMaya/*.cpp"),
                  "symvis": "default",
                  "install": {out_incdir + "/medicMaya": excons.glob("include/medicMaya/*.h")},
-                 "custom": [python.SoftRequire, maya.Require]})
+                 "custom": [python.SoftRequire, maya.Require, RequireMedic]})
 
     prjs.append({"name": "_medicMaya",
                  "type": "dynamicmodule",
@@ -83,9 +116,9 @@ if mayaver:
                  "rpath": out_libdir,
                  "cppflags": cppflags,
                  "incdirs": ["pybind11/include", "include"],
-                 "srcs": excons.glob("src/medicBinding/*.cpp") + excons.glob("src/medicMayaBinding/*.cpp"),
+                 "srcs": excons.glob("src/medicMayaBinding/*.cpp"),
                  "libdirs": [out_libdir],
-                 "libs": ["medic", "mayaMedic"],
+                 "libs": ["mayaMedic"],
                  "custom": [python.SoftRequire, maya.Require]})
 
 
@@ -96,13 +129,10 @@ for test in excons.glob("test/*.cpp"):
                  "type": "testprograms",
                  "defs": defs,
                  "cppflags": cppflags,
-                 "incdirs": ["include"],
                  "prefix": "test",
                  "srcs": [test],
-                 "libdirs": [out_libdir],
-                 "libs": ["medic"],
                  "rpath": out_libdir,
-                 "custom": [python.Require]})
+                 "custom": [python.Require, RequireMedic]})
 
 for test_plugin in excons.glob("test/testers/*.cpp"):
     plug_base = os.path.splitext(os.path.basename(test_plugin))[0]
@@ -111,14 +141,11 @@ for test_plugin in excons.glob("test/testers/*.cpp"):
                  "type": "dynamicmodule",
                  "defs": defs,
                  "cppflags": cppflags,
-                 "incdirs": ["include"],
                  "srcs": [test_plugin],
-                 "libs": ["medic"],
-                 "libdirs": [out_libdir],
                  "prefix": "test/testers",
                  "symvis": "default",
                  "rpath": out_libdir,
-                 "custom": [python.SoftRequire]})
+                 "custom": [python.SoftRequire, RequireMedic]})
 
 
 excons.DeclareTargets(env, prjs)
