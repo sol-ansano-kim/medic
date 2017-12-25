@@ -16,8 +16,6 @@ namespace MEDIC
         public:
             MdMayaVisitor(const MdPluginManager *manager);
             virtual ~MdMayaVisitor();
-            bool setKarte(const std::string &name);
-            bool setKarte(const MdKarte *karte);
             virtual void collectNodes();
     };
 }

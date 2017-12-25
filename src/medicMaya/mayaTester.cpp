@@ -21,22 +21,12 @@ bool MdMayaTester::Match(const MdNode *node) const
     return Match(maya_node);    
 }
 
-bool MdMayaTester::Match(const MdMayaNode *node) const
-{
-    return false;
-}
-
 MdReport *MdMayaTester::test(const MdNode *node) const
 {
     const MdMayaNode *maya_node = dynamic_cast<const MdMayaNode *>(node);
     MdMayaReport *report = test(maya_node);
 
     return (report != NULL) ? (MdReport *)report : NULL;
-}
-
-MdMayaReport *MdMayaTester::test(const MdMayaNode *node) const
-{
-    return NULL;
 }
 
 bool MdMayaTester::fix(const MdReport *report, MdParamContainer *params) const
@@ -48,6 +38,16 @@ bool MdMayaTester::fix(const MdReport *report, MdParamContainer *params) const
     }
 
     return fix(maya_report, params);
+}
+
+bool MdMayaTester::Match(const MdMayaNode *node) const
+{
+    return false;
+}
+
+MdMayaReport *MdMayaTester::test(const MdMayaNode *node) const
+{
+    return NULL;
 }
 
 bool MdMayaTester::fix(const MdMayaReport *report, MdParamContainer *params) const
