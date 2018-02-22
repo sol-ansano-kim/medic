@@ -561,6 +561,9 @@ class PyKarteManager(object):
         self.__Kartes[karte.Name()] = karte
         return True
 
+    def unload(self):
+        self.__Kartes = {}
+
     def __new__(cls):
         if not cls.__Instance:
             cls.__Instance = super(PyKarteManager, cls).__new__(cls)
@@ -583,6 +586,9 @@ class PyTesterManager(object):
 
     def tester(self, name):
         return self.__Testers.get(name, None)
+
+    def unload(self):
+        self.__Testers = {}
 
     def __new__(cls, existsList=[]):
         if not cls.__Instance:
@@ -746,6 +752,13 @@ cdef class __PluginManager:
     def karteNames(self):
         return self.__py_karte_manager.karteNames()
 
+    def reloadPlugins(self):
+        self.__py_tester_manager.unload()
+        self.__py_karte_manager.unload()
+        self.ptr.unload()
+        self.__registTesters()
+        self.__registKartes()
+
 
 class PluginManager(object):
     __Instance = None
@@ -758,6 +771,7 @@ class PluginManager(object):
             cls.karte = cls.__PluginManager.karte
             cls.testerNames = cls.__PluginManager.testerNames
             cls.karteNames = cls.__PluginManager.karteNames
+            cls.reloadPlugins = cls.__PluginManager.reloadPlugins
 
         return cls.__Instance
 

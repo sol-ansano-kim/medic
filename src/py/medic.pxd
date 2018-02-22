@@ -114,4 +114,5 @@ cdef extern from "medic/pluginManager.h" namespace "MEDIC":
         MdKarte *karte(string name)
         MdPluginLoadingStatus addTester(string pluginPath)
         MdPluginLoadingStatus addKarte(string name, string description, std_vector[string] testerNames)
+        void unload()
         
