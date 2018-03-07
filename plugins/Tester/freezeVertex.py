@@ -1,8 +1,6 @@
 import medic
 from maya import OpenMaya
 from maya import cmds
-from pprint import pprint
-import numpy as np
 import sys
 
 
@@ -43,10 +41,8 @@ class FreezeVertex(medic.PyTester):
                 break
             i+=1
         if tweaked:
-            print "tweaked"
             return medic.PyReport(node)
         else:
-            print "clear"
             return None
 
     def IsFixable(self):
