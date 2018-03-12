@@ -32,7 +32,11 @@ class IntermediateNode(medic.PyTester):
     def test(self, node):
         if node.dag().isIntermediateObject():
             plugs = OpenMaya.MPlugArray()
-            node.dg().getConnections(plugs)
+            try:
+                node.dg().getConnections(plugs)
+            except:
+                #kfailure:Node has no connections
+                return medic.PyReport(node)
             if plugs.length() <= 2:
                 return medic.PyReport(node)
 
