@@ -30,17 +30,18 @@ class IntermediateNode(medic.PyTester):
 
 
     def test(self, node):
-        if node.dag().isIntermediateObject():
-            plugs = OpenMaya.MPlugArray()
-            try:
-                node.dg().getConnections(plugs)
-            except:
-                #kfailure:Node has no connections
-                return medic.PyReport(node)
-            if plugs.length() <= 2:
-                return medic.PyReport(node)
+        if not node.dag().isIntermediateObject():
+            return None
 
-        return None
+        for i, f in enumerate(cmds.listHistory(node.name(), future=True)) or []:
+            if i == 0:
+                continue
+
+            if "shape" in cmds.nodeType(f, inherited=True):
+                return None
+
+        return medic.PyReport(node)
+       
 
 def Create():
     return IntermediateNode()
