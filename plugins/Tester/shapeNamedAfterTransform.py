@@ -1,7 +1,5 @@
 import medic
 from maya import OpenMaya
-import re
-from maya import cmds
 
 
 class ShapeNamedAfterTransform(medic.PyTester):
@@ -22,35 +20,29 @@ class ShapeNamedAfterTransform(medic.PyTester):
         if node.dag().isInstanced() or node.dag().isFromReferencedFile() or node.dag().isIntermediateObject():
             return None
 
-        for p in node.parents():
-            correctShapeName = self.NameCompare(node.name(), p.name())
-            if correctShapeName:
-                return None
+        parent = node.parents()[0]
+        if ShapeNamedAfterTransform.NameCompare(node.dg().name(), parent.dg().name()):
+            return None
 
         return medic.PyReport(node)
 
     def fix(self, report, params):
         node = report.node()
-        newName= self.NameCompare(node.name(), node.parents()[0].name(), fixMe=True)
-        cmds.rename(node.name(), newName)
+        newName = ShapeNamedAfterTransform.FixName(node.parents()[0].dg().name())
+        node.dg().setName(newName)
         return True
 
     def IsFixable(self):
         return True
 
-    def NameCompare(self, shape, trans, fixMe=False):
-    
-        tmp_trans = trans.split('|')[-1]
-        tmp_shapeName = tmp_trans + "Shape"
-        shape_lastName = shape.split("|")[-1]
+    @staticmethod
+    def FixName(trans):
+        return "{}Shape".format(trans)
 
-        if fixMe:
-            return shape.replace(shape_lastName, tmp_shapeName)
+    @staticmethod
+    def NameCompare(shape, trans):
+        return ("{}Shape".format(trans) == shape)
 
-        if tmp_shapeName != shape_lastName:
-            return False
-        else:
-            return True
 
 def Create():
     return ShapeNamedAfterTransform()
