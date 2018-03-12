@@ -23,24 +23,17 @@ class FreezeVertex(medic.PyTester):
         for i in range(plug.numElements()):
             elm = plug.elementByPhysicalIndex(i)
             for j in range(3):
-                if abs(elm.child(j).asDouble()) > sys.float_info.epsilon:
-                    tweaked = True
-                    break
-            if tweaked:
-                break
-            
-        if tweaked:
-            return medic.PyReport(node)
-        else:
-            return None
+                if abs(elm.child(j).asDouble()) > 0.000001:
+                    return medic.PyReport(node)
+
+        return None
 
     def IsFixable(self):
         return True
 
     def fix(self, report, params):
         obj_name = report.node().name()
-
-        cmds.polyMoveVertex(obj_name, ch=1)
+        cmds.polyMoveVertex(obj_name, ch=0)
 
         return True
 
