@@ -1,8 +1,6 @@
 import medic
 from maya import OpenMaya
 from maya import cmds
-import sys
-
 
 class FreezeVertex(medic.PyTester):
     def __init__(self):
