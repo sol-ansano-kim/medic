@@ -1,5 +1,6 @@
 import medic
 from maya import OpenMaya
+from maya import cmds
 
 
 class UnknownType(medic.PyTester):
@@ -29,9 +30,8 @@ class UnknownType(medic.PyTester):
         if node.dg().isLocked():
             node.dg().setLocked(False)
 
-        mod = OpenMaya.MDGModifier()
-        mod.deleteNode(node.object())
-        mod.doIt()
+        cmds.delete(node.name())
+
         return True
 
 
