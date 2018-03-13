@@ -23,6 +23,8 @@ std::vector<std::string> MdTester::Dependencies()
     return std::vector<std::string>();
 }
 
+void MdTester::initialize() {}
+
 bool MdTester::Match(MdNode *node)
 {
     return false;

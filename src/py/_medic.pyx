@@ -478,6 +478,7 @@ cdef class Visitor:
             return
 
         if tester.IsPyTester():
+            tester.initialize()
             self.__report_cache.pop(tester, [])
             nodes = self.__nodes()
             for n in nodes:
@@ -592,6 +593,7 @@ cdef class Visitor:
         self.ptr.visit(karte.ptr)
 
     cdef __visitWithTester(self, Karte karte, Tester tester):
+        tester.ptr.initialize()
         self.ptr.visit(karte.ptr, tester.ptr)
 
     cdef __report(self, Tester tester):
@@ -912,6 +914,9 @@ class PyTester(object):
     @staticmethod
     def IsPyTester():
         return True
+
+    def initialize(self):
+        pass
 
     def Name(self):
         return "TesterBase"
