@@ -18,6 +18,11 @@ class Statics:
     RePyExt = re.compile("[.]py$", re.IGNORECASE)
     SelectionList = OpenMaya.MSelectionList()
 
+    Wait = 0
+    Done = 1
+    Failed = 2
+    Suspended = 3
+
     @staticmethod
     def ImportModule(path):
         module = None
@@ -333,6 +338,12 @@ cdef class Tester:
 
         return self.ptr.Description()
 
+    def Dependencies(self):
+        if self.ptr == NULL:
+            return []
+
+        return self.ptr.Dependencies()
+
     def IsFixable(self):
         if self.ptr == NULL:
             return False
@@ -415,6 +426,34 @@ cdef class Karte:
         for t in self.py_testers:
             yield t
 
+    def cppTesters(self):
+        if self.ptr == NULL:
+            return []
+
+        testers = []
+        cdef MdTesterIterator it = self.ptr.testers()
+        cdef MdTester *t
+
+        while (not it.isDone()):
+            t = it.next()
+            if t != NULL:
+                tester = Tester()
+                tester.ptr = t
+                testers.append(tester)
+
+        for tr in testers:
+            yield tr
+
+    def testers(self):
+        testers = []
+        for t in self.cppTesters():
+            testers.append(t)
+
+        for t in self.pyTesters():
+            testers.append(t)
+
+        return testers
+
     def addPyTester(self, tester):
         if tester in self.py_testers:
             return False
@@ -435,7 +474,10 @@ cdef class Visitor:
         del(self.ptr)
 
     def test(self, karte, tester):
-        if karte.hasPyTester(tester):
+        if not karte.hasTester(tester):
+            return
+
+        if tester.IsPyTester():
             self.__report_cache.pop(tester, [])
             nodes = self.__nodes()
             for n in nodes:
@@ -450,18 +492,72 @@ cdef class Visitor:
 
     def testAll(self, karte):
         self.__report_cache = {}
-        self.__visitAll(karte)
-        nodes = self.__nodes()
 
-        for t in karte.pyTesters():
-            self.__report_cache.pop(t, [])
-            for n in nodes:
-                if t.Match(n):
-                    r = t.test(n)
-                    if r:
-                        if not self.__report_cache.has_key(t):
-                            self.__report_cache[t] = []
-                        self.__report_cache[t].append(r)
+        over_states = [Statics.Done, Statics.Failed, Statics.Suspended]
+
+        testers = {}
+
+        for t in karte.testers():
+            testers[t.Name()] = {"tester": t, "dep": t.Dependencies(), "state": Statics.Wait}
+
+        pynodes = self.__nodes()
+        while (True):
+            for name, tester_dict in testers.iteritems():
+                if tester_dict["state"] in over_states:
+                    continue
+
+                dependencies = tester_dict["dep"]
+
+                need_to_wait = False
+                available = True
+                for dep in dependencies:
+                    dep_dict = testers.get(dep)
+                    if not dep_dict:
+                        continue
+
+                    st = dep_dict["state"]
+                    if st == Statics.Failed or st == Statics.Suspended:
+                        available = False
+                        break
+
+                    if st == Statics.Wait:
+                        need_to_wait = True
+                        break
+
+                if not available:
+                    tester_dict["state"] = Statics.Suspended
+                    continue
+
+                if need_to_wait:
+                    continue
+
+                tester = tester_dict["tester"]
+
+                self.test(karte, tester)
+
+                if self.hasError(tester):
+                    tester_dict["state"] = Statics.Failed
+                else:
+                    tester_dict["state"] = Statics.Done
+
+            is_done = True
+            for tester_dict in testers.itervalues():
+                st = tester_dict["state"]
+                if st not in over_states:
+                    is_done = False
+                    break
+
+            if is_done:
+                break
+
+    def hasError(self, tester):
+        if tester.IsPyTester():
+            return True if self.__report_cache.get(tester) else False
+
+        return self.__hasError(tester)
+
+    cdef __hasError(self, Tester tester):
+        return self.ptr.hasError(tester.ptr)
 
     def reportAll(self):
         return self.__reportAll()
@@ -822,6 +918,9 @@ class PyTester(object):
 
     def Description(self):
         return ""
+
+    def Dependencies(self):
+        return []
 
     def Match(self, node):
         return False

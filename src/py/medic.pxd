@@ -73,10 +73,15 @@ cdef extern from "medic/report.h" namespace "MEDIC":
 
 
 cdef extern from "medic/tester.h" namespace "MEDIC":
-    cdef cppclass MdTesterIterator
+    cdef cppclass MdTesterIterator:
+        MdTesterIterator();
+        MdTester *next()
+        bint isDone()
+
     cdef cppclass MdTester:
         string Name()
         string Description()
+        std_vector[string] Dependencies()
         MdParamContainer *GetParameters()
         bint IsFixable()
         bint fix(MdReport *report, MdParamContainer *params)
@@ -87,6 +92,7 @@ cdef extern from "medic/karte.h" namespace "MEDIC":
         string Name() const
         string Description() const
         bint hasTester(MdTester *t)
+        MdTesterIterator testers()
 
 
 cdef extern from "medic/visitor.h" namespace "MEDIC":
@@ -96,6 +102,7 @@ cdef extern from "medic/visitor.h" namespace "MEDIC":
         bint visit(MdKarte *karte, MdTester *tester)
         std_vector[MdTester *] reportTesters()
         MdReportIterator report(MdTester *tester)
+        bint hasError(MdTester *tester)
         void reset()
         MdNodeIterator nodes()
 

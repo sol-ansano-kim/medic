@@ -3,6 +3,7 @@
 
 
 #include <string>
+#include <vector>
 #include <map>
 #include "medic/node.h"
 #include "medic/parameter.h"
@@ -21,6 +22,7 @@ namespace MEDIC
             MEDIC_EXPORT virtual ~MdTester();
             MEDIC_EXPORT virtual std::string Name();
             MEDIC_EXPORT virtual std::string Description();
+            MEDIC_EXPORT virtual std::vector<std::string> Dependencies();
             MEDIC_EXPORT virtual bool Match(MdNode *node);
             MEDIC_EXPORT virtual bool IsFixable();
             MEDIC_EXPORT virtual MdParamContainer *GetParameters();
@@ -53,10 +55,11 @@ namespace MEDIC
     class MdTesterIterator
     {
         public:
+            MEDIC_EXPORT MdTesterIterator();
             MdTesterIterator(MdTesterContainer *container);
             ~MdTesterIterator();
-            MdTester *next();
-            bool isDone();
+            MEDIC_EXPORT MdTester *next();
+            MEDIC_EXPORT bool isDone();
 
         private:
             MdTesterContainer *m_container;

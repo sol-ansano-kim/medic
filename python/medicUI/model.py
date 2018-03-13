@@ -102,10 +102,65 @@ class KarteItem(object):
 
     def testAll(self, testerCallback=None):
         self.reset()
-        for tester in self.__tester_items:
-            tester.test(self.__karte, self.__visitor)
-            if testerCallback:
-                testerCallback()
+
+        over_states = [medic.Statics.Done, medic.Statics.Failed, medic.Statics.Suspended]
+
+        testers = {}
+
+        for t in self.__tester_items:
+            testers[t.name()] = {"tester": t, "dep": t.tester().Dependencies(), "state": medic.Statics.Wait}
+
+        while (True):
+            for name, tester_dict in testers.iteritems():
+                if tester_dict["state"] in over_states:
+                    continue
+
+                dependencies = tester_dict["dep"]
+
+                need_to_wait = False
+                available = True
+
+                for dep in dependencies:
+                    dep_dict = testers.get(dep)
+                    if not dep_dict:
+                        continue
+
+                    st = dep_dict["state"]
+                    if st == medic.Statics.Failed or st == medic.Statics.Suspended:
+                        available = False
+                        break
+
+                    if st == medic.Statics.Wait:
+                        need_to_wait = True
+                        break
+
+                if not available:
+                    tester_dict["state"] = medic.Statics.Suspended
+                    continue
+
+                if need_to_wait:
+                    continue
+
+                tester = tester_dict["tester"]
+
+                tester.test(self.__karte, self.__visitor)
+                if testerCallback:
+                    testerCallback()
+
+                if tester.status() == Success:
+                    tester_dict["state"] = medic.Statics.Done
+                else:
+                    tester_dict["state"] = medic.Statics.Failed
+
+            is_done = True
+            for tester_dict in testers.itervalues():
+                st = tester_dict["state"]
+                if st not in over_states:
+                    is_done = False
+                    break
+
+            if is_done:
+                break
 
     def test(self, tester, testerCallback=None):
         self.reset()

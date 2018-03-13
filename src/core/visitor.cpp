@@ -113,6 +113,17 @@ MdReportIterator MdVisitor::report(MdTester *tester)
     return it->second.iterator();
 }
 
+bool MdVisitor::hasError(MdTester *tester)
+{
+    TesterReportsMap::iterator it = m_results.find(tester);
+    if (it == m_results.end())
+    {
+        return false;
+    }
+
+    return it->second.size();
+}
+
 MdNodeIterator MdVisitor::nodes()
 {
     if (!m_node_collected)

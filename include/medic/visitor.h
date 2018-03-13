@@ -26,6 +26,7 @@ namespace MEDIC
             MEDIC_EXPORT void reset();
             MEDIC_EXPORT std::vector<MdTester *> reportTesters();
             MEDIC_EXPORT MdReportIterator report(MdTester *tester);
+            MEDIC_EXPORT bool hasError(MdTester *tester);
             MEDIC_EXPORT MdNodeIterator nodes();
             TesterReportsMap &reportAll();
 

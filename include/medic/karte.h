@@ -28,7 +28,7 @@ namespace MEDIC
             MEDIC_EXPORT std::string Description() const;
             bool addTester(MdTester *tester);
             void accept(MdVisitor *v);
-            MdTesterIterator testers();
+            MEDIC_EXPORT MdTesterIterator testers();
 
         private:
             MdTesterContainer m_testers;
