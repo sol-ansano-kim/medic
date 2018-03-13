@@ -82,6 +82,7 @@ cdef extern from "medic/tester.h" namespace "MEDIC":
         string Name()
         string Description()
         void initialize()
+        void finalize()
         std_vector[string] Dependencies()
         MdParamContainer *GetParameters()
         bint IsFixable()

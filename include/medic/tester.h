@@ -25,6 +25,7 @@ namespace MEDIC
             MEDIC_EXPORT virtual std::vector<std::string> Dependencies();
             MEDIC_EXPORT virtual bool Match(MdNode *node);
             MEDIC_EXPORT virtual void initialize();
+            MEDIC_EXPORT virtual void finalize();
             MEDIC_EXPORT virtual bool IsFixable();
             MEDIC_EXPORT virtual MdParamContainer *GetParameters();
             MEDIC_EXPORT virtual MdReport *test(MdNode *node);

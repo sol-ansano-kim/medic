@@ -479,6 +479,7 @@ cdef class Visitor:
 
         if tester.IsPyTester():
             tester.initialize()
+
             self.__report_cache.pop(tester, [])
             nodes = self.__nodes()
             for n in nodes:
@@ -488,6 +489,8 @@ cdef class Visitor:
                         if not self.__report_cache.has_key(tester):
                             self.__report_cache[tester] = []
                         self.__report_cache[tester].append(r)
+
+            tester.finalize()
         else:
             self.__visitWithTester(karte, tester)
 
@@ -595,6 +598,7 @@ cdef class Visitor:
     cdef __visitWithTester(self, Karte karte, Tester tester):
         tester.ptr.initialize()
         self.ptr.visit(karte.ptr, tester.ptr)
+        tester.ptr.finalize()
 
     cdef __report(self, Tester tester):
         cdef MdReportIterator reports
@@ -916,6 +920,9 @@ class PyTester(object):
         return True
 
     def initialize(self):
+        pass
+
+    def finalize(self):
         pass
 
     def Name(self):
