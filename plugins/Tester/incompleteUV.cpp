@@ -41,7 +41,7 @@ MdReport *IncompleteUV::test(MdNode *node)
     bool error = false;
     MStringArray uvsets;
     MFnSingleIndexedComponent comp;
-    MObject comp_obj = comp.create(MFn::kMeshPolygonComponent);
+    MObject comp_obj = comp.create(MFn::kMeshVertComponent);
 
     MItMeshFaceVertex it(node->object(), &stat);
 
