@@ -16,22 +16,33 @@ class FaceAssigned(medic.PyTester):
         return node.object().hasFn(OpenMaya.MFn.kMesh) or node.object().hasFn(OpenMaya.MFn.kNurbsSurfaceGeom)
 
     def test(self, node):
-        geom = None
-        try:
-            if node.object().hasFn(OpenMaya.MFn.kMesh):
-                geom = OpenMaya.MFnMesh(node.object())
-            elif node.object().hasFn(OpenMaya.MFn.kNurbsSurfaceGeom):
-                geom = OpenMaya.MFnNurbsSurface(node.object())
-        except:
+        dg = node.dg()
+
+        if not dg.hasAttribute("compInstObjGroups") or not dg.hasAttribute("compObjectGroups"):
             return None
 
-        for i in range(node.dag().instanceCount(True)):
-            objs = OpenMaya.MObjectArray()
-            sid = OpenMaya.MIntArray()
-            geom.getConnectedShaders(i, objs, sid)
+        cio_plug = node.dg().findPlug("compInstObjGroups")
+        cog_obj = node.dg().attribute("compObjectGroups")
 
-            if objs.length() > 1:
-                return medic.PyReport(node)
+        cio_plug.numConnectedElements()
+
+        for i in range(cio_plug.numElements()):
+            elm = cio_plug.elementByPhysicalIndex(i)
+            cog_plug = elm.child(cog_obj)
+
+            if not cog_plug.numConnectedElements():
+                continue
+
+            for j in range(cog_plug.numElements()):
+                gelm = cog_plug.elementByPhysicalIndex(j)
+
+                arr = OpenMaya.MPlugArray()
+                if not gelm.connectedTo(arr, False, True):
+                    continue
+
+                for n in range(arr.length()):
+                    if arr[n].node().hasFn(OpenMaya.MFn.kShadingEngine):
+                        return medic.PyReport(node)
 
         return None
 
