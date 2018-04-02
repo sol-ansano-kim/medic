@@ -10,7 +10,7 @@
 using namespace MEDIC;
 
 
-class NonManifold : public MdTester
+class NonManifoldEdge : public MdTester
 {
     std::string Name();
     std::string Description();
@@ -19,22 +19,22 @@ class NonManifold : public MdTester
 };
 
 
-std::string NonManifold::Name()
+std::string NonManifoldEdge::Name()
 {
-    return "NonManifold";
+    return "NonManifoldEdge";
 }
 
-std::string NonManifold::Description()
+std::string NonManifoldEdge::Description()
 {
-    return "Non manifold mesh(s) exists";
+    return "Non manifold edge(s) exists";
 }
 
-bool NonManifold::Match(MdNode *node)
+bool NonManifoldEdge::Match(MdNode *node)
 {
     return node->object().hasFn(MFn::kMesh);
 }
 
-MdReport *NonManifold::test(MdNode *node)
+MdReport *NonManifoldEdge::test(MdNode *node)
 {
     MStatus stat;
     MItMeshEdge it(node->object(), &stat);
@@ -73,5 +73,5 @@ MdReport *NonManifold::test(MdNode *node)
 
 MEDIC_PLUGIN_API MdTester *Create()
 {
-    return new NonManifold();
+    return new NonManifoldEdge();
 }

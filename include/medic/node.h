@@ -36,7 +36,7 @@ namespace MEDIC
             MEDIC_EXPORT bool isDag() const;
             MEDIC_EXPORT void parents(MdNodeContainer *container) const;
             MEDIC_EXPORT void children(MdNodeContainer *container) const;
-            MDagPath getPath() const;
+            MEDIC_EXPORT MDagPath getPath() const;
             MEDIC_EXPORT MFnDependencyNode &dg();
             MEDIC_EXPORT MFnDagNode &dag();
 
