@@ -3,15 +3,15 @@ from maya import OpenMaya
 from maya import cmds
 
 
-class HasLayer(medic.PyTester):
+class AnyLayer(medic.PyTester):
     def __init__(self):
-        super(HasLayer, self).__init__()
+        super(AnyLayer, self).__init__()
 
     def Name(self):
-        return "HasLayer"
+        return "AnyLayer"
 
     def Description(self):
-        return "layer(s) exists"
+        return "Check if any render, anim or display layer exists"
 
     def Match(self, node):
         return node.object().hasFn(OpenMaya.MFn.kDisplayLayer) or node.object().hasFn(OpenMaya.MFn.kAnimLayer) or node.object().hasFn(OpenMaya.MFn.kRenderLayer)
@@ -39,4 +39,4 @@ class HasLayer(medic.PyTester):
 
 
 def Create():
-    return HasLayer()
+    return AnyLayer()

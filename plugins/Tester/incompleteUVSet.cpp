@@ -11,7 +11,7 @@
 using namespace MEDIC;
 
 
-class IncompleteUV : public MdTester
+class IncompleteUVSet : public MdTester
 {
     std::string Name();
     std::string Description();
@@ -20,22 +20,22 @@ class IncompleteUV : public MdTester
 };
 
 
-std::string IncompleteUV::Name()
+std::string IncompleteUVSet::Name()
 {
-    return "IncompleteUV";
+    return "IncompleteUVSet";
 }
 
-std::string IncompleteUV::Description()
+std::string IncompleteUVSet::Description()
 {
-    return "Vertex has no UVs";
+    return "Mesh(s) has incomplete UV(s)";
 }
 
-bool IncompleteUV::Match(MdNode *node)
+bool IncompleteUVSet::Match(MdNode *node)
 {
     return node->object().hasFn(MFn::kMesh);
 }
 
-MdReport *IncompleteUV::test(MdNode *node)
+MdReport *IncompleteUVSet::test(MdNode *node)
 {
     MStatus stat;
     bool error = false;
@@ -89,5 +89,5 @@ MdReport *IncompleteUV::test(MdNode *node)
 
 MEDIC_PLUGIN_API MdTester *Create()
 {
-    return new IncompleteUV();
+    return new IncompleteUVSet();
 }

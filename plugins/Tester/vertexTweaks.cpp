@@ -11,10 +11,10 @@
 using namespace MEDIC;
 
 
-#define FreezeVertexEpsilon 0.000001
+#define VertexTweaksEpsilon 0.000001
 
 
-class FreezeVertex : public MdTester
+class VertexTweaks : public MdTester
 {
     std::string Name();
     std::string Description();
@@ -25,27 +25,27 @@ class FreezeVertex : public MdTester
 };
 
 
-std::string FreezeVertex::Name()
+std::string VertexTweaks::Name()
 {
-    return "FreezeVertex";
+    return "VertexTweaks";
 }
 
-std::string FreezeVertex::Description()
+std::string VertexTweaks::Description()
 {
-    return "Not Frozen Verticies";
+    return "Verticies are tweaked. Not Frozen.";
 }
 
-bool FreezeVertex::Match(MdNode *node)
+bool VertexTweaks::Match(MdNode *node)
 {
     return node->object().hasFn(MFn::kMesh);
 }
 
-bool FreezeVertex::IsFixable()
+bool VertexTweaks::IsFixable()
 {
     return true;
 }
 
-MdReport *FreezeVertex::test(MdNode *node)
+MdReport *VertexTweaks::test(MdNode *node)
 {
     MPlug plug = node->dg().findPlug("pnts");
 
@@ -55,7 +55,7 @@ MdReport *FreezeVertex::test(MdNode *node)
 
         for (unsigned int j = 0; j < 3; ++j)
         {
-            if (std::fabs(elm.child(j).asDouble()) > FreezeVertexEpsilon)
+            if (std::fabs(elm.child(j).asDouble()) > VertexTweaksEpsilon)
             {
                 return new MdReport(node);
             }
@@ -65,7 +65,7 @@ MdReport *FreezeVertex::test(MdNode *node)
     return 0;
 }
 
-bool FreezeVertex::fix(MdReport *report, MdParamContainer *params)
+bool VertexTweaks::fix(MdReport *report, MdParamContainer *params)
 {
     MString cmd("polyMoveVertex -ch 0 ");
     cmd += report->node()->name().c_str();
@@ -81,5 +81,5 @@ bool FreezeVertex::fix(MdReport *report, MdParamContainer *params)
 
 MEDIC_PLUGIN_API MdTester *Create()
 {
-    return new FreezeVertex();
+    return new VertexTweaks();
 }

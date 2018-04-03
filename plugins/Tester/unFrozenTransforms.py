@@ -2,17 +2,17 @@ import medic
 from maya import OpenMaya
 
 
-class NotFreezed(medic.PyTester):
+class UnFrozenTransforms(medic.PyTester):
     Identity = OpenMaya.MMatrix()
 
     def __init__(self):
-        super(NotFreezed, self).__init__()
+        super(UnFrozenTransforms, self).__init__()
 
     def Name(self):
-        return "NotFreezed"
+        return "UnFrozenTransforms"
 
     def Description(self):
-        return "Not freezed mesh(s)"
+        return "Check that all transforms are frozen"
 
     def Match(self, node):
         return node.object().hasFn(OpenMaya.MFn.kMesh)
@@ -25,11 +25,11 @@ class NotFreezed(medic.PyTester):
 
         for p in node.parents():
             transform = p.dag().transformationMatrix()
-            if not NotFreezed.Identity == transform:
+            if not UnFrozenTransforms.Identity == transform:
                 return medic.PyReport(node)
 
         return None
 
 
 def Create():
-    return NotFreezed()
+    return UnFrozenTransforms()

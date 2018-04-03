@@ -14,7 +14,7 @@ class IntermediateNode(medic.PyTester):
         return "Intermediate node(s) exists"
 
     def Dependencies(self):
-        return ["HasInputGeometry"]
+        return ["ConstructionHistory"]
 
     def Match(self, node):
         return node.object().hasFn(OpenMaya.MFn.kDagNode)

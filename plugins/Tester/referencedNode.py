@@ -2,12 +2,12 @@ import medic
 from maya import OpenMaya
 
 
-class Referenced(medic.PyTester):
+class ReferencedNode(medic.PyTester):
     def __init__(self):
-        super(Referenced, self).__init__()
+        super(ReferencedNode, self).__init__()
 
     def Name(self):
-        return "Referenced"
+        return "ReferencedNode"
 
     def Description(self):
         return "Refrenced node(s) exists"
@@ -23,4 +23,4 @@ class Referenced(medic.PyTester):
 
 
 def Create():
-    return Referenced()
+    return ReferencedNode()

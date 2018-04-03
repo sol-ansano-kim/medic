@@ -10,7 +10,7 @@
 using namespace MEDIC;
 
 
-class EdgeLengthZero : public MdTester
+class ZeroLengthEdge : public MdTester
 {
     std::string Name();
     std::string Description();
@@ -19,22 +19,22 @@ class EdgeLengthZero : public MdTester
 };
 
 
-std::string EdgeLengthZero::Name()
+std::string ZeroLengthEdge::Name()
 {
-    return "EdgeLengthZero";
+    return "ZeroLengthEdge";
 }
 
-std::string EdgeLengthZero::Description()
+std::string ZeroLengthEdge::Description()
 {
-    return "Zero edge length";
+    return "Check if any edge length is zero";
 }
 
-bool EdgeLengthZero::Match(MdNode *node)
+bool ZeroLengthEdge::Match(MdNode *node)
 {
     return node->object().hasFn(MFn::kMesh);
 }
 
-MdReport *EdgeLengthZero::test(MdNode *node)
+MdReport *ZeroLengthEdge::test(MdNode *node)
 {
     MStatus stat;
     MItMeshEdge it(node->object(), &stat);
@@ -72,5 +72,5 @@ MdReport *EdgeLengthZero::test(MdNode *node)
 
 MEDIC_PLUGIN_API MdTester *Create()
 {
-    return new EdgeLengthZero();
+    return new ZeroLengthEdge();
 }

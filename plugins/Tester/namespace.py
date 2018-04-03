@@ -3,13 +3,13 @@ from maya import OpenMaya
 import re
 
 
-class HasNamespace(medic.PyTester):
+class Namespace(medic.PyTester):
     ReNS = re.compile("[:]")
     def __init__(self):
-        super(HasNamespace, self).__init__()
+        super(Namespace, self).__init__()
 
     def Name(self):
-        return "HasNamespace"
+        return "Namespace"
 
     def Description(self):
         return "Node(s) has a namespace"
@@ -21,11 +21,11 @@ class HasNamespace(medic.PyTester):
         if node.dg().isFromReferencedFile():
             return None
 
-        if HasNamespace.ReNS.search(node.name()):
+        if Namespace.ReNS.search(node.name()):
             return medic.PyReport(node)
 
         return None
 
 
 def Create():
-    return HasNamespace()
+    return Namespace()

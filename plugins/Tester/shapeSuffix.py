@@ -2,13 +2,12 @@ import medic
 from maya import OpenMaya
 
 
-class ShapeNamedAfterTransform(medic.PyTester):
-
+class ShapeSuffix(medic.PyTester):
     def __init__(self):
-        super(ShapeNamedAfterTransform, self).__init__()
+        super(ShapeSuffix, self).__init__()
 
     def Name(self):
-        return "ShapeNamedAfterTransform"
+        return "ShapeSuffix"
 
     def Description(self):
         return "Shape isn't named after the Transform"
@@ -21,14 +20,14 @@ class ShapeNamedAfterTransform(medic.PyTester):
             return None
 
         parent = node.parents()[0]
-        if ShapeNamedAfterTransform.NameCompare(node.dg().name(), parent.dg().name()):
+        if ShapeSuffix.NameCompare(node.dg().name(), parent.dg().name()):
             return None
 
         return medic.PyReport(node)
 
     def fix(self, report, params):
         node = report.node()
-        newName = ShapeNamedAfterTransform.FixName(node.parents()[0].dg().name())
+        newName = ShapeSuffix.FixName(node.parents()[0].dg().name())
         node.dg().setName(newName)
         return True
 
@@ -45,5 +44,5 @@ class ShapeNamedAfterTransform(medic.PyTester):
 
 
 def Create():
-    return ShapeNamedAfterTransform()
+    return ShapeSuffix()
     

@@ -2,15 +2,15 @@ import medic
 from maya import OpenMaya
 
 
-class HasInputGeometry(medic.PyTester):
+class ConstructionHistory(medic.PyTester):
     def __init__(self):
-        super(HasInputGeometry, self).__init__()
+        super(ConstructionHistory, self).__init__()
 
     def Name(self):
-        return "HasInputGeometry"
+        return "ConstructionHistory"
 
     def Description(self):
-        return "Shape(s) has an input connection"
+        return "Shape has construction history"
 
     def Match(self, node):
         return node.object().hasFn(OpenMaya.MFn.kNurbsSurfaceGeom) or node.object().hasFn(OpenMaya.MFn.kNurbsCurve) or node.object().hasFn(OpenMaya.MFn.kMesh)
@@ -42,4 +42,4 @@ class HasInputGeometry(medic.PyTester):
 
 
 def Create():
-    return HasInputGeometry()
+    return ConstructionHistory()

@@ -9,7 +9,7 @@
 using namespace MEDIC;
 
 
-class OverFourSidedPolygon : public MdTester
+class NGon : public MdTester
 {
     std::string Name();
     std::string Description();
@@ -18,22 +18,22 @@ class OverFourSidedPolygon : public MdTester
 };
 
 
-std::string OverFourSidedPolygon::Name()
+std::string NGon::Name()
 {
-    return "OverFourSidedPolygon";
+    return "NGon";
 }
 
-std::string OverFourSidedPolygon::Description()
+std::string NGon::Description()
 {
-    return "5 or more faced polygon(s)";
+    return "Mesh has an Ngon (5 =< sided polygon)";
 }
 
-bool OverFourSidedPolygon::Match(MdNode *node)
+bool NGon::Match(MdNode *node)
 {
     return node->object().hasFn(MFn::kMesh);
 }
 
-MdReport *OverFourSidedPolygon::test(MdNode *node)
+MdReport *NGon::test(MdNode *node)
 {
     MStatus stat;
     MItMeshPolygon it(node->object(), &stat);
@@ -70,5 +70,5 @@ MdReport *OverFourSidedPolygon::test(MdNode *node)
 
 MEDIC_PLUGIN_API MdTester *Create()
 {
-    return new OverFourSidedPolygon();
+    return new NGon();
 }
