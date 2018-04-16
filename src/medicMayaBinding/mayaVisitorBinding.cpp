@@ -19,6 +19,5 @@ void bindMayaVisitor(pybind11::module mod)
         .def("test", static_cast<void (MdMayaVisitor::*)(const std::string &)>(&MdMayaVisitor::test))
         .def("test", static_cast<void (MdMayaVisitor::*)(const MdTester *)>(&MdMayaVisitor::test))
         .def("testAll", &MdMayaVisitor::testAll)
-        .def("reset", &MdMayaVisitor::reset)
-        .def("__collectNodes", &MdMayaVisitor::collectNodes);
+        .def("reset", &MdMayaVisitor::reset);
 }

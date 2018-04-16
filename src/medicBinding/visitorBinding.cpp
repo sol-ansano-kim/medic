@@ -19,6 +19,5 @@ void bindVisitor(pybind11::module mod)
         .def("test", static_cast<void (MdVisitor::*)(const std::string &)>(&MdVisitor::test))
         .def("test", static_cast<void (MdVisitor::*)(const MdTester *)>(&MdVisitor::test))
         .def("testAll", &MdVisitor::testAll)
-        .def("reset", &MdVisitor::reset)
-        .def("__collectNodes", &MdVisitor::collectNodes);
+        .def("reset", &MdVisitor::reset);
 }
