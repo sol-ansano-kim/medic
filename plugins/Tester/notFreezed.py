@@ -12,23 +12,20 @@ class NotFreezed(medic.PyTester):
         return "NotFreezed"
 
     def Description(self):
-        return "Not freezed mesh(s)"
+        return "Not freezed trasnform(s)"
 
     def Match(self, node):
-        return node.object().hasFn(OpenMaya.MFn.kMesh)
+        return node.object().hasFn(OpenMaya.MFn.kTransform)
 
     def test(self, node):
         if node.dag().isInstanced():
             return None
 
-        iden = OpenMaya.MMatrix()
+        transform = node.dag().transformationMatrix()
+        if NotFreezed.Identity == transform:
+            return None
 
-        for p in node.parents():
-            transform = p.dag().transformationMatrix()
-            if not NotFreezed.Identity == transform:
-                return medic.PyReport(node)
-
-        return None
+        return medic.PyReport(node)
 
 
 def Create():
