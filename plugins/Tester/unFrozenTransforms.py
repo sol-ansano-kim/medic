@@ -1,5 +1,6 @@
 import medic
 from maya import OpenMaya
+from maya import cmds
 
 
 class UnFrozenTransforms(medic.PyTester):
@@ -14,8 +15,14 @@ class UnFrozenTransforms(medic.PyTester):
     def Description(self):
         return "Check that all transforms are frozen"
 
+    def Dependencies(self):
+        return ["ConstructionHistory"]
+
     def Match(self, node):
         return node.object().hasFn(OpenMaya.MFn.kTransform)
+
+    def IsFixable(self):
+        return True
 
     def test(self, node):
         if node.dag().isInstanced():
@@ -26,6 +33,11 @@ class UnFrozenTransforms(medic.PyTester):
             return None
 
         return medic.PyReport(node)
+
+    def fix(self, report, params):
+        cmds.makeIdentity(report.node().name(), apply=True, t=True, r=True, s=True)
+
+        return True
 
 
 def Create():
