@@ -15,20 +15,17 @@ class UnFrozenTransforms(medic.PyTester):
         return "Check that all transforms are frozen"
 
     def Match(self, node):
-        return node.object().hasFn(OpenMaya.MFn.kMesh)
+        return node.object().hasFn(OpenMaya.MFn.kTransform)
 
     def test(self, node):
         if node.dag().isInstanced():
             return None
 
-        iden = OpenMaya.MMatrix()
+        transform = node.dag().transformationMatrix()
+        if NotFreezed.Identity == transform:
+            return None
 
-        for p in node.parents():
-            transform = p.dag().transformationMatrix()
-            if not UnFrozenTransforms.Identity == transform:
-                return medic.PyReport(node)
-
-        return None
+        return medic.PyReport(node)
 
 
 def Create():
