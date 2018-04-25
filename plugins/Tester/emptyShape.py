@@ -1,5 +1,6 @@
 import medic
 from maya import OpenMaya
+from maya import cmds
 
 
 class EmptyShape(medic.PyTester):
@@ -45,9 +46,8 @@ class EmptyShape(medic.PyTester):
         if node.dg().isLocked():
             node.dg().setLocked(False)
 
-        mod = OpenMaya.MDGModifier()
-        mod.deleteNode(node.object())
-        mod.doIt()
+        cmds.delete(node.name())
+
         return True
 
 

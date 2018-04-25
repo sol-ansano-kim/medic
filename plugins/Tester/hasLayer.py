@@ -1,5 +1,6 @@
 import medic
 from maya import OpenMaya
+from maya import cmds
 
 
 class HasLayer(medic.PyTester):
@@ -32,9 +33,9 @@ class HasLayer(medic.PyTester):
         if node.dg().isLocked():
             node.dg().setLocked(False)
 
-        mod = OpenMaya.MDGModifier()
-        mod.deleteNode(node.object())
-        mod.doIt()
+        cmds.delete(node.name())
+
+        return True
 
 
 def Create():
