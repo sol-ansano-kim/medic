@@ -15,26 +15,25 @@ class FaceAssigned(medic.PyTester):
     def Match(self, node):
         return node.object().hasFn(OpenMaya.MFn.kMesh) or node.object().hasFn(OpenMaya.MFn.kNurbsSurfaceGeom)
 
-    def test(self, node):
+    @staticmethod
+    def __TestObjGrp(node, parentPlug, childPlug):
         dg = node.dg()
 
-        if not dg.hasAttribute("compInstObjGroups") or not dg.hasAttribute("compObjectGroups"):
-            return None
+        if not dg.hasAttribute(parentPlug) or not dg.hasAttribute(childPlug):
+            return False
 
-        cio_plug = node.dg().findPlug("compInstObjGroups")
-        cog_obj = node.dg().attribute("compObjectGroups")
+        io_plug = node.dg().findPlug(parentPlug)
+        og_obj = node.dg().attribute(childPlug)
 
-        cio_plug.numConnectedElements()
+        for i in range(io_plug.numElements()):
+            elm = io_plug.elementByPhysicalIndex(i)
+            og_plug = elm.child(og_obj)
 
-        for i in range(cio_plug.numElements()):
-            elm = cio_plug.elementByPhysicalIndex(i)
-            cog_plug = elm.child(cog_obj)
-
-            if not cog_plug.numConnectedElements():
+            if not og_plug.numConnectedElements():
                 continue
 
-            for j in range(cog_plug.numElements()):
-                gelm = cog_plug.elementByPhysicalIndex(j)
+            for j in range(og_plug.numElements()):
+                gelm = og_plug.elementByPhysicalIndex(j)
 
                 arr = OpenMaya.MPlugArray()
                 if not gelm.connectedTo(arr, False, True):
@@ -42,10 +41,18 @@ class FaceAssigned(medic.PyTester):
 
                 for n in range(arr.length()):
                     if arr[n].node().hasFn(OpenMaya.MFn.kShadingEngine):
-                        return medic.PyReport(node)
+                        return True
+
+        return False
+
+    def test(self, node):
+        if FaceAssigned.__TestObjGrp(node, "compInstObjGroups", "compObjectGroups"):
+            return medic.PyReport(node)
+
+        if FaceAssigned.__TestObjGrp(node, "instObjGroups", "objectGroups"):
+            return medic.PyReport(node)
 
         return None
-
 
 def Create():
     return FaceAssigned()
