@@ -11,12 +11,15 @@
 
 namespace MEDIC
 {
+    class MdVisitor;
     class MdTester;
     class MdTesterContainer;
     class MdTesterIterator;
 
     class MdTester
     {
+        friend class MdVisitor;
+
         public:
             MEDIC_EXPORT MdTester();
             MEDIC_EXPORT virtual ~MdTester();
@@ -30,6 +33,11 @@ namespace MEDIC
             MEDIC_EXPORT virtual MdParamContainer *GetParameters();
             MEDIC_EXPORT virtual MdReport *test(MdNode *node);
             MEDIC_EXPORT virtual bool fix(MdReport *report, MdParamContainer *params);
+            MdParamContainer* getOptions() const;
+
+        private:
+            void setOptions(MdParamContainer* options);
+            MdParamContainer* m_options;
     };
 
     typedef std::map<std::string, MdTester *> TesterPtrMap;

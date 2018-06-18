@@ -4,7 +4,8 @@
 using namespace MEDIC;
 
 
-MdTester::MdTester() {}
+MdTester::MdTester()
+    : m_options(NULL) {}
 
 MdTester::~MdTester() {}
 
@@ -51,6 +52,17 @@ bool MdTester::fix(MdReport *report, MdParamContainer *params)
 {
     return true;
 };
+
+void MdTester::setOptions(MdParamContainer* options)
+{
+    m_options = options;
+}
+
+
+MdParamContainer* MdTester::getOptions() const
+{
+    return m_options;
+}
 
 
 MdTesterContainer::MdTesterContainer() {}

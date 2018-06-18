@@ -7,6 +7,7 @@ import os
 import re
 import sys
 import imp
+import copy
 from maya import OpenMaya
 
 
@@ -492,7 +493,6 @@ cdef class Visitor:
                 continue
 
             cur_dict = {}
-            return_dict[k] = cur_dict
 
             names = con.names()
             for n in names:
@@ -538,6 +538,9 @@ cdef class Visitor:
                         for i in range(param.size()):
                             con.get[string](n, stringValue, <size_t>i)
                             values.append(stringValue)
+
+            if cur_dict:
+                return_dict[k] = cur_dict
 
         return return_dict
 
@@ -672,6 +675,9 @@ cdef class Visitor:
 
         if tester.IsPyTester():
             tester.initialize()
+
+            options = self.getOptions()
+            tester.setOptions(options.get(tester.Name(), {}))
 
             self.__report_cache.pop(tester, [])
             nodes = self.__nodes()
@@ -1107,6 +1113,13 @@ class PyReport(object):
 class PyTester(object):
     def __init__(self):
         super(PyTester, self).__init__()
+        self.__options = {}
+
+    def setOptions(self, options):
+        self.__options = options
+
+    def getOptions(self):
+        return copy.deepcopy(self.__options)
 
     @staticmethod
     def IsPyTester():

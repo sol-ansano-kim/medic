@@ -25,6 +25,9 @@ void MdVisitor::visit(MdKarte *karte)
     {
         MdTester *tester = tester_it.next();
 
+        tester->initialize();
+        tester->setOptions(getOptions(tester->Name()));
+
         MdNodeIterator node_it = m_nodes.iterator();
         while (!node_it.isDone())
         {
@@ -38,6 +41,8 @@ void MdVisitor::visit(MdKarte *karte)
                 }
             }
         }
+
+        tester->finalize();
     }
 }
 
@@ -48,6 +53,8 @@ bool MdVisitor::visit(MdKarte *karte, MdTester *tester)
         return false;
     }
 
+    tester->setOptions(getOptions(tester->Name()));
+
     if (!m_node_collected)
     {
         GetNodes(&m_nodes);
@@ -55,6 +62,7 @@ bool MdVisitor::visit(MdKarte *karte, MdTester *tester)
     }
 
     cleanReport(tester);
+    tester->initialize();
 
     MdNodeIterator node_it = m_nodes.iterator();
     while (!node_it.isDone())
@@ -69,6 +77,8 @@ bool MdVisitor::visit(MdKarte *karte, MdTester *tester)
             }
         }
     }
+
+    tester->finalize();
 
     return true;
 }
