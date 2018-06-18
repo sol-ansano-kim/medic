@@ -9,6 +9,7 @@ MdVisitor::MdVisitor() : m_node_collected(false) {}
 MdVisitor::~MdVisitor()
 {
     reset();
+    clearOptions();
 }
 
 void MdVisitor::visit(MdKarte *karte)
@@ -138,6 +139,43 @@ MdNodeIterator MdVisitor::nodes()
 TesterReportsMap &MdVisitor::reportAll()
 {
     return m_results;
+}
+
+void MdVisitor::clearOptions()
+{
+    for (OptionMaps::iterator it = m_options.begin(); it != m_options.end(); ++it)
+    {
+        delete it->second;
+    }
+
+    m_options.clear();
+}
+
+MdParamContainer* MdVisitor::getOptions(const std::string& name)
+{
+    OptionMaps::iterator it = m_options.find(name);
+
+    if (it != m_options.end())
+    {
+        return it->second;
+    }
+
+    MdParamContainer* params = new MdParamContainer();
+    m_options[name] = params;
+
+    return params;
+}
+
+std::vector<std::string> MdVisitor::getOptionKeys()
+{
+    std::vector<std::string> names;
+
+    for (OptionMaps::iterator it = m_options.begin(); it != m_options.end(); ++it)
+    {
+        names.push_back(it->first);
+    }
+
+    return names;
 }
 
 void MdVisitor::cleanReport(MdTester *tester)

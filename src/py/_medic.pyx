@@ -1,4 +1,5 @@
 from medic cimport *
+from numbers import Number
 from cython.operator cimport dereference
 from cython.operator cimport preincrement
 import fnmatch
@@ -472,6 +473,198 @@ cdef class Visitor:
 
     def __dealloc__(self):
         del(self.ptr)
+
+    def getOptions(self):
+        cdef MdParamContainer* con = NULL
+        cdef std_vector[string] names
+        cdef MdParameter *param = NULL
+        cdef bint boolValue
+        cdef int intValue
+        cdef float floatValue
+        cdef string stringValue
+
+        return_dict = {}
+
+        option_keys = self.ptr.getOptionKeys()
+        for k in option_keys:
+            con = self.ptr.getOptions(<string>k)
+            if con == NULL:
+                continue
+
+            cur_dict = {}
+            return_dict[k] = cur_dict
+
+            names = con.names()
+            for n in names:
+                param = con.getParam(n)
+                if (param == NULL):
+                    continue
+
+                typ = param.getType()
+
+                if not param.isArray():
+                    if typ == Types.Bool:
+                        con.get[bint](n, boolValue)
+                        cur_dict[n] = boolValue
+                    elif typ == Types.Int:
+                        con.get[int](n, intValue)
+                        cur_dict[n] = intValue
+                    elif typ == Types.Float:
+                        con.get[float](n, floatValue)
+                        cur_dict[n] = floatValue
+                    elif typ == Types.String:
+                        con.get[string](n, stringValue)
+                        cur_dict[n] = stringValue
+                else:
+                    values = []
+                    cur_dict[n] = values
+
+                    if typ == Types.BoolArray:
+                        for i in range(param.size()):
+                            con.get[bint](n, boolValue, <size_t>i)
+                            values.append(boolValue)
+
+                    elif typ == Types.IntArray:
+                        for i in range(param.size()):
+                            con.get[int](n, intValue, <size_t>i)
+                            values.append(intValue)
+
+                    elif typ == Types.FloatArray:
+                        for i in range(param.size()):
+                            con.get[float](n, floatValue, <size_t>i)
+                            values.append(floatValue)
+
+                    elif typ == Types.StringArray:
+                        for i in range(param.size()):
+                            con.get[string](n, stringValue, <size_t>i)
+                            values.append(stringValue)
+
+        return return_dict
+
+    def __getArrayType(self, values):
+        list_dt = None
+
+        for v in values:
+            dt = type(v)
+
+            if isinstance(v, basestring):
+                dt = str
+
+            if list_dt is None:
+                list_dt = dt
+                continue
+
+            if list_dt == dt:
+                continue
+
+            if list_dt == float and issubclass(dt, Number):
+                continue
+
+            if list_dt == int and issubclass(dt, Number):
+                if dt == float:
+                    list_dt = float
+
+                continue
+
+            if list_dt == bool and issubclass(dt, Number):
+                if dt != bool:
+                    list_dt = dt
+
+                continue
+
+            return None
+
+        return list_dt
+
+    def setOptions(self, optionDict):
+        cdef MdParamContainer* con = NULL
+
+        self.ptr.clearOptions()
+
+        if not isinstance(optionDict, dict):
+            return False
+
+        for key, options in optionDict.iteritems():
+            if not isinstance(key, basestring) or not isinstance(options, dict):
+                print("Warning : Invalid Option '{}' - {}".format(key, options))
+                continue
+
+            con = self.ptr.getOptions(key)
+
+            for n, v in options.iteritems():
+                if not isinstance(n, basestring):
+                    print("Warning : Invalid Option '{}' - {}".format(n, v))
+
+                if isinstance(v, list):
+                    values = []
+                    if len(v) == 0:
+                        dt = float
+                    else:
+                        dt = self.__getArrayType(v)
+                        if dt is None:
+                            print("Warning : Invalid Option List'{}'".format(v))
+                            continue
+
+                        values = map(lambda x: dt(x), v)
+
+                    if dt == bool:
+                        parm = MdParameter.Create(n, n, Types.BoolArray, False, NULL)
+                        parm.resize(len(values))
+                        con.append(parm)
+                        for i, v in enumerate(values):
+                            con.set[bint](n, v, <size_t>i)
+
+                    elif dt == int:
+                        parm = MdParameter.Create(n, n, Types.IntArray, 0, NULL)
+                        parm.resize(len(values))
+                        con.append(parm)
+                        for i, v in enumerate(values):
+                            con.set[int](n, v, <size_t>i)
+
+                    elif dt == float:
+                        parm = MdParameter.Create(n, n, Types.FloatArray, 0.0, NULL)
+                        parm.resize(len(values))
+                        con.append(parm)
+                        for i, v in enumerate(values):
+                            con.set[float](n, v, <size_t>i)
+
+                    elif dt == str:
+                        parm = MdParameter.Create(n, n, Types.StringArray, "", NULL)
+                        parm.resize(len(values))
+                        con.append(parm)
+                        for i, v in enumerate(values):
+                            con.set[string](n, v, <size_t>i)
+
+                    else:
+                        print("Warning : Invalid value type {}:{} '{}'".format(key, n, dt))
+                        continue
+
+                else:
+                    if isinstance(v, bool):
+                        parm = MdParameter.Create(n, n, Types.Bool, False, NULL)
+                        con.append(parm)
+                        con.set[bint](n, bool(v))
+
+                    elif isinstance(v, int):
+                        parm = MdParameter.Create(n, n, Types.Int, 0, NULL)
+                        con.append(parm)
+                        con.set[int](n, int(v))
+
+                    elif isinstance(v, float):
+                        parm = MdParameter.Create(n, n, Types.Float, 0.0, NULL)
+                        con.append(parm)
+                        con.set[float](n, float(v))
+
+                    elif isinstance(v, str):
+                        parm = MdParameter.Create(n, n, Types.String, "", NULL)
+                        con.append(parm)
+                        con.set[string](n, str(v))
+
+                    else:
+                        print("Warning : Invalid value type {}:{} '{}'".format(key, n, type(v)))
+                        continue
+
+        return True
 
     def test(self, karte, tester):
         if not karte.hasTester(tester):

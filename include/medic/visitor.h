@@ -2,6 +2,7 @@
 #define MEDIC_VISITOR_INCLUDED
 
 
+#include <string>
 #include <map>
 #include "medic/karte.h"
 #include "medic/report.h"
@@ -14,6 +15,7 @@ namespace MEDIC
 {
     class MdKarte;
     typedef std::map<MdTester *, MdReportContainer> TesterReportsMap;
+    typedef std::map<std::string, MdParamContainer*> OptionMaps;
 
     class MdVisitor
     {
@@ -29,12 +31,17 @@ namespace MEDIC
             MEDIC_EXPORT bool hasError(MdTester *tester);
             MEDIC_EXPORT MdNodeIterator nodes();
             TesterReportsMap &reportAll();
+            MEDIC_EXPORT void clearOptions();
+            MEDIC_EXPORT MdParamContainer* getOptions(const std::string& name);
+            MEDIC_EXPORT std::vector<std::string> getOptionKeys();
 
         protected:
-            void cleanReport(MdTester *tester);
+            bool m_node_collected;
             MdNodeContainer m_nodes;
             TesterReportsMap m_results;
-            bool m_node_collected;
+            OptionMaps m_options;
+
+            void cleanReport(MdTester *tester);
     };
 }
 

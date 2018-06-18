@@ -30,6 +30,9 @@ cdef extern from "medic/parameter.h" namespace "MEDIC":
         MdTypes getType() const
         string getLabel() const
         bint getDefault[T](T &t) const
+        bint resize(size_t s)
+        size_t size() const
+        bint isArray() const
 
     cdef cppclass MdParamContainer:
         MdParamContainer()
@@ -38,6 +41,7 @@ cdef extern from "medic/parameter.h" namespace "MEDIC":
         bint set[T](string paramName, const T &v, size_t index)
         bint get[T](string paramName, T &v, size_t index)
         bint getDefault[T](string paramName, T &v)
+
         std_vector[string] names()
 
 
@@ -107,6 +111,9 @@ cdef extern from "medic/visitor.h" namespace "MEDIC":
         bint hasError(MdTester *tester)
         void reset()
         MdNodeIterator nodes()
+        void clearOptions()
+        MdParamContainer* getOptions(string name)
+        std_vector[string] getOptionKeys()
 
 
 cdef extern from "medic/pluginManager.h" namespace "MEDIC":
