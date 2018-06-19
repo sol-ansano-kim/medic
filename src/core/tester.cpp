@@ -9,6 +9,11 @@ MdTester::MdTester()
 
 MdTester::~MdTester() {}
 
+MdTesterScope MdTester::Scope()
+{
+    return MdNodeTester;
+}
+
 std::string MdTester::Name()
 {
     return "Tester";
@@ -44,6 +49,21 @@ MdParamContainer *MdTester::GetParameters()
 };
 
 MdReport *MdTester::test(MdNode *node)
+{
+    return 0;
+};
+
+MdReport *MdTester::testNode(MdNode *node)
+{
+    return test(node);
+};
+
+MdReport *MdTester::testAsset()
+{
+    return 0;
+};
+
+MdReport *MdTester::testScene()
 {
     return 0;
 };

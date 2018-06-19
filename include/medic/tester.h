@@ -16,6 +16,13 @@ namespace MEDIC
     class MdTesterContainer;
     class MdTesterIterator;
 
+    enum MdTesterScope
+    {
+        MdNodeTester,
+        MdAssetTester,
+        MdSceneTester
+    };
+
     class MdTester
     {
         friend class MdVisitor;
@@ -23,6 +30,7 @@ namespace MEDIC
         public:
             MEDIC_EXPORT MdTester();
             MEDIC_EXPORT virtual ~MdTester();
+            MEDIC_EXPORT virtual MdTesterScope Scope();
             MEDIC_EXPORT virtual std::string Name();
             MEDIC_EXPORT virtual std::string Description();
             MEDIC_EXPORT virtual std::vector<std::string> Dependencies();
@@ -32,6 +40,9 @@ namespace MEDIC
             MEDIC_EXPORT virtual bool IsFixable();
             MEDIC_EXPORT virtual MdParamContainer *GetParameters();
             MEDIC_EXPORT virtual MdReport *test(MdNode *node);
+            MEDIC_EXPORT virtual MdReport *testNode(MdNode *node);
+            MEDIC_EXPORT virtual MdReport *testAsset();
+            MEDIC_EXPORT virtual MdReport *testScene();
             MEDIC_EXPORT virtual bool fix(MdReport *report, MdParamContainer *params);
             MdParamContainer* getOptions() const;
 

@@ -88,6 +88,17 @@ if custom_plugins:
 headers = excons.glob("include/medic/*")
 
 
+def CheckDeprecated(path, pattern, message):
+    if not os.path.isfile(path):
+        return
+
+    with open(path, "r") as f:
+        for i, l in enumerate(f.readlines()):
+            if re.search(pattern, l):
+                print("[DEPRECATED] '{}' line {} : {}".format(path, i + 1, message))
+                break
+
+
 def Pacakage(target, source, env):
     path = target[0].get_path()
     path_split = re.split(r"[\\/]", path)
@@ -162,6 +173,7 @@ if do_pacakage:
 
 # plugins
 for plug in excons.glob("plugins/Tester/*.cpp"):
+    CheckDeprecated(plug, "[:\s*]test\s*[(][^)]*MdNode\s*[*]\s*", "test(MdNode*) is deprecated. Use testNode(MdNode*) instead")
     prjs.append({"name": os.path.splitext(os.path.basename(plug))[0],
                  "type": "dynamicmodule",
                  "alias": "medic-plugins",
@@ -179,6 +191,8 @@ for plug in excons.glob("plugins/Tester/*.cpp"):
                  "custom": customs})
 
 py_plugs = excons.glob("plugins/Tester/*.py")
+for pyplug in py_plugs:
+    CheckDeprecated(pyplug, "def\s+test[(]", "test(node) is deprecated. Use testNode(node) instead")
 if py_plugs:
     prjs.append({"name": "pyPlugins",
                  "type": "install",
@@ -206,6 +220,7 @@ if kartes:
 
 if custom_cpp:
     for cpp in custom_cpp:
+        CheckDeprecated(cpp, "[:\s*]test\s*[(][^)]*MdNode\s*[*]\s*", "test(MdNode*) is deprecated. Use testNode(MdNode*) instead")
         prjs.append({"name": os.path.splitext(os.path.basename(cpp))[0],
                      "type": "dynamicmodule",
                      "alias": "medic-custom-plugins",
@@ -221,6 +236,10 @@ if custom_cpp:
                      "deps": ["medic-lib"],
                      "srcs": [cpp],
                      "custom": customs})
+
+
+for pyplug in custom_py:
+    CheckDeprecated(pyplug, "def\s+test[(]", "test(node) is deprecated. Use testNode(node) instead")
 
 if custom_py:
     prjs.append({"name": "medicCustonPyPlugins",

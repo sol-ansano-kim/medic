@@ -28,16 +28,19 @@ void MdVisitor::visit(MdKarte *karte)
         tester->initialize();
         tester->setOptions(getOptions(tester->Name()));
 
-        MdNodeIterator node_it = m_nodes.iterator();
-        while (!node_it.isDone())
+        if (tester->Scope() == MdNodeTester)
         {
-            MdNode *node = node_it.next();
-            if (tester->Match(node))
+            MdNodeIterator node_it = m_nodes.iterator();
+            while (!node_it.isDone())
             {
-                MdReport *r = tester->test(node);
-                if (r)
+                MdNode *node = node_it.next();
+                if (tester->Match(node))
                 {
-                    addReport(tester, r);
+                    MdReport *r = tester->testNode(node);
+                    if (r)
+                    {
+                        addReport(tester, r);
+                    }
                 }
             }
         }
@@ -63,17 +66,21 @@ bool MdVisitor::visit(MdKarte *karte, MdTester *tester)
 
     cleanReport(tester);
     tester->initialize();
+    tester->setOptions(getOptions(tester->Name()));
 
-    MdNodeIterator node_it = m_nodes.iterator();
-    while (!node_it.isDone())
+    if (tester->Scope() == MdNodeTester)
     {
-        MdNode *node = node_it.next();
-        if (tester->Match(node))
+        MdNodeIterator node_it = m_nodes.iterator();
+        while (!node_it.isDone())
         {
-            MdReport *r = tester->test(node);
-            if (r)
+            MdNode *node = node_it.next();
+            if (tester->Match(node))
             {
-                addReport(tester, r);
+                MdReport *r = tester->testNode(node);
+                if (r)
+                {
+                    addReport(tester, r);
+                }
             }
         }
     }

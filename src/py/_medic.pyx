@@ -680,14 +680,16 @@ cdef class Visitor:
             tester.setOptions(options.get(tester.Name(), {}))
 
             self.__report_cache.pop(tester, [])
-            nodes = self.__nodes()
-            for n in nodes:
-                if tester.Match(n):
-                    r = tester.test(n)
-                    if r:
-                        if not self.__report_cache.has_key(tester):
-                            self.__report_cache[tester] = []
-                        self.__report_cache[tester].append(r)
+
+            if tester.Scope() == MdNodeTester:
+                nodes = self.__nodes()
+                for n in nodes:
+                    if tester.Match(n):
+                        r = tester.test(n)
+                        if r:
+                            if not self.__report_cache.has_key(tester):
+                                self.__report_cache[tester] = []
+                            self.__report_cache[tester].append(r)
 
             tester.finalize()
         else:
@@ -1131,6 +1133,9 @@ class PyTester(object):
     def finalize(self):
         pass
 
+    def Scope(self):
+        return MdNodeTester
+
     def Name(self):
         return "TesterBase"
 
@@ -1150,6 +1155,15 @@ class PyTester(object):
         return ParamContainer.Create()
 
     def test(self, node):
+        return None
+
+    def testNode(self, node):
+        return self.test()
+
+    def testAsset(self):
+        return None
+
+    def testScene(self):
         return None
 
     def fix(self, report, params):

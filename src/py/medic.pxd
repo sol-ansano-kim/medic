@@ -77,12 +77,18 @@ cdef extern from "medic/report.h" namespace "MEDIC":
 
 
 cdef extern from "medic/tester.h" namespace "MEDIC":
+    cdef enum MdTesterScope:
+        MdNodeTester = 0
+        MdAssetTester
+        MdSceneTester
+
     cdef cppclass MdTesterIterator:
         MdTesterIterator();
         MdTester *next()
         bint isDone()
 
     cdef cppclass MdTester:
+        MdTesterScope Scope()
         string Name()
         string Description()
         void initialize()
