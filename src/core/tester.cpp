@@ -63,12 +63,12 @@ MdReport *MdTester::testNode(MdNode *node)
     return test(node);
 };
 
-MdReport *MdTester::testAsset(const MdContext *asset)
+MdReport *MdTester::testAsset(MdContext *asset)
 {
     return 0;
 };
 
-MdReport *MdTester::testScene(const MdContext *scene)
+MdReport *MdTester::testScene(MdContext *scene)
 {
     return 0;
 };

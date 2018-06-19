@@ -438,10 +438,30 @@ cdef class Report:
         if self.ptr == NULL:
             return None
 
+        cdef MdNode *nodeptr = self.ptr.node()
+
+        if nodeptr == NULL:
+            return None
+
         new_node = Node()
-        new_node.ptr = self.ptr.node()
+        new_node.ptr = nodeptr
         new_node.initialize()
+
         return new_node
+
+    def context(self):
+        if self.ptr == NULL:
+            return None
+
+        cdef MdContext *contextptr = self.ptr.context()
+
+        if contextptr == NULL:
+            return None
+
+        context = Context()
+        context.ptr = contextptr
+
+        return context
 
 
 cdef class Karte:
@@ -1231,8 +1251,15 @@ class PluginManager(object):
 
 
 class PyReport(object):
-    def __init__(self, node, components=None):
-        self.__node = node
+    def __init__(self, node_or_context, components=None):
+        self.__node = None
+        self.__context = None
+
+        if isinstance(node_or_context, Node):
+            self.__node = node_or_context
+        if isinstance(node_or_context, Context):
+            self.__context = node_or_context
+
         self.__components = components
         self.__has_components = False if components is None else True
 
@@ -1241,6 +1268,9 @@ class PyReport(object):
         return True
 
     def addSelection(self):
+        if self.__node is None:
+            return
+
         Statics.SelectionList.clear()
 
         if self.__node.isDag():
@@ -1255,6 +1285,9 @@ class PyReport(object):
 
     def node(self):
         return self.__node
+
+    def context(self):
+        return self.__context
 
     def components(self):
         return self.__components

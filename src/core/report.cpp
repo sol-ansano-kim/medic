@@ -5,22 +5,23 @@ using namespace MEDIC;
 
 
 MdReport::MdReport(MdNode *node, MObject &compObj)
-{
-    m_node = node;
-    m_comp = compObj;
-    m_has_components = true;
-}
+    : m_node(node), m_context(NULL), m_comp(compObj), m_has_components(true) {}
 
 MdReport::MdReport(MdNode *node)
-{
-    m_node = node;
-    m_has_components = false;
-}
+    : m_node(node), m_context(NULL), m_has_components(false) {}
+
+MdReport::MdReport(MdContext *context)
+    : m_node(NULL), m_context(context), m_has_components(false) {}
 
 MdReport::~MdReport() {};
 
 void MdReport::addSelection() const
 {
+    if (m_node == NULL)
+    {
+        return;
+    }
+
     selection_list.clear();
 
     if (m_node->isDag())
@@ -45,6 +46,11 @@ void MdReport::addSelection() const
 MdNode *MdReport::node()
 {
     return m_node;
+}
+
+MdContext *MdReport::context()
+{
+    return m_context;
 }
 
 MObject &MdReport::components()

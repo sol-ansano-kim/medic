@@ -31,7 +31,15 @@ class ReportItem(object):
         return self.__report.node()
 
     def name(self):
-        return self.__report.node().name()
+        node = self.__report.node()
+        if node:
+            return node.name()
+
+        context = self.__report.context()
+        if context:
+            return context.name()
+
+        return ""
 
 
 class TesterItem(object):
@@ -215,7 +223,7 @@ class KarteModel(QtCore.QAbstractListModel):
                 if karte.hasTester(tester):
                     tester_items.append(TesterItem(tester))
 
-            self.__karte_items.append(KarteItem(karte, tester_items, vistorClass=self.__visitor_class))
+            self.__karte_items.append(KarteItem(karte, tester_items, visitorClass=self.__visitor_class))
 
         self.endResetModel()
 

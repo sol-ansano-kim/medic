@@ -83,6 +83,7 @@ cdef extern from "medic/context.h" namespace "MEDIC":
 cdef extern from "medic/report.h" namespace "MEDIC":
     cdef cppclass MdReport:
         MdNode *node()
+        MdContext *context()
         bint hasComponents() const
         void addSelection() const
 
