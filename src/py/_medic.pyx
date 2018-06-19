@@ -1145,7 +1145,7 @@ class PyTester(object):
     def Dependencies(self):
         return []
 
-    def Match(self, node):
+    def Match(self, node_or_context):
         return False
 
     def IsFixable(self):
@@ -1160,10 +1160,10 @@ class PyTester(object):
     def testNode(self, node):
         return self.test()
 
-    def testAsset(self):
+    def testAsset(self, asset):
         return None
 
-    def testScene(self):
+    def testScene(self, scene):
         return None
 
     def fix(self, report, params):

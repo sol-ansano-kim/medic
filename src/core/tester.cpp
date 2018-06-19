@@ -38,6 +38,11 @@ bool MdTester::Match(MdNode *node)
     return false;
 }
 
+bool MdTester::Match(MdContext *context)
+{
+    return false;
+}
+
 bool MdTester::IsFixable()
 {
     return false;
@@ -58,12 +63,12 @@ MdReport *MdTester::testNode(MdNode *node)
     return test(node);
 };
 
-MdReport *MdTester::testAsset()
+MdReport *MdTester::testAsset(const MdContext *asset)
 {
     return 0;
 };
 
-MdReport *MdTester::testScene()
+MdReport *MdTester::testScene(const MdContext *scene)
 {
     return 0;
 };

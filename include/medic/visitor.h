@@ -8,6 +8,7 @@
 #include "medic/report.h"
 #include "medic/tester.h"
 #include "medic/node.h"
+#include "medic/context.h"
 #include "medic/platform.h"
 
 
@@ -37,6 +38,8 @@ namespace MEDIC
 
         protected:
             bool m_node_collected;
+            MdContext *m_scene;
+            MdContextContainer m_assets;
             MdNodeContainer m_nodes;
             TesterReportsMap m_results;
             OptionMaps m_options;

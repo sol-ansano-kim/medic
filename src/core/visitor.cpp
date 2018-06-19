@@ -4,7 +4,8 @@
 using namespace MEDIC;
 
 
-MdVisitor::MdVisitor() : m_node_collected(false) {}
+MdVisitor::MdVisitor()
+    : m_node_collected(false), m_scene(NULL) {}
 
 MdVisitor::~MdVisitor()
 {
@@ -37,6 +38,35 @@ void MdVisitor::visit(MdKarte *karte)
                 if (tester->Match(node))
                 {
                     MdReport *r = tester->testNode(node);
+                    if (r)
+                    {
+                        addReport(tester, r);
+                    }
+                }
+            }
+        }
+
+        else if (tester->Scope() == MdSceneTester && m_scene)
+        {
+            if (tester->Match(m_scene))
+            {
+                MdReport *r = tester->testScene(m_scene);
+                if (r)
+                {
+                    addReport(tester, r);
+                }
+            }
+        }
+
+        else if (tester->Scope() == MdAssetTester)
+        {
+            MdContextIterator asset_it = m_assets.iterator();
+            while (!asset_it.isDone())
+            {
+                MdContext *asset = asset_it.next();
+                if (tester->Match(asset))
+                {
+                    MdReport *r = tester->testAsset(asset);
                     if (r)
                     {
                         addReport(tester, r);
@@ -85,6 +115,35 @@ bool MdVisitor::visit(MdKarte *karte, MdTester *tester)
         }
     }
 
+    else if (tester->Scope() == MdSceneTester && m_scene)
+    {
+        if (tester->Match(m_scene))
+        {
+            MdReport *r = tester->testScene(m_scene);
+            if (r)
+            {
+                addReport(tester, r);
+            }
+        }
+    }
+
+    else if (tester->Scope() == MdAssetTester)
+    {
+        MdContextIterator asset_it = m_assets.iterator();
+        while (!asset_it.isDone())
+        {
+            MdContext *asset = asset_it.next();
+            if (tester->Match(asset))
+            {
+                MdReport *r = tester->testAsset(asset);
+                if (r)
+                {
+                    addReport(tester, r);
+                }
+            }
+        }
+    }
+
     tester->finalize();
 
     return true;
@@ -104,6 +163,13 @@ bool MdVisitor::addReport(MdTester *tester, MdReport *report)
 void MdVisitor::reset()
 {
     m_node_collected = false;
+
+    if (m_scene)
+    {
+        delete m_scene;
+    }
+
+    m_assets.clear();
     m_results.clear();
     m_nodes.clear();
 }

@@ -41,7 +41,6 @@ cdef extern from "medic/parameter.h" namespace "MEDIC":
         bint set[T](string paramName, const T &v, size_t index)
         bint get[T](string paramName, T &v, size_t index)
         bint getDefault[T](string paramName, T &v)
-
         std_vector[string] names()
 
 
@@ -62,6 +61,24 @@ cdef extern from "medic/node.h" namespace "MEDIC":
         bint isDag() const
         void parents(MdNodeContainer *container) const
         void children(MdNodeContainer *container) const
+
+
+cdef extern from "medic/context.h" namespace "MEDIC":
+    cdef cppclass MdContextIterator:
+        MdContextIterator()
+        MdContextIterator(MdContextContainer *container)
+        MdContext *next()
+        bint isDone()
+
+    cdef cppclass MdContextContainer:
+        MdContextIterator iterator()
+
+    cdef cppclass MdContext:
+        MdContext(string name)
+        string name() const
+        MdParamContainer* params()
+        MdParameter* param(string name)
+        bint addParam(MdParameter* param)
 
 
 cdef extern from "medic/report.h" namespace "MEDIC":
