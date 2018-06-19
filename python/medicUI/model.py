@@ -92,9 +92,12 @@ class TesterItem(object):
 
 
 class KarteItem(object):
-    def __init__(self, karte, testerItems):
+    def __init__(self, karte, testerItems, visitorClass=None):
         self.__karte = karte
-        self.__visitor = medic.Visitor()
+        if visitorClass:
+            self.__visitor = visitorClass()
+        else:
+            self.__visitor = medic.Visitor()
         self.__tester_items = testerItems
 
     def testerItems(self):
@@ -193,10 +196,11 @@ class KarteItem(object):
 
 
 class KarteModel(QtCore.QAbstractListModel):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, visitorClass=None):
         super(KarteModel, self).__init__(parent=parent)
         self.__manager = None
         self.__karte_items = []
+        self.__visitor_class = visitorClass
         self.__initialize()
 
     def __initialize(self):
@@ -211,7 +215,7 @@ class KarteModel(QtCore.QAbstractListModel):
                 if karte.hasTester(tester):
                     tester_items.append(TesterItem(tester))
 
-            self.__karte_items.append(KarteItem(karte, tester_items))
+            self.__karte_items.append(KarteItem(karte, tester_items, vistorClass=self.__visitor_class))
 
         self.endResetModel()
 
