@@ -49,6 +49,12 @@ class Types:
     StringArray = MdTypes.MdStringArray
 
 
+class TesterScopes:
+    NodeTester = MdTesterScope.MdNodeTester
+    SceneTester = MdTesterScope.MdSceneTester
+    AssetTester = MdTesterScope.MdAssetTester
+
+
 cdef class Parameter:
     cdef MdParameter *ptr
 
