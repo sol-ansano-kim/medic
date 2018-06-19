@@ -58,20 +58,10 @@ MdReport *MdTester::test(MdNode *node)
     return 0;
 };
 
-MdReport *MdTester::testNode(MdNode *node)
-{
-    return test(node);
-};
-
-MdReport *MdTester::testAsset(MdContext *asset)
+MdReport *MdTester::test(MdContext *node)
 {
     return 0;
-};
-
-MdReport *MdTester::testScene(MdContext *scene)
-{
-    return 0;
-};
+}
 
 bool MdTester::fix(MdReport *report, MdParamContainer *params)
 {

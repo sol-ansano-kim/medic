@@ -43,9 +43,7 @@ namespace MEDIC
             MEDIC_EXPORT virtual bool IsFixable();
             MEDIC_EXPORT virtual MdParamContainer *GetParameters();
             MEDIC_EXPORT virtual MdReport *test(MdNode *node);
-            MEDIC_EXPORT virtual MdReport *testNode(MdNode *node);
-            MEDIC_EXPORT virtual MdReport *testAsset(MdContext *asset);
-            MEDIC_EXPORT virtual MdReport *testScene(MdContext *scene);
+            MEDIC_EXPORT virtual MdReport *test(MdContext *node);
             MEDIC_EXPORT virtual bool fix(MdReport *report, MdParamContainer *params);
             MdParamContainer* getOptions() const;
 

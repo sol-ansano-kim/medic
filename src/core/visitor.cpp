@@ -37,7 +37,7 @@ void MdVisitor::visit(MdKarte *karte)
                 MdNode *node = node_it.next();
                 if (tester->Match(node))
                 {
-                    MdReport *r = tester->testNode(node);
+                    MdReport *r = tester->test(node);
                     if (r)
                     {
                         addReport(tester, r);
@@ -50,7 +50,7 @@ void MdVisitor::visit(MdKarte *karte)
         {
             if (tester->Match(m_scene))
             {
-                MdReport *r = tester->testScene(m_scene);
+                MdReport *r = tester->test(m_scene);
                 if (r)
                 {
                     addReport(tester, r);
@@ -66,7 +66,7 @@ void MdVisitor::visit(MdKarte *karte)
                 MdContext *asset = asset_it.next();
                 if (tester->Match(asset))
                 {
-                    MdReport *r = tester->testAsset(asset);
+                    MdReport *r = tester->test(asset);
                     if (r)
                     {
                         addReport(tester, r);
@@ -106,7 +106,7 @@ bool MdVisitor::visit(MdKarte *karte, MdTester *tester)
             MdNode *node = node_it.next();
             if (tester->Match(node))
             {
-                MdReport *r = tester->testNode(node);
+                MdReport *r = tester->test(node);
                 if (r)
                 {
                     addReport(tester, r);
@@ -119,7 +119,7 @@ bool MdVisitor::visit(MdKarte *karte, MdTester *tester)
     {
         if (tester->Match(m_scene))
         {
-            MdReport *r = tester->testScene(m_scene);
+            MdReport *r = tester->test(m_scene);
             if (r)
             {
                 addReport(tester, r);
@@ -135,7 +135,7 @@ bool MdVisitor::visit(MdKarte *karte, MdTester *tester)
             MdContext *asset = asset_it.next();
             if (tester->Match(asset))
             {
-                MdReport *r = tester->testAsset(asset);
+                MdReport *r = tester->test(asset);
                 if (r)
                 {
                     addReport(tester, r);

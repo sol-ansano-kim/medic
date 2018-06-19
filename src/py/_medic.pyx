@@ -835,7 +835,7 @@ cdef class Visitor:
                 nodes = self.__nodes()
                 for n in nodes:
                     if tester.Match(n):
-                        r = tester.testNode(n)
+                        r = tester.test(n)
                         if r:
                             if not self.__report_cache.has_key(tester):
                                 self.__report_cache[tester] = []
@@ -844,7 +844,7 @@ cdef class Visitor:
             elif tester.Scope() == MdSceneTester:
                 scn = self.scene()
                 if scn and tester.Match(scn):
-                    r = tester.testScene(scn)
+                    r = tester.test(scn)
                     if r:
                         if not self.__report_cache.has_key(tester):
                             self.__report_cache[tester] = []
@@ -854,7 +854,7 @@ cdef class Visitor:
                 assets = self.assets()
                 for asset in assets:
                     if tester.Match(asset):
-                        r = tester.testAsset(asset)
+                        r = tester.test(asset)
                         if r:
                             if not self.__report_cache.has_key(tester):
                                 self.__report_cache[tester] = []
@@ -1338,16 +1338,7 @@ class PyTester(object):
     def GetParameters(self):
         return ParamContainer.Create()
 
-    def test(self, node):
-        return None
-
-    def testNode(self, node):
-        return self.test()
-
-    def testAsset(self, asset):
-        return None
-
-    def testScene(self, scene):
+    def test(self, node_or_context):
         return None
 
     def fix(self, report, params):
