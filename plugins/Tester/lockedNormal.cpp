@@ -18,7 +18,7 @@ class LockedNormal : public MdTester
     std::string Description();
     bool Match(MdNode *node);
     bool IsFixable();
-    MdReport *testNode(MdNode *node);
+    MdReport *test(MdNode *node);
     bool fix(MdReport *report, MdParamContainer *params);
 };
 
@@ -43,7 +43,7 @@ bool LockedNormal::IsFixable()
     return true;
 }
 
-MdReport *LockedNormal::testNode(MdNode *node)
+MdReport *LockedNormal::test(MdNode *node)
 {
     MStatus stat;
     MItMeshPolygon it(node->object(), &stat);

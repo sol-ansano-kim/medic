@@ -17,7 +17,7 @@ class CurrentUVSet(medic.PyTester):
     def Match(self, node):
         return node.object().hasFn(OpenMaya.MFn.kMesh)
 
-    def testNode(self, node):
+    def test(self, node):
         mesh = None
         try:
             mesh = OpenMaya.MFnMesh(node.object())

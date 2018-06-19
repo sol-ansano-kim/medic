@@ -15,7 +15,7 @@ class ZeroLengthEdge : public MdTester
     std::string Name();
     std::string Description();
     bool Match(MdNode *node);
-    MdReport *testNode(MdNode *node);
+    MdReport *test(MdNode *node);
 };
 
 
@@ -34,7 +34,7 @@ bool ZeroLengthEdge::Match(MdNode *node)
     return node->object().hasFn(MFn::kMesh);
 }
 
-MdReport *ZeroLengthEdge::testNode(MdNode *node)
+MdReport *ZeroLengthEdge::test(MdNode *node)
 {
     MStatus stat;
     MItMeshEdge it(node->object(), &stat);

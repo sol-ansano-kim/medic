@@ -19,7 +19,7 @@ class UnknownType(medic.PyTester):
     def IsFixable(self):
         return True
 
-    def testNode(self, node):
+    def test(self, node):
         return medic.PyReport(node)
 
     def fix(self, report, params):

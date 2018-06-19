@@ -24,7 +24,7 @@ class NonUniqueName(medic.PyTester):
         con.append(p)
         return con
 
-    def testNode(self, node):
+    def test(self, node):
         if node.dg().hasUniqueName():
             return None
 

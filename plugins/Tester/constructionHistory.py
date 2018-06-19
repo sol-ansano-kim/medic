@@ -15,7 +15,7 @@ class ConstructionHistory(medic.PyTester):
     def Match(self, node):
         return node.object().hasFn(OpenMaya.MFn.kNurbsSurfaceGeom) or node.object().hasFn(OpenMaya.MFn.kNurbsCurve) or node.object().hasFn(OpenMaya.MFn.kMesh)
 
-    def testNode(self, node):
+    def test(self, node):
         plug_name = None
         if node.object().hasFn(OpenMaya.MFn.kNurbsSurfaceGeom) or node.object().hasFn(OpenMaya.MFn.kNurbsCurve):
             plug_name = "create"

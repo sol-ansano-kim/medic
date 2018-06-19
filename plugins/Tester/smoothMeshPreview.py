@@ -18,7 +18,7 @@ class SmoothMeshPreview(medic.PyTester):
     def IsFixable(self):
         return True
 
-    def testNode(self, node):
+    def test(self, node):
         plug = node.dg().findPlug("displaySmoothMesh")
         if not plug:
             return None

@@ -15,7 +15,7 @@ class InstancedNode(medic.PyTester):
     def Match(self, node):
         return node.object().hasFn(OpenMaya.MFn.kDagNode)
 
-    def testNode(self, node):
+    def test(self, node):
         if node.dag().isInstanced():
             return medic.PyReport(node)
 

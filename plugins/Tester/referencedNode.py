@@ -15,7 +15,7 @@ class ReferencedNode(medic.PyTester):
     def Match(self, node):
         return True
 
-    def testNode(self, node):
+    def test(self, node):
         if node.dg().isFromReferencedFile():
             return medic.PyReport(node)
 

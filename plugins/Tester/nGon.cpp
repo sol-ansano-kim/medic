@@ -14,7 +14,7 @@ class NGon : public MdTester
     std::string Name();
     std::string Description();
     bool Match(MdNode *node);
-    MdReport *testNode(MdNode *node);
+    MdReport *test(MdNode *node);
 };
 
 
@@ -33,7 +33,7 @@ bool NGon::Match(MdNode *node)
     return node->object().hasFn(MFn::kMesh);
 }
 
-MdReport *NGon::testNode(MdNode *node)
+MdReport *NGon::test(MdNode *node)
 {
     MStatus stat;
     MItMeshPolygon it(node->object(), &stat);

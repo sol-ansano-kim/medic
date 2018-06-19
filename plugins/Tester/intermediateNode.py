@@ -34,7 +34,7 @@ class IntermediateNode(medic.PyTester):
 
         return True
 
-    def testNode(self, node):
+    def test(self, node):
         if not node.dag().isIntermediateObject():
             return None
 
