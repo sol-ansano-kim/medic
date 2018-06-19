@@ -20,7 +20,7 @@ class VertexTweaks : public MdTester
     std::string Description();
     bool Match(MdNode *node);
     bool IsFixable();
-    MdReport *test(MdNode *node);
+    MdReport *testNode(MdNode *node);
     bool fix(MdReport *report, MdParamContainer *params);
 };
 
@@ -45,7 +45,7 @@ bool VertexTweaks::IsFixable()
     return true;
 }
 
-MdReport *VertexTweaks::test(MdNode *node)
+MdReport *VertexTweaks::testNode(MdNode *node)
 {
     MPlug plug = node->dg().findPlug("pnts");
 

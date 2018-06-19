@@ -45,7 +45,7 @@ class FaceAssigned(medic.PyTester):
 
         return False
 
-    def test(self, node):
+    def testNode(self, node):
         if FaceAssigned.__TestObjGrp(node, "compInstObjGroups", "compObjectGroups"):
             return medic.PyReport(node)
 

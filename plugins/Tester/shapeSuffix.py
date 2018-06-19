@@ -15,7 +15,7 @@ class ShapeSuffix(medic.PyTester):
     def Match(self, node):
         return node.object().hasFn(OpenMaya.MFn.kShape)
 
-    def test(self, node):
+    def testNode(self, node):
         if node.dag().isInstanced() or node.dag().isFromReferencedFile() or node.dag().isIntermediateObject():
             return None
 

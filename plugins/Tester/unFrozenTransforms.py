@@ -24,7 +24,7 @@ class UnFrozenTransforms(medic.PyTester):
     def IsFixable(self):
         return True
 
-    def test(self, node):
+    def testNode(self, node):
         if node.dag().isInstanced():
             return None
 

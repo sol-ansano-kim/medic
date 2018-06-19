@@ -15,7 +15,7 @@ class NonManifoldEdge : public MdTester
     std::string Name();
     std::string Description();
     bool Match(MdNode *node);
-    MdReport *test(MdNode *node);
+    MdReport *testNode(MdNode *node);
 };
 
 
@@ -34,7 +34,7 @@ bool NonManifoldEdge::Match(MdNode *node)
     return node->object().hasFn(MFn::kMesh);
 }
 
-MdReport *NonManifoldEdge::test(MdNode *node)
+MdReport *NonManifoldEdge::testNode(MdNode *node)
 {
     MStatus stat;
     MItMeshEdge it(node->object(), &stat);

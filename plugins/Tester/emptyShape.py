@@ -16,7 +16,7 @@ class EmptyShape(medic.PyTester):
     def Match(self, node):
         return node.object().hasFn(OpenMaya.MFn.kNurbsSurfaceGeom) or node.object().hasFn(OpenMaya.MFn.kNurbsCurve) or node.object().hasFn(OpenMaya.MFn.kMesh)
 
-    def test(self, node):
+    def testNode(self, node):
         nc = None
         if node.object().hasFn(OpenMaya.MFn.kMesh):
             om = node.dg().findPlug("outMesh", True)

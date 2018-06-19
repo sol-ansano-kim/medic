@@ -16,7 +16,7 @@ class IncompleteUVSet : public MdTester
     std::string Name();
     std::string Description();
     bool Match(MdNode *node);
-    MdReport *test(MdNode *node);
+    MdReport *testNode(MdNode *node);
 };
 
 
@@ -35,7 +35,7 @@ bool IncompleteUVSet::Match(MdNode *node)
     return node->object().hasFn(MFn::kMesh);
 }
 
-MdReport *IncompleteUVSet::test(MdNode *node)
+MdReport *IncompleteUVSet::testNode(MdNode *node)
 {
     MStatus stat;
     bool error = false;

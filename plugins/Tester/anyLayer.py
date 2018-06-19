@@ -16,7 +16,7 @@ class AnyLayer(medic.PyTester):
     def Match(self, node):
         return node.object().hasFn(OpenMaya.MFn.kDisplayLayer) or node.object().hasFn(OpenMaya.MFn.kAnimLayer) or node.object().hasFn(OpenMaya.MFn.kRenderLayer)
 
-    def test(self, node):
+    def testNode(self, node):
         if node.name() not in ["BaseAnimation", "defaultRenderLayer", "defaultLayer"]:
             return medic.PyReport(node)
 

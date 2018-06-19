@@ -14,7 +14,7 @@ class LaminaFace : public MdTester
     std::string Name();
     std::string Description();
     bool Match(MdNode *node);
-    MdReport *test(MdNode *node);
+    MdReport *testNode(MdNode *node);
 };
 
 
@@ -33,7 +33,7 @@ bool LaminaFace::Match(MdNode *node)
     return node->object().hasFn(MFn::kMesh);
 }
 
-MdReport *LaminaFace::test(MdNode *node)
+MdReport *LaminaFace::testNode(MdNode *node)
 {
     MStatus stat;
     MItMeshPolygon it(node->object(), &stat);

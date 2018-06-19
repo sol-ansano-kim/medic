@@ -15,7 +15,7 @@ class NonManifoldVertex : public MdTester
     std::string Name();
     std::string Description();
     bool Match(MdNode *node);
-    MdReport *test(MdNode *node);
+    MdReport *testNode(MdNode *node);
 };
 
 
@@ -34,7 +34,7 @@ bool NonManifoldVertex::Match(MdNode *node)
     return node->object().hasFn(MFn::kMesh);
 }
 
-MdReport *NonManifoldVertex::test(MdNode *node)
+MdReport *NonManifoldVertex::testNode(MdNode *node)
 {
     MItMeshVertex itvtx(node->getPath());
     MFnSingleIndexedComponent comp;

@@ -17,7 +17,7 @@ class Namespace(medic.PyTester):
     def Match(self, node):
         return True
 
-    def test(self, node):
+    def testNode(self, node):
         if node.dg().isFromReferencedFile():
             return None
 
