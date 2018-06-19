@@ -14,7 +14,10 @@ MdContext::MdContext(const std::string& name, MdParamContainer* params)
 
 MdContext::~MdContext()
 {
-    delete m_params;
+    if (m_params)
+    {
+        delete m_params;
+    }
 } 
 
 std::string MdContext::name() const

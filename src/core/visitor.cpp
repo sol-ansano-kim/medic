@@ -164,12 +164,9 @@ void MdVisitor::reset()
 {
     m_node_collected = false;
 
-    if (m_scene)
-    {
-        delete m_scene;
-    }
+    clearScene();
+    clearAssets();
 
-    m_assets.clear();
     m_results.clear();
     m_nodes.clear();
 }
@@ -261,6 +258,30 @@ std::vector<std::string> MdVisitor::getOptionKeys()
     return names;
 }
 
+bool MdVisitor::setScene(MdContext *scene)
+{
+    clearScene();
+
+    m_scene = scene;
+
+    return true;
+}
+
+MdContext *MdVisitor::scene()
+{
+    return m_scene;
+}
+
+bool MdVisitor::addAsset(MdContext *asset)
+{
+    return m_assets.append(asset);
+}
+
+MdContextIterator MdVisitor::assets()
+{
+    return m_assets.iterator();
+}
+
 void MdVisitor::cleanReport(MdTester *tester)
 {
     TesterReportsMap::iterator it = m_results.find(tester);
@@ -269,4 +290,20 @@ void MdVisitor::cleanReport(MdTester *tester)
         m_results[tester].clear();
         m_results.erase(tester);
     }
+}
+
+
+void MdVisitor::clearScene()
+{
+    if (m_scene)
+    {
+        delete m_scene;
+    }
+
+    m_scene = NULL;
+}
+
+void MdVisitor::clearAssets()
+{
+    m_assets.clear();
 }

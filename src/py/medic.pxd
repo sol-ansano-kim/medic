@@ -75,10 +75,9 @@ cdef extern from "medic/context.h" namespace "MEDIC":
 
     cdef cppclass MdContext:
         MdContext(string name)
+        MdContext(string name, MdParamContainer* params)
         string name() const
         MdParamContainer* params()
-        MdParameter* param(string name)
-        bint addParam(MdParameter* param)
 
 
 cdef extern from "medic/report.h" namespace "MEDIC":
@@ -137,6 +136,12 @@ cdef extern from "medic/visitor.h" namespace "MEDIC":
         void clearOptions()
         MdParamContainer* getOptions(string name)
         std_vector[string] getOptionKeys()
+        bint setScene(MdContext *scene)
+        MdContext *scene()
+        bint addAsset(MdContext *asset)
+        MdContextIterator assets()
+        void clearScene()
+        void clearAssets()
 
 
 cdef extern from "medic/pluginManager.h" namespace "MEDIC":

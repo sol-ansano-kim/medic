@@ -35,6 +35,12 @@ namespace MEDIC
             MEDIC_EXPORT void clearOptions();
             MEDIC_EXPORT MdParamContainer* getOptions(const std::string& name);
             MEDIC_EXPORT std::vector<std::string> getOptionKeys();
+            MEDIC_EXPORT bool setScene(MdContext *scene);
+            MEDIC_EXPORT MdContext *scene();
+            MEDIC_EXPORT bool addAsset(MdContext *asset);
+            MEDIC_EXPORT MdContextIterator assets();
+            MEDIC_EXPORT void clearScene();
+            MEDIC_EXPORT void clearAssets();
 
         protected:
             bool m_node_collected;

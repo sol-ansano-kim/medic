@@ -74,15 +74,17 @@ cdef class Parameter:
 
 
 cdef class ParamContainer:
+    cdef bint needToDelete
     cdef MdParamContainer *ptr
 
     def __cinit__(self):
-        pass
+        needToDelete = False
 
     @staticmethod
     def Create():
         con = ParamContainer()
         con.ptr = new MdParamContainer()
+        needToDelete = True
         return con
 
     def append(self, Parameter param):
@@ -112,6 +114,12 @@ cdef class ParamContainer:
             return self.ptr.set[string](paramName, value, <size_t>index)
 
         return False
+
+    def names(self):
+        if self.ptr == NULL:
+            return []
+
+        return self.ptr.names()
 
     def get(self, paramName, index=0):
         if self.ptr == NULL:
@@ -191,7 +199,7 @@ cdef class ParamContainer:
         return None
 
     def __dealloc__(self):
-        if self.ptr != NULL:
+        if self.needToDelete and self.ptr != NULL:
             del(self.ptr)
 
 
@@ -318,6 +326,41 @@ cdef class Node:
         return child_list
 
 
+cdef class Context:
+    cdef MdContext *ptr
+
+    def __cinit__(self):
+        pass
+
+    @staticmethod
+    def Create(name):
+        context = Context()
+        context.ptr = new MdContext(<string>name)
+
+        return context
+
+    def name(self):
+        if self.ptr == NULL:
+            return ""
+
+        return self.ptr.name()
+
+    def params(self):
+        if self.ptr == NULL:
+            return None
+
+        cdef MdParamContainer* conptr = NULL
+
+        conptr = self.ptr.params()
+        if conptr == NULL:
+            return None
+
+        con = ParamContainer()
+        con.ptr = conptr
+
+        return con
+
+
 cdef class Tester:
     cdef MdTester *ptr
 
@@ -327,6 +370,12 @@ cdef class Tester:
     @staticmethod
     def IsPyTester():
         return False
+
+    def Scope(self):
+        if self.ptr == NULL:
+            return None
+
+        return self.ptr.Scope()
 
     def Name(self):
         if self.ptr == NULL:
@@ -467,13 +516,80 @@ cdef class Karte:
 cdef class Visitor:
     cdef MdVisitor *ptr
     cdef object __report_cache
+    cdef bint scene_collected
+    cdef bint assets_collected
 
     def __cinit__(self):
         self.ptr = new MdVisitor()
         self.__report_cache = {}
+        self.scene_collected = False
+        self.assets_collected = False
 
     def __dealloc__(self):
         del(self.ptr)
+
+    def collectScene(self):
+        pass
+
+    def collectAssets(self):
+        pass
+
+    def clearScene(self):
+        if self.ptr != NULL:
+            self.ptr.clearScene()
+
+        self.scene_collected = False
+
+    def clearAssets(self):
+        if self.ptr != NULL:
+            self.ptr.clearAssets()
+
+        self.assets_collected = False
+
+    def setScene(self, Context scene):
+        if self.ptr == NULL:
+            return False
+
+        self.ptr.setScene(scene.ptr)
+        self.scene_collected = True
+
+        return True
+
+    def scene(self):
+        if self.ptr == NULL:
+            return None
+
+        cdef MdContext *scn_ptr = self.ptr.scene()
+
+        if scn_ptr == NULL:
+            return None
+
+        con = Context()
+        con.ptr = scn_ptr
+
+        return con
+
+    def addAsset(self, Context asset):
+        if self.ptr == NULL:
+            return False
+
+        self.assets_collected = True
+
+        return self.ptr.addAsset(asset.ptr)
+
+    def assets(self):
+        cdef MdContextIterator it = self.ptr.assets()
+        cdef MdContext *c
+        assets = []
+
+        while (not it.isDone()):
+            n = it.next()
+            if n != NULL:
+                asset = Context()
+                asset.ptr = n
+                assets.append(asset)
+
+        return assets
 
     def getOptions(self):
         cdef MdParamContainer* con = NULL
@@ -673,6 +789,14 @@ cdef class Visitor:
         if not karte.hasTester(tester):
             return
 
+        if tester.Scope() == MdAssetTester and not self.assets_collected:
+            self.collectAssets()
+            self.assets_collected = True
+
+        if tester.Scope() == MdSceneTester and not self.scene_collected:
+            self.collectScene()
+            self.scene_collected = True
+
         if tester.IsPyTester():
             tester.initialize()
 
@@ -685,7 +809,26 @@ cdef class Visitor:
                 nodes = self.__nodes()
                 for n in nodes:
                     if tester.Match(n):
-                        r = tester.test(n)
+                        r = tester.testNode(n)
+                        if r:
+                            if not self.__report_cache.has_key(tester):
+                                self.__report_cache[tester] = []
+                            self.__report_cache[tester].append(r)
+
+            elif tester.Scope() == MdSceneTester:
+                scn = self.scene()
+                if scn and tester.Match(scn):
+                    r = tester.testScene(scn)
+                    if r:
+                        if not self.__report_cache.has_key(tester):
+                            self.__report_cache[tester] = []
+                        self.__report_cache[tester].append(r)
+
+            elif tester.Scope() == MdAssetTester:
+                assets = self.assets()
+                for asset in assets:
+                    if tester.Match(asset):
+                        r = tester.testAsset(asset)
                         if r:
                             if not self.__report_cache.has_key(tester):
                                 self.__report_cache[tester] = []
@@ -777,6 +920,8 @@ cdef class Visitor:
     def reset(self):
         self.ptr.reset()
         self.__report_cache = {}
+        self.clearScene()
+        self.clearAssets()
 
     def __nodes(self):
         cdef MdNodeIterator it = self.ptr.nodes()

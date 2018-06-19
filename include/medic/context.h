@@ -21,8 +21,8 @@ namespace MEDIC
             MEDIC_EXPORT ~MdContext();
             MEDIC_EXPORT std::string name() const;
             MEDIC_EXPORT MdParamContainer* params();
-            MEDIC_EXPORT MdParameter* param(const std::string& name);
-            MEDIC_EXPORT bool addParam(MdParameter* param);
+            MdParameter* param(const std::string& name);
+            bool addParam(MdParameter* param);
 
         private:
             std::string m_name;
