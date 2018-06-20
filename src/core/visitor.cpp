@@ -202,7 +202,7 @@ bool MdVisitor::hasError(MdTester *tester)
         return false;
     }
 
-    return it->second.size();
+    return it->second.size() != 0;
 }
 
 MdNodeIterator MdVisitor::nodes()

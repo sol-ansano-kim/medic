@@ -85,9 +85,9 @@ namespace MEDIC
             MEDIC_EXPORT bool setDefault(const std::string &v);
             MEDIC_EXPORT bool setDefault(const char *v);
             MEDIC_EXPORT bool getDefault(std::string &v) const;
-            bool resize(size_t s);
-            size_t size() const;
-            bool isArray() const;
+            MEDIC_EXPORT bool resize(size_t s);
+            MEDIC_EXPORT size_t size() const;
+            MEDIC_EXPORT bool isArray() const;
             bool hasAction() const;
             void doAction();
 

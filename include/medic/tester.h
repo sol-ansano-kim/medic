@@ -79,7 +79,7 @@ namespace MEDIC
         public:
             MEDIC_EXPORT MdTesterIterator();
             MdTesterIterator(MdTesterContainer *container);
-            ~MdTesterIterator();
+            MEDIC_EXPORT ~MdTesterIterator();
             MEDIC_EXPORT MdTester *next();
             MEDIC_EXPORT bool isDone();
 
