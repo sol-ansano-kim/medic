@@ -200,11 +200,11 @@ class TesterList(QtWidgets.QListView):
 class KarteList(QtWidgets.QListView):
     KarteChanged = QtCore.Signal("QModelIndex")
 
-    def __init__(self, parent=None):
+    def __init__(self, visitorClass=None, parent=None):
         super(KarteList, self).__init__(parent=parent)
         self.setObjectName("medic_karte_list")
         self.setUniformItemSizes(True)
-        self.source_model = model.KarteModel()
+        self.source_model = model.KarteModel(visitorClass=visitorClass)
         self.delegate = delegate.KarteDelegate()
         self.setModel(self.source_model)
         self.setItemDelegate(self.delegate)
@@ -551,9 +551,10 @@ class MainWidget(QtWidgets.QWidget):
     KarteChanged = QtCore.Signal(str)
     StatusChanged = QtCore.Signal(int)
 
-    def __init__(self, parent=None):
+    def __init__(self, visitorClass=None, parent=None):
         super(MainWidget, self).__init__(parent=parent)
         self.setObjectName("medic_main_widget")
+        self.__visitor_class = visitorClass
         self.__kartes_widget = None
         self.__testers_widget = None
         self.__phase = 0
@@ -600,7 +601,7 @@ class MainWidget(QtWidgets.QWidget):
         main_layout.setContentsMargins(0, 0, 0, 0)
         main_layout.setSpacing(0)
         self.setLayout(main_layout)
-        self.__kartes_widget = KarteList()
+        self.__kartes_widget = KarteList(visitorClass=self.__visitor_class)
         self.__testers_widget = TesterList()
         self.__detail_widget = TesterDetailWidget()
 

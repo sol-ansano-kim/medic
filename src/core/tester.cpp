@@ -4,9 +4,15 @@
 using namespace MEDIC;
 
 
-MdTester::MdTester() {}
+MdTester::MdTester()
+    : m_options(NULL) {}
 
 MdTester::~MdTester() {}
+
+MdTesterScope MdTester::Scope()
+{
+    return MdNodeTester;
+}
 
 std::string MdTester::Name()
 {
@@ -18,7 +24,21 @@ std::string MdTester::Description()
     return "";
 };
 
+std::vector<std::string> MdTester::Dependencies()
+{
+    return std::vector<std::string>();
+}
+
+void MdTester::initialize() {}
+
+void MdTester::finalize() {}
+
 bool MdTester::Match(MdNode *node)
+{
+    return false;
+}
+
+bool MdTester::Match(MdContext *context)
 {
     return false;
 }
@@ -38,10 +58,26 @@ MdReport *MdTester::test(MdNode *node)
     return 0;
 };
 
+MdReport *MdTester::test(MdContext *node)
+{
+    return 0;
+}
+
 bool MdTester::fix(MdReport *report, MdParamContainer *params)
 {
     return true;
 };
+
+void MdTester::setOptions(MdParamContainer* options)
+{
+    m_options = options;
+}
+
+
+MdParamContainer* MdTester::getOptions() const
+{
+    return m_options;
+}
 
 
 MdTesterContainer::MdTesterContainer() {}
@@ -133,6 +169,8 @@ size_t MdTesterContainer::size()
     return m_testers.size();
 }
 
+
+MdTesterIterator::MdTesterIterator() {}
 
 MdTesterIterator::MdTesterIterator(MdTesterContainer *container)
 {

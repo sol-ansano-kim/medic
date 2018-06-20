@@ -118,6 +118,7 @@ MdPlugInManager::~MdPlugInManager()
 
 void MdPlugInManager::unload()
 {
+    m_plugin_path_cache.clear();
     m_kartes.clear(true);
     m_testers.clear(true);
 

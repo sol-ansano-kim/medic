@@ -31,7 +31,15 @@ class ReportItem(object):
         return self.__report.node()
 
     def name(self):
-        return self.__report.node().name()
+        node = self.__report.node()
+        if node:
+            return node.name()
+
+        context = self.__report.context()
+        if context:
+            return context.name()
+
+        return ""
 
 
 class TesterItem(object):
@@ -92,9 +100,12 @@ class TesterItem(object):
 
 
 class KarteItem(object):
-    def __init__(self, karte, testerItems):
+    def __init__(self, karte, testerItems, visitorClass=None):
         self.__karte = karte
-        self.__visitor = medic.Visitor()
+        if visitorClass:
+            self.__visitor = visitorClass()
+        else:
+            self.__visitor = medic.Visitor()
         self.__tester_items = testerItems
 
     def testerItems(self):
@@ -102,10 +113,65 @@ class KarteItem(object):
 
     def testAll(self, testerCallback=None):
         self.reset()
-        for tester in self.__tester_items:
-            tester.test(self.__karte, self.__visitor)
-            if testerCallback:
-                testerCallback()
+
+        over_states = [medic.Statics.Done, medic.Statics.Failed, medic.Statics.Suspended]
+
+        testers = {}
+
+        for t in self.__tester_items:
+            testers[t.name()] = {"tester": t, "dep": t.tester().Dependencies(), "state": medic.Statics.Wait}
+
+        while (True):
+            for name, tester_dict in testers.iteritems():
+                if tester_dict["state"] in over_states:
+                    continue
+
+                dependencies = tester_dict["dep"]
+
+                need_to_wait = False
+                available = True
+
+                for dep in dependencies:
+                    dep_dict = testers.get(dep)
+                    if not dep_dict:
+                        continue
+
+                    st = dep_dict["state"]
+                    if st == medic.Statics.Failed or st == medic.Statics.Suspended:
+                        available = False
+                        break
+
+                    if st == medic.Statics.Wait:
+                        need_to_wait = True
+                        break
+
+                if not available:
+                    tester_dict["state"] = medic.Statics.Suspended
+                    continue
+
+                if need_to_wait:
+                    continue
+
+                tester = tester_dict["tester"]
+
+                tester.test(self.__karte, self.__visitor)
+                if testerCallback:
+                    testerCallback()
+
+                if tester.status() == Success:
+                    tester_dict["state"] = medic.Statics.Done
+                else:
+                    tester_dict["state"] = medic.Statics.Failed
+
+            is_done = True
+            for tester_dict in testers.itervalues():
+                st = tester_dict["state"]
+                if st not in over_states:
+                    is_done = False
+                    break
+
+            if is_done:
+                break
 
     def test(self, tester, testerCallback=None):
         self.reset()
@@ -138,10 +204,11 @@ class KarteItem(object):
 
 
 class KarteModel(QtCore.QAbstractListModel):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, visitorClass=None):
         super(KarteModel, self).__init__(parent=parent)
         self.__manager = None
         self.__karte_items = []
+        self.__visitor_class = visitorClass
         self.__initialize()
 
     def __initialize(self):
@@ -156,7 +223,7 @@ class KarteModel(QtCore.QAbstractListModel):
                 if karte.hasTester(tester):
                     tester_items.append(TesterItem(tester))
 
-            self.__karte_items.append(KarteItem(karte, tester_items))
+            self.__karte_items.append(KarteItem(karte, tester_items, visitorClass=self.__visitor_class))
 
         self.endResetModel()
 

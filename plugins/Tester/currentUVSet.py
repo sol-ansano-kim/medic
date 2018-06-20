@@ -2,14 +2,14 @@ import medic
 from maya import OpenMaya
 
 
-class NotDefaultUVSet(medic.PyTester):
+class CurrentUVSet(medic.PyTester):
     __DefaultSetName = "map1"
 
     def __init__(self):
-        super(NotDefaultUVSet, self).__init__()
+        super(CurrentUVSet, self).__init__()
 
     def Name(self):
-        return "NotDefaultUVSet"
+        return "CurrentUVSet"
 
     def Description(self):
         return "The first uvSet is not 'map1'"
@@ -24,11 +24,11 @@ class NotDefaultUVSet(medic.PyTester):
         except:
             return None
 
-        if mesh.currentUVSetName() != NotDefaultUVSet.__DefaultSetName:
+        if mesh.currentUVSetName() != CurrentUVSet.__DefaultSetName:
             return medic.PyReport(node)
 
         return None
 
 
 def Create():
-    return NotDefaultUVSet()
+    return CurrentUVSet()

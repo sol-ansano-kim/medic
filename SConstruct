@@ -8,8 +8,8 @@ import re
 
 
 major = 1
-minor = 0
-patch = 2
+minor = 2
+patch = 0
 
 os.environ["PYTHONPATH"] = os.environ.get("PYTHONPATH", "") + os.pathsep + os.path.abspath("cython")
 maya.SetupMscver()
@@ -179,6 +179,7 @@ for plug in excons.glob("plugins/Tester/*.cpp"):
                  "custom": customs})
 
 py_plugs = excons.glob("plugins/Tester/*.py")
+
 if py_plugs:
     prjs.append({"name": "pyPlugins",
                  "type": "install",
@@ -221,6 +222,7 @@ if custom_cpp:
                      "deps": ["medic-lib"],
                      "srcs": [cpp],
                      "custom": customs})
+
 
 if custom_py:
     prjs.append({"name": "medicCustonPyPlugins",

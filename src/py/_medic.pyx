@@ -1,4 +1,5 @@
 from medic cimport *
+from numbers import Number
 from cython.operator cimport dereference
 from cython.operator cimport preincrement
 import fnmatch
@@ -6,6 +7,7 @@ import os
 import re
 import sys
 import imp
+import copy
 from maya import OpenMaya
 
 
@@ -17,6 +19,11 @@ class Statics:
     ReKarteExt = re.compile("[.]karte$", re.IGNORECASE)
     RePyExt = re.compile("[.]py$", re.IGNORECASE)
     SelectionList = OpenMaya.MSelectionList()
+
+    Wait = 0
+    Done = 1
+    Failed = 2
+    Suspended = 3
 
     @staticmethod
     def ImportModule(path):
@@ -40,6 +47,12 @@ class Types:
     IntArray = MdTypes.MdIntArray
     FloatArray = MdTypes.MdFloatArray
     StringArray = MdTypes.MdStringArray
+
+
+class TesterScopes:
+    NodeTester = MdTesterScope.MdNodeTester
+    SceneTester = MdTesterScope.MdSceneTester
+    AssetTester = MdTesterScope.MdAssetTester
 
 
 cdef class Parameter:
@@ -67,15 +80,17 @@ cdef class Parameter:
 
 
 cdef class ParamContainer:
+    cdef bint needToDelete
     cdef MdParamContainer *ptr
 
     def __cinit__(self):
-        pass
+        needToDelete = False
 
     @staticmethod
     def Create():
         con = ParamContainer()
         con.ptr = new MdParamContainer()
+        needToDelete = True
         return con
 
     def append(self, Parameter param):
@@ -105,6 +120,12 @@ cdef class ParamContainer:
             return self.ptr.set[string](paramName, value, <size_t>index)
 
         return False
+
+    def names(self):
+        if self.ptr == NULL:
+            return []
+
+        return self.ptr.names()
 
     def get(self, paramName, index=0):
         if self.ptr == NULL:
@@ -184,7 +205,7 @@ cdef class ParamContainer:
         return None
 
     def __dealloc__(self):
-        if self.ptr != NULL:
+        if self.needToDelete and self.ptr != NULL:
             del(self.ptr)
 
 
@@ -311,6 +332,41 @@ cdef class Node:
         return child_list
 
 
+cdef class Context:
+    cdef MdContext *ptr
+
+    def __cinit__(self):
+        pass
+
+    @staticmethod
+    def Create(name):
+        context = Context()
+        context.ptr = new MdContext(<string>name)
+
+        return context
+
+    def name(self):
+        if self.ptr == NULL:
+            return ""
+
+        return self.ptr.name()
+
+    def params(self):
+        if self.ptr == NULL:
+            return None
+
+        cdef MdParamContainer* conptr = NULL
+
+        conptr = self.ptr.params()
+        if conptr == NULL:
+            return None
+
+        con = ParamContainer()
+        con.ptr = conptr
+
+        return con
+
+
 cdef class Tester:
     cdef MdTester *ptr
 
@@ -320,6 +376,12 @@ cdef class Tester:
     @staticmethod
     def IsPyTester():
         return False
+
+    def Scope(self):
+        if self.ptr == NULL:
+            return None
+
+        return self.ptr.Scope()
 
     def Name(self):
         if self.ptr == NULL:
@@ -332,6 +394,12 @@ cdef class Tester:
             return ""
 
         return self.ptr.Description()
+
+    def Dependencies(self):
+        if self.ptr == NULL:
+            return []
+
+        return self.ptr.Dependencies()
 
     def IsFixable(self):
         if self.ptr == NULL:
@@ -370,10 +438,30 @@ cdef class Report:
         if self.ptr == NULL:
             return None
 
+        cdef MdNode *nodeptr = self.ptr.node()
+
+        if nodeptr == NULL:
+            return None
+
         new_node = Node()
-        new_node.ptr = self.ptr.node()
+        new_node.ptr = nodeptr
         new_node.initialize()
+
         return new_node
+
+    def context(self):
+        if self.ptr == NULL:
+            return None
+
+        cdef MdContext *contextptr = self.ptr.context()
+
+        if contextptr == NULL:
+            return None
+
+        context = Context()
+        context.ptr = contextptr
+
+        return context
 
 
 cdef class Karte:
@@ -415,6 +503,34 @@ cdef class Karte:
         for t in self.py_testers:
             yield t
 
+    def cppTesters(self):
+        if self.ptr == NULL:
+            return []
+
+        testers = []
+        cdef MdTesterIterator it = self.ptr.testers()
+        cdef MdTester *t
+
+        while (not it.isDone()):
+            t = it.next()
+            if t != NULL:
+                tester = Tester()
+                tester.ptr = t
+                testers.append(tester)
+
+        for tr in testers:
+            yield tr
+
+    def testers(self):
+        testers = []
+        for t in self.cppTesters():
+            testers.append(t)
+
+        for t in self.pyTesters():
+            testers.append(t)
+
+        return testers
+
     def addPyTester(self, tester):
         if tester in self.py_testers:
             return False
@@ -426,42 +542,396 @@ cdef class Karte:
 cdef class Visitor:
     cdef MdVisitor *ptr
     cdef object __report_cache
+    cdef bint scene_collected
+    cdef bint assets_collected
 
     def __cinit__(self):
         self.ptr = new MdVisitor()
         self.__report_cache = {}
+        self.scene_collected = False
+        self.assets_collected = False
 
     def __dealloc__(self):
         del(self.ptr)
 
+    def collectScene(self):
+        pass
+
+    def collectAssets(self):
+        pass
+
+    def clearScene(self):
+        if self.ptr != NULL:
+            self.ptr.clearScene()
+
+        self.scene_collected = False
+
+    def clearAssets(self):
+        if self.ptr != NULL:
+            self.ptr.clearAssets()
+
+        self.assets_collected = False
+
+    def setScene(self, Context scene):
+        if self.ptr == NULL:
+            return False
+
+        self.ptr.setScene(scene.ptr)
+        self.scene_collected = True
+
+        return True
+
+    def scene(self):
+        if self.ptr == NULL:
+            return None
+
+        cdef MdContext *scn_ptr = self.ptr.scene()
+
+        if scn_ptr == NULL:
+            return None
+
+        con = Context()
+        con.ptr = scn_ptr
+
+        return con
+
+    def addAsset(self, Context asset):
+        if self.ptr == NULL:
+            return False
+
+        self.assets_collected = True
+
+        return self.ptr.addAsset(asset.ptr)
+
+    def assets(self):
+        cdef MdContextIterator it = self.ptr.assets()
+        cdef MdContext *c
+        assets = []
+
+        while (not it.isDone()):
+            n = it.next()
+            if n != NULL:
+                asset = Context()
+                asset.ptr = n
+                assets.append(asset)
+
+        return assets
+
+    def getOptions(self):
+        cdef MdParamContainer* con = NULL
+        cdef std_vector[string] names
+        cdef MdParameter *param = NULL
+        cdef bint boolValue
+        cdef int intValue
+        cdef float floatValue
+        cdef string stringValue
+
+        return_dict = {}
+
+        option_keys = self.ptr.getOptionKeys()
+        for k in option_keys:
+            con = self.ptr.getOptions(<string>k)
+            if con == NULL:
+                continue
+
+            cur_dict = {}
+
+            names = con.names()
+            for n in names:
+                param = con.getParam(n)
+                if (param == NULL):
+                    continue
+
+                typ = param.getType()
+
+                if not param.isArray():
+                    if typ == Types.Bool:
+                        con.get[bint](n, boolValue)
+                        cur_dict[n] = boolValue
+                    elif typ == Types.Int:
+                        con.get[int](n, intValue)
+                        cur_dict[n] = intValue
+                    elif typ == Types.Float:
+                        con.get[float](n, floatValue)
+                        cur_dict[n] = floatValue
+                    elif typ == Types.String:
+                        con.get[string](n, stringValue)
+                        cur_dict[n] = stringValue
+                else:
+                    values = []
+                    cur_dict[n] = values
+
+                    if typ == Types.BoolArray:
+                        for i in range(param.size()):
+                            con.get[bint](n, boolValue, <size_t>i)
+                            values.append(boolValue)
+
+                    elif typ == Types.IntArray:
+                        for i in range(param.size()):
+                            con.get[int](n, intValue, <size_t>i)
+                            values.append(intValue)
+
+                    elif typ == Types.FloatArray:
+                        for i in range(param.size()):
+                            con.get[float](n, floatValue, <size_t>i)
+                            values.append(floatValue)
+
+                    elif typ == Types.StringArray:
+                        for i in range(param.size()):
+                            con.get[string](n, stringValue, <size_t>i)
+                            values.append(stringValue)
+
+            if cur_dict:
+                return_dict[k] = cur_dict
+
+        return return_dict
+
+    def __getArrayType(self, values):
+        list_dt = None
+
+        for v in values:
+            dt = type(v)
+
+            if isinstance(v, basestring):
+                dt = str
+
+            if list_dt is None:
+                list_dt = dt
+                continue
+
+            if list_dt == dt:
+                continue
+
+            if list_dt == float and issubclass(dt, Number):
+                continue
+
+            if list_dt == int and issubclass(dt, Number):
+                if dt == float:
+                    list_dt = float
+
+                continue
+
+            if list_dt == bool and issubclass(dt, Number):
+                if dt != bool:
+                    list_dt = dt
+
+                continue
+
+            return None
+
+        return list_dt
+
+    def setOptions(self, optionDict):
+        cdef MdParamContainer* con = NULL
+
+        self.ptr.clearOptions()
+
+        if not isinstance(optionDict, dict):
+            return False
+
+        for key, options in optionDict.iteritems():
+            if not isinstance(key, basestring) or not isinstance(options, dict):
+                print("Warning : Invalid Option '{}' - {}".format(key, options))
+                continue
+
+            con = self.ptr.getOptions(key)
+
+            for n, v in options.iteritems():
+                if not isinstance(n, basestring):
+                    print("Warning : Invalid Option '{}' - {}".format(n, v))
+
+                if isinstance(v, list):
+                    values = []
+                    if len(v) == 0:
+                        dt = float
+                    else:
+                        dt = self.__getArrayType(v)
+                        if dt is None:
+                            print("Warning : Invalid Option List'{}'".format(v))
+                            continue
+
+                        values = map(lambda x: dt(x), v)
+
+                    if dt == bool:
+                        parm = MdParameter.Create(n, n, Types.BoolArray, False, NULL)
+                        parm.resize(len(values))
+                        con.append(parm)
+                        for i, v in enumerate(values):
+                            con.set[bint](n, v, <size_t>i)
+
+                    elif dt == int:
+                        parm = MdParameter.Create(n, n, Types.IntArray, 0, NULL)
+                        parm.resize(len(values))
+                        con.append(parm)
+                        for i, v in enumerate(values):
+                            con.set[int](n, v, <size_t>i)
+
+                    elif dt == float:
+                        parm = MdParameter.Create(n, n, Types.FloatArray, 0.0, NULL)
+                        parm.resize(len(values))
+                        con.append(parm)
+                        for i, v in enumerate(values):
+                            con.set[float](n, v, <size_t>i)
+
+                    elif dt == str:
+                        parm = MdParameter.Create(n, n, Types.StringArray, "", NULL)
+                        parm.resize(len(values))
+                        con.append(parm)
+                        for i, v in enumerate(values):
+                            con.set[string](n, v, <size_t>i)
+
+                    else:
+                        print("Warning : Invalid value type {}:{} '{}'".format(key, n, dt))
+                        continue
+
+                else:
+                    if isinstance(v, bool):
+                        parm = MdParameter.Create(n, n, Types.Bool, False, NULL)
+                        con.append(parm)
+                        con.set[bint](n, bool(v))
+
+                    elif isinstance(v, int):
+                        parm = MdParameter.Create(n, n, Types.Int, 0, NULL)
+                        con.append(parm)
+                        con.set[int](n, int(v))
+
+                    elif isinstance(v, float):
+                        parm = MdParameter.Create(n, n, Types.Float, 0.0, NULL)
+                        con.append(parm)
+                        con.set[float](n, float(v))
+
+                    elif isinstance(v, str):
+                        parm = MdParameter.Create(n, n, Types.String, "", NULL)
+                        con.append(parm)
+                        con.set[string](n, str(v))
+
+                    else:
+                        print("Warning : Invalid value type {}:{} '{}'".format(key, n, type(v)))
+                        continue
+
+        return True
+
     def test(self, karte, tester):
-        if karte.hasPyTester(tester):
+        if not karte.hasTester(tester):
+            return
+
+        if tester.Scope() == MdAssetTester and not self.assets_collected:
+            self.collectAssets()
+            self.assets_collected = True
+
+        if tester.Scope() == MdSceneTester and not self.scene_collected:
+            self.collectScene()
+            self.scene_collected = True
+
+        if tester.IsPyTester():
+            tester.initialize()
+
+            options = self.getOptions()
+            tester.setOptions(options.get(tester.Name(), {}))
+
             self.__report_cache.pop(tester, [])
-            nodes = self.__nodes()
-            for n in nodes:
-                if tester.Match(n):
-                    r = tester.test(n)
+
+            if tester.Scope() == MdNodeTester:
+                nodes = self.__nodes()
+                for n in nodes:
+                    if tester.Match(n):
+                        r = tester.test(n)
+                        if r:
+                            if not self.__report_cache.has_key(tester):
+                                self.__report_cache[tester] = []
+                            self.__report_cache[tester].append(r)
+
+            elif tester.Scope() == MdSceneTester:
+                scn = self.scene()
+                if scn and tester.Match(scn):
+                    r = tester.test(scn)
                     if r:
                         if not self.__report_cache.has_key(tester):
                             self.__report_cache[tester] = []
                         self.__report_cache[tester].append(r)
+
+            elif tester.Scope() == MdAssetTester:
+                assets = self.assets()
+                for asset in assets:
+                    if tester.Match(asset):
+                        r = tester.test(asset)
+                        if r:
+                            if not self.__report_cache.has_key(tester):
+                                self.__report_cache[tester] = []
+                            self.__report_cache[tester].append(r)
+
+            tester.finalize()
         else:
             self.__visitWithTester(karte, tester)
 
     def testAll(self, karte):
         self.__report_cache = {}
-        self.__visitAll(karte)
-        nodes = self.__nodes()
 
-        for t in karte.pyTesters():
-            self.__report_cache.pop(t, [])
-            for n in nodes:
-                if t.Match(n):
-                    r = t.test(n)
-                    if r:
-                        if not self.__report_cache.has_key(t):
-                            self.__report_cache[t] = []
-                        self.__report_cache[t].append(r)
+        over_states = [Statics.Done, Statics.Failed, Statics.Suspended]
+
+        testers = {}
+
+        for t in karte.testers():
+            testers[t.Name()] = {"tester": t, "dep": t.Dependencies(), "state": Statics.Wait}
+
+        pynodes = self.__nodes()
+        while (True):
+            for name, tester_dict in testers.iteritems():
+                if tester_dict["state"] in over_states:
+                    continue
+
+                dependencies = tester_dict["dep"]
+
+                need_to_wait = False
+                available = True
+                for dep in dependencies:
+                    dep_dict = testers.get(dep)
+                    if not dep_dict:
+                        continue
+
+                    st = dep_dict["state"]
+                    if st == Statics.Failed or st == Statics.Suspended:
+                        available = False
+                        break
+
+                    if st == Statics.Wait:
+                        need_to_wait = True
+                        break
+
+                if not available:
+                    tester_dict["state"] = Statics.Suspended
+                    continue
+
+                if need_to_wait:
+                    continue
+
+                tester = tester_dict["tester"]
+
+                self.test(karte, tester)
+
+                if self.hasError(tester):
+                    tester_dict["state"] = Statics.Failed
+                else:
+                    tester_dict["state"] = Statics.Done
+
+            is_done = True
+            for tester_dict in testers.itervalues():
+                st = tester_dict["state"]
+                if st not in over_states:
+                    is_done = False
+                    break
+
+            if is_done:
+                break
+
+    def hasError(self, tester):
+        if tester.IsPyTester():
+            return True if self.__report_cache.get(tester) else False
+
+        return self.__hasError(tester)
+
+    cdef __hasError(self, Tester tester):
+        return self.ptr.hasError(tester.ptr)
 
     def reportAll(self):
         return self.__reportAll()
@@ -476,6 +946,8 @@ cdef class Visitor:
     def reset(self):
         self.ptr.reset()
         self.__report_cache = {}
+        self.clearScene()
+        self.clearAssets()
 
     def __nodes(self):
         cdef MdNodeIterator it = self.ptr.nodes()
@@ -496,7 +968,9 @@ cdef class Visitor:
         self.ptr.visit(karte.ptr)
 
     cdef __visitWithTester(self, Karte karte, Tester tester):
+        tester.ptr.initialize()
         self.ptr.visit(karte.ptr, tester.ptr)
+        tester.ptr.finalize()
 
     cdef __report(self, Tester tester):
         cdef MdReportIterator reports
@@ -777,8 +1251,15 @@ class PluginManager(object):
 
 
 class PyReport(object):
-    def __init__(self, node, components=None):
-        self.__node = node
+    def __init__(self, node_or_context, components=None):
+        self.__node = None
+        self.__context = None
+
+        if isinstance(node_or_context, Node):
+            self.__node = node_or_context
+        if isinstance(node_or_context, Context):
+            self.__context = node_or_context
+
         self.__components = components
         self.__has_components = False if components is None else True
 
@@ -787,6 +1268,9 @@ class PyReport(object):
         return True
 
     def addSelection(self):
+        if self.__node is None:
+            return
+
         Statics.SelectionList.clear()
 
         if self.__node.isDag():
@@ -802,6 +1286,9 @@ class PyReport(object):
     def node(self):
         return self.__node
 
+    def context(self):
+        return self.__context
+
     def components(self):
         return self.__components
 
@@ -812,10 +1299,26 @@ class PyReport(object):
 class PyTester(object):
     def __init__(self):
         super(PyTester, self).__init__()
+        self.__options = {}
+
+    def setOptions(self, options):
+        self.__options = options
+
+    def getOptions(self):
+        return copy.deepcopy(self.__options)
 
     @staticmethod
     def IsPyTester():
         return True
+
+    def initialize(self):
+        pass
+
+    def finalize(self):
+        pass
+
+    def Scope(self):
+        return MdNodeTester
 
     def Name(self):
         return "TesterBase"
@@ -823,7 +1326,10 @@ class PyTester(object):
     def Description(self):
         return ""
 
-    def Match(self, node):
+    def Dependencies(self):
+        return []
+
+    def Match(self, node_or_context):
         return False
 
     def IsFixable(self):
@@ -832,7 +1338,7 @@ class PyTester(object):
     def GetParameters(self):
         return ParamContainer.Create()
 
-    def test(self, node):
+    def test(self, node_or_context):
         return None
 
     def fix(self, report, params):

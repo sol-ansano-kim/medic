@@ -2,11 +2,13 @@
 #define MEDIC_VISITOR_INCLUDED
 
 
+#include <string>
 #include <map>
 #include "medic/karte.h"
 #include "medic/report.h"
 #include "medic/tester.h"
 #include "medic/node.h"
+#include "medic/context.h"
 #include "medic/platform.h"
 
 
@@ -14,6 +16,7 @@ namespace MEDIC
 {
     class MdKarte;
     typedef std::map<MdTester *, MdReportContainer> TesterReportsMap;
+    typedef std::map<std::string, MdParamContainer*> OptionMaps;
 
     class MdVisitor
     {
@@ -26,14 +29,28 @@ namespace MEDIC
             MEDIC_EXPORT void reset();
             MEDIC_EXPORT std::vector<MdTester *> reportTesters();
             MEDIC_EXPORT MdReportIterator report(MdTester *tester);
+            MEDIC_EXPORT bool hasError(MdTester *tester);
             MEDIC_EXPORT MdNodeIterator nodes();
             TesterReportsMap &reportAll();
+            MEDIC_EXPORT void clearOptions();
+            MEDIC_EXPORT MdParamContainer* getOptions(const std::string& name);
+            MEDIC_EXPORT std::vector<std::string> getOptionKeys();
+            MEDIC_EXPORT bool setScene(MdContext *scene);
+            MEDIC_EXPORT MdContext *scene();
+            MEDIC_EXPORT bool addAsset(MdContext *asset);
+            MEDIC_EXPORT MdContextIterator assets();
+            MEDIC_EXPORT void clearScene();
+            MEDIC_EXPORT void clearAssets();
 
         protected:
-            void cleanReport(MdTester *tester);
+            bool m_node_collected;
+            MdContext *m_scene;
+            MdContextContainer m_assets;
             MdNodeContainer m_nodes;
             TesterReportsMap m_results;
-            bool m_node_collected;
+            OptionMaps m_options;
+
+            void cleanReport(MdTester *tester);
     };
 }
 

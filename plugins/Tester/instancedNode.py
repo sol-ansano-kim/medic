@@ -2,15 +2,15 @@ import medic
 from maya import OpenMaya
 
 
-class InstanceNode(medic.PyTester):
+class InstancedNode(medic.PyTester):
     def __init__(self):
-        super(InstanceNode, self).__init__()
+        super(InstancedNode, self).__init__()
 
     def Name(self):
-        return "InstanceNode"
+        return "InstancedNode"
 
     def Description(self):
-        return "Instance node(s) exists"
+        return "Instanced node(s) exists"
 
     def Match(self, node):
         return node.object().hasFn(OpenMaya.MFn.kDagNode)
@@ -23,4 +23,4 @@ class InstanceNode(medic.PyTester):
 
 
 def Create():
-    return InstanceNode()
+    return InstancedNode()

@@ -462,7 +462,11 @@ bool MdParamContainer::remove(MdParameter *p)
     ParamPtrMap::iterator it = m_params.find(p->getName());
     if (it != m_params.end())
     {
-        delete it->second;
+        if (it->second)
+        {
+            delete it->second;
+        }
+
         m_params.erase(it);
         return true;
     }
@@ -474,7 +478,10 @@ void MdParamContainer::clear()
 {
     for (ParamPtrMap::iterator it = m_params.begin(); it != m_params.end(); ++it)
     {
-        delete it->second;
+        if (it->second)
+        {
+            delete it->second;
+        }
     }
 
     m_params.clear();

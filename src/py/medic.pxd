@@ -30,6 +30,9 @@ cdef extern from "medic/parameter.h" namespace "MEDIC":
         MdTypes getType() const
         string getLabel() const
         bint getDefault[T](T &t) const
+        bint resize(size_t s)
+        size_t size() const
+        bint isArray() const
 
     cdef cppclass MdParamContainer:
         MdParamContainer()
@@ -60,9 +63,27 @@ cdef extern from "medic/node.h" namespace "MEDIC":
         void children(MdNodeContainer *container) const
 
 
+cdef extern from "medic/context.h" namespace "MEDIC":
+    cdef cppclass MdContextIterator:
+        MdContextIterator()
+        MdContextIterator(MdContextContainer *container)
+        MdContext *next()
+        bint isDone()
+
+    cdef cppclass MdContextContainer:
+        MdContextIterator iterator()
+
+    cdef cppclass MdContext:
+        MdContext(string name)
+        MdContext(string name, MdParamContainer* params)
+        string name() const
+        MdParamContainer* params()
+
+
 cdef extern from "medic/report.h" namespace "MEDIC":
     cdef cppclass MdReport:
         MdNode *node()
+        MdContext *context()
         bint hasComponents() const
         void addSelection() const
 
@@ -73,10 +94,23 @@ cdef extern from "medic/report.h" namespace "MEDIC":
 
 
 cdef extern from "medic/tester.h" namespace "MEDIC":
-    cdef cppclass MdTesterIterator
+    cdef enum MdTesterScope:
+        MdNodeTester = 0
+        MdAssetTester
+        MdSceneTester
+
+    cdef cppclass MdTesterIterator:
+        MdTesterIterator();
+        MdTester *next()
+        bint isDone()
+
     cdef cppclass MdTester:
+        MdTesterScope Scope()
         string Name()
         string Description()
+        void initialize()
+        void finalize()
+        std_vector[string] Dependencies()
         MdParamContainer *GetParameters()
         bint IsFixable()
         bint fix(MdReport *report, MdParamContainer *params)
@@ -87,6 +121,7 @@ cdef extern from "medic/karte.h" namespace "MEDIC":
         string Name() const
         string Description() const
         bint hasTester(MdTester *t)
+        MdTesterIterator testers()
 
 
 cdef extern from "medic/visitor.h" namespace "MEDIC":
@@ -96,8 +131,18 @@ cdef extern from "medic/visitor.h" namespace "MEDIC":
         bint visit(MdKarte *karte, MdTester *tester)
         std_vector[MdTester *] reportTesters()
         MdReportIterator report(MdTester *tester)
+        bint hasError(MdTester *tester)
         void reset()
         MdNodeIterator nodes()
+        void clearOptions()
+        MdParamContainer* getOptions(string name)
+        std_vector[string] getOptionKeys()
+        bint setScene(MdContext *scene)
+        MdContext *scene()
+        bint addAsset(MdContext *asset)
+        MdContextIterator assets()
+        void clearScene()
+        void clearAssets()
 
 
 cdef extern from "medic/pluginManager.h" namespace "MEDIC":

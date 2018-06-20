@@ -6,5 +6,6 @@
 
 #include "medic/tester.h"
 #include "medic/node.h"
+#include "medic/context.h"
 #include "medic/parameter.h"
 #include "medic/report.h"
