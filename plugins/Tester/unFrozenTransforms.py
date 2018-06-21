@@ -29,7 +29,7 @@ class UnFrozenTransforms(medic.PyTester):
             return None
 
         transform = node.dag().transformationMatrix()
-        if NotFreezed.Identity == transform:
+        if UnFrozenTransforms.Identity == transform:
             return None
 
         return medic.PyReport(node)
