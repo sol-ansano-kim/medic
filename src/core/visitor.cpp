@@ -5,7 +5,7 @@ using namespace MEDIC;
 
 
 MdVisitor::MdVisitor()
-    : m_node_collected(false), m_scene(NULL) {}
+    : m_node_collected(false), m_collect_in_selection(false), m_scene(NULL) {}
 
 MdVisitor::~MdVisitor()
 {
@@ -17,7 +17,7 @@ void MdVisitor::visit(MdKarte *karte)
 {
     reset();
 
-    GetNodes(&m_nodes);
+    collectNodes();
     m_node_collected = true;
 
     MdTesterIterator tester_it = karte->testers();
@@ -90,7 +90,7 @@ bool MdVisitor::visit(MdKarte *karte, MdTester *tester)
 
     if (!m_node_collected)
     {
-        GetNodes(&m_nodes);
+        collectNodes();
         m_node_collected = true;
     }
 
@@ -209,7 +209,7 @@ MdNodeIterator MdVisitor::nodes()
 {
     if (!m_node_collected)
     {
-        GetNodes(&m_nodes);
+        collectNodes();
         m_node_collected = true;
     }
 
@@ -292,7 +292,6 @@ void MdVisitor::cleanReport(MdTester *tester)
     }
 }
 
-
 void MdVisitor::clearScene()
 {
     if (m_scene)
@@ -306,4 +305,27 @@ void MdVisitor::clearScene()
 void MdVisitor::clearAssets()
 {
     m_assets.clear();
+}
+
+
+bool MdVisitor::selectionOnly() const
+{
+    return m_collect_in_selection;
+}
+
+void MdVisitor::setSelectionOnly(bool v)
+{
+    m_collect_in_selection = v;
+}
+
+void MdVisitor::collectNodes()
+{
+    if (m_collect_in_selection)
+    {
+        GetNodesInSelection(&m_nodes);
+    }
+    else
+    {
+        GetNodes(&m_nodes);
+    }
 }

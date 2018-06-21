@@ -5,6 +5,7 @@
 #include <vector>
 #include <algorithm>
 #include <string>
+#include <set>
 #include <maya/MString.h>
 #include <maya/MObject.h>
 #include <maya/MSelectionList.h>
@@ -12,6 +13,9 @@
 #include <maya/MFnDagNode.h>
 #include <maya/MDagPath.h>
 #include <maya/MItDependencyNodes.h>
+#include <maya/MItDependencyGraph.h>
+#include <maya/MItDag.h>
+#include <maya/MGlobal.h>
 #include "medic/platform.h"
 
 
@@ -79,6 +83,8 @@ namespace MEDIC
     };
 
     void GetNodes(MdNodeContainer *container);
+
+    void GetNodesInSelection(MdNodeContainer *container);
 }
 
 

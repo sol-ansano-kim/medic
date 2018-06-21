@@ -558,7 +558,18 @@ cdef class Visitor:
         self.assets_collected = False
 
     def __dealloc__(self):
-        del(self.ptr)
+        if self.ptr != NULL:
+            del(self.ptr)
+
+    def selectionOnly(self):
+        if self.ptr == NULL:
+            return False
+
+        return self.ptr.selectionOnly()
+
+    def setSelectionOnly(self, v):
+        if self.ptr != NULL:
+            self.ptr.setSelectionOnly(v)
 
     def collectScene(self):
         pass

@@ -41,9 +41,12 @@ namespace MEDIC
             MEDIC_EXPORT MdContextIterator assets();
             MEDIC_EXPORT void clearScene();
             MEDIC_EXPORT void clearAssets();
+            MEDIC_EXPORT bool selectionOnly() const;
+            MEDIC_EXPORT void setSelectionOnly(bool v);
 
         protected:
             bool m_node_collected;
+            bool m_collect_in_selection;
             MdContext *m_scene;
             MdContextContainer m_assets;
             MdNodeContainer m_nodes;
@@ -51,6 +54,7 @@ namespace MEDIC
             OptionMaps m_options;
 
             void cleanReport(MdTester *tester);
+            void collectNodes();
     };
 }
 
