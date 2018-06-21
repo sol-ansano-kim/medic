@@ -218,6 +218,10 @@ class KarteModel(QtCore.QAbstractListModel):
         all_testers = map(lambda x: self.__manager.tester(x), self.__manager.testerNames())
         for karte_name in self.__manager.karteNames():
             karte = self.__manager.karte(karte_name)
+
+            if not karte.Visible():
+                continue
+
             tester_items = []
             for tester in all_testers:
                 if karte.hasTester(tester):

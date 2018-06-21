@@ -84,7 +84,7 @@ MdPluginLoadingStatus MdPlugInManager::addTester(std::string pluginPath)
     return MdLoadingFailure;
 }
 
-MdPluginLoadingStatus MdPlugInManager::addKarte(std::string name, std::string description, std::vector<std::string> testerNames)
+MdPluginLoadingStatus MdPlugInManager::addKarte(std::string name, std::string description, bool visible, std::vector<std::string> testerNames)
 {
     MdKarte *exist = m_kartes.get(name);
     if (exist)
@@ -92,7 +92,7 @@ MdPluginLoadingStatus MdPlugInManager::addKarte(std::string name, std::string de
         return MdExistsPlugin;
     }
 
-    MdKarte *karte = new MdKarte(name, description);
+    MdKarte *karte = new MdKarte(name, description, visible);
 
     for (std::vector<std::string>::iterator it = testerNames.begin(); it != testerNames.end(); ++it)
     {

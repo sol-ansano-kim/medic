@@ -20,17 +20,19 @@ namespace MEDIC
     class MdKarte
     {
         public:
-            MdKarte(std::string name, std::string desc);
+            MdKarte(std::string name, std::string desc, bool visible);
             ~MdKarte();
             MdTester *tester(std::string testerName);
             MEDIC_EXPORT bool hasTester(MdTester *t);
             MEDIC_EXPORT std::string Name() const;
             MEDIC_EXPORT std::string Description() const;
+            MEDIC_EXPORT bool Visible() const;
             bool addTester(MdTester *tester);
             void accept(MdVisitor *v);
             MEDIC_EXPORT MdTesterIterator testers();
 
         private:
+            bool m_visible;
             MdTesterContainer m_testers;
             std::string m_name;
             std::string m_description;
