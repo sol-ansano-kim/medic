@@ -120,6 +120,7 @@ cdef extern from "medic/karte.h" namespace "MEDIC":
     cdef cppclass MdKarte:
         string Name() const
         string Description() const
+        bint Visible() const
         bint hasTester(MdTester *t)
         MdTesterIterator testers()
 
@@ -158,6 +159,6 @@ cdef extern from "medic/pluginManager.h" namespace "MEDIC":
         MdTester *tester(string name)
         MdKarte *karte(string name)
         MdPluginLoadingStatus addTester(string pluginPath)
-        MdPluginLoadingStatus addKarte(string name, string description, std_vector[string] testerNames)
+        MdPluginLoadingStatus addKarte(string name, string description, bint visible, std_vector[string] testerNames)
         void unload()
         

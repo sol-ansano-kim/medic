@@ -483,6 +483,12 @@ cdef class Karte:
 
         return self.ptr.Description()
 
+    def Visible(self):
+        if self.ptr == NULL:
+            return False
+
+        return self.ptr.Visible()
+
     def hasTester(self, tester):
         if tester.IsPyTester():
             return self.hasPyTester(tester)
@@ -1157,6 +1163,7 @@ cdef class __PluginManager:
                 name = karte_data.get("Name", "UNKNOWN")
                 description = karte_data.get("Description", "")
                 tester_patterns = karte_data.get("Testers", [])
+                visible = karte_data.get("Visible", True)
                 karte_testers = []
 
                 for tester in ctesters:
@@ -1165,7 +1172,7 @@ cdef class __PluginManager:
                             karte_testers.append(tester)
                             break
 
-                if self.__addKarte(full_path, name, description, karte_testers) == MdLoadingFailure:
+                if self.__addKarte(full_path, name, description, visible, karte_testers) == MdLoadingFailure:
                     print "Load Karte Failed : %s" % full_path
                     continue
 
@@ -1177,11 +1184,11 @@ cdef class __PluginManager:
 
                 self.__py_karte_manager.regist(karte)
 
-    cdef __addKarte(self, filepath, name, description, testers):
+    cdef __addKarte(self, filepath, name, description, visible, testers):
         cdef std_vector[string] tester_names;
         for t in testers:
             tester_names.push_back(<string>t)
-        result = self.ptr.addKarte(<string>name, <string>description, tester_names)
+        result = self.ptr.addKarte(<string>name, <string>description, <bint>visible, tester_names)
 
         if result:
             new_karte = Karte()

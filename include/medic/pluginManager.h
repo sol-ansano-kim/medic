@@ -28,7 +28,7 @@ namespace MEDIC
             MEDIC_EXPORT MdTester *tester(std::string name);
             MEDIC_EXPORT MdKarte *karte(std::string name);
             MEDIC_EXPORT MdPluginLoadingStatus addTester(std::string pluginPath);
-            MEDIC_EXPORT MdPluginLoadingStatus addKarte(std::string name, std::string description, std::vector<std::string> testerNames);
+            MEDIC_EXPORT MdPluginLoadingStatus addKarte(std::string name, std::string description, bool visible, std::vector<std::string> testerNames);
             MEDIC_EXPORT void unload();
 
         private:

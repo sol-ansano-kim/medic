@@ -4,8 +4,8 @@
 using namespace MEDIC;
 
 
-MdKarte::MdKarte(std::string name, std::string desc)
-: m_name(name), m_description(desc) {}
+MdKarte::MdKarte(std::string name, std::string desc, bool visible)
+: m_visible(visible), m_name(name), m_description(desc) {}
 
 MdKarte::~MdKarte()
 {
@@ -30,6 +30,11 @@ std::string MdKarte::Name() const
 std::string MdKarte::Description() const
 {
     return m_description;
+}
+
+bool MdKarte::Visible() const
+{
+    return m_visible;
 }
 
 bool MdKarte::addTester(MdTester *tester)
