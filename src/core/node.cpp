@@ -323,6 +323,8 @@ void MEDIC::GetNodesInSelection(MdNodeContainer *container)
                                 break;
                             }
                         }
+
+                        down_ses.next();
                     }
                 }
 
