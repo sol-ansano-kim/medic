@@ -222,7 +222,6 @@ void MEDIC::GetNodesInSelection(MdNodeContainer *container)
     MObject obj;
     MObject member;
     MDagPath root;
-    MDagPath dagp;
     MFnDependencyNode dn;
     MFnDagNode dagn;
     MFnSet set_node;
@@ -240,8 +239,7 @@ void MEDIC::GetNodesInSelection(MdNodeContainer *container)
             dag_it.reset(root, MItDag::kDepthFirst);
             while (!dag_it.isDone())
             {
-                dag_it.getPath(dagp);
-                selection.insert(dagp.fullPathName().asChar());
+                selection.insert(dag_it.fullPathName().asChar());
 
                 dag_it.next();
             }
