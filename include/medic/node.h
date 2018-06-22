@@ -11,6 +11,7 @@
 #include <maya/MSelectionList.h>
 #include <maya/MFnDependencyNode.h>
 #include <maya/MFnDagNode.h>
+#include <maya/MFnSet.h>
 #include <maya/MDagPath.h>
 #include <maya/MItDependencyNodes.h>
 #include <maya/MItDependencyGraph.h>

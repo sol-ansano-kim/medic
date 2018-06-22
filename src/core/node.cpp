@@ -217,12 +217,15 @@ void MEDIC::GetNodesInSelection(MdNodeContainer *container)
 {
     std::set<std::string> selection;
     MSelectionList sel;
+    MSelectionList membership;
     MItDag dag_it;
     MObject obj;
+    MObject member;
     MDagPath root;
     MDagPath dagp;
     MFnDependencyNode dn;
     MFnDagNode dagn;
+    MFnSet set_node;
     MItDependencyNodes it;
 
     MGlobal::getActiveSelectionList(sel);
@@ -268,6 +271,7 @@ void MEDIC::GetNodesInSelection(MdNodeContainer *container)
             if (obj.hasFn(MFn::kDagNode))
             {
                 dagn.setObject(obj);
+
                 if (selection.find(dagn.fullPathName().asChar()) == selection.end())
                 {
                     it.next();
@@ -276,20 +280,50 @@ void MEDIC::GetNodesInSelection(MdNodeContainer *container)
             }
             else if (selection.find(dn.name().asChar()) == selection.end())
             {
-                MItDependencyGraph dg_it(obj, MFn::kDagNode, MItDependencyGraph::kDownstream, MItDependencyGraph::kDepthFirst, MItDependencyGraph::kNodeLevel);
+                MItDependencyGraph down_dags(obj, MFn::kDagNode, MItDependencyGraph::kDownstream, MItDependencyGraph::kDepthFirst, MItDependencyGraph::kNodeLevel);
 
                 bool is_in = false;
 
-                while (!dg_it.isDone())
+                while (!down_dags.isDone())
                 {
-                    dagn.setObject(dg_it.currentItem());
+                    dagn.setObject(down_dags.currentItem());
+
                     if (selection.find(dagn.fullPathName().asChar()) != selection.end())
                     {
                         is_in = true;
                         break;
                     }
 
-                    dg_it.next();
+                    down_dags.next();
+                }
+
+                if (!is_in)
+                {
+                    MItDependencyGraph down_ses(obj, MFn::kSet, MItDependencyGraph::kDownstream, MItDependencyGraph::kDepthFirst, MItDependencyGraph::kNodeLevel);
+
+                    while (!down_ses.isDone() && !is_in)
+                    {
+                        set_node.setObject(down_ses.thisNode());
+                        set_node.getMembers(membership, true);
+
+                        for (unsigned int j = 0; j < membership.length(); ++j)
+                        {
+                            membership.getDependNode(j, member);
+
+                            if (!member.hasFn(MFn::kDagNode))
+                            {
+                                continue;
+                            }
+
+                            dagn.setObject(member);
+
+                            if (selection.find(dagn.fullPathName().asChar()) != selection.end())
+                            {
+                                is_in = true;
+                                break;
+                            }
+                        }
+                    }
                 }
 
                 if (!is_in)
