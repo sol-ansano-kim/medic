@@ -8,7 +8,13 @@ import re
 import sys
 import imp
 import copy
+import logging
 from maya import OpenMaya
+
+
+LogDebug = logging.DEBUG
+LogWarning = logging.WARNING
+LogError = logging.ERROR
 
 
 class Statics:
@@ -25,6 +31,14 @@ class Statics:
     Failed = 2
     Suspended = 3
 
+    Logger = logging.getLogger("Medic")
+    __stream_handler = logging.StreamHandler()
+    __stream_handler.setFormatter(logging.Formatter("[%(name)s] %(levelname)s : '%(message)s'"))
+
+    Logger.addHandler(__stream_handler)
+    Logger.setLevel(LogWarning)
+    Logger.propagate = False
+
     @staticmethod
     def ImportModule(path):
         module = None
@@ -32,9 +46,25 @@ class Statics:
         try:
             module = imp.load_source(os.path.splitext(os.path.basename(path))[0], path)
         except Exception as e:
-            return None
+            Statics.Debug("Failed to load module '{}' : '{}'".format(path, e))
 
         return module
+
+    @staticmethod
+    def Debug(msg):
+        Statics.Logger.debug(msg)
+
+    @staticmethod
+    def Warning(msg):
+        Statics.Logger.warning(msg)
+
+    @staticmethod
+    def Error(msg):
+        Statics.Logger.error(msg)
+
+
+def SetLogLevel(log_level):
+    Statics.Logger.setLevel(log_level)
 
 
 class Types:
@@ -65,15 +95,20 @@ cdef class Parameter:
     def Create(name, label, typ, defaultValue):
         pram = Parameter()
         if typ == Types.Bool or typ == Types.BoolArray:
+            Statics.Debug("Create a new bool Parameter")
             pram.ptr = MdParameter.Create[bint](name, label, typ, defaultValue, NULL)
         elif typ == Types.Int or typ == Types.IntArray:
+            Statics.Debug("Create a new int Parameter")
             pram.ptr = MdParameter.Create[int](name, label, typ, defaultValue, NULL)
         elif typ == Types.Float or typ == Types.FloatArray:
+            Statics.Debug("Create a new float Parameter")
             pram.ptr = MdParameter.Create[float](name, label, typ, defaultValue, NULL)
         elif typ == Types.String or typ == Types.StringArray:
+            Statics.Debug("Create a new string Parameter")
             pram.ptr = MdParameter.Create[string](name, label, typ, defaultValue, NULL)
         else:
-            print "WARNING : NOT SUPPORTED TYPE"
+            Statics.Warning("Not supported type")
+
             return None
 
         return pram
@@ -88,6 +123,7 @@ cdef class ParamContainer:
 
     @staticmethod
     def Create():
+        Statics.Debug("Create a new ParamContainer")
         con = ParamContainer()
         con.ptr = new MdParamContainer()
         needToDelete = True
@@ -95,12 +131,14 @@ cdef class ParamContainer:
 
     def append(self, Parameter param):
         if self.ptr == NULL:
+            Statics.Warning("NULL pointer")
             return None
 
         return self.ptr.append(param.ptr)
 
     def set(self, paramName, value, index=0):
         if self.ptr == NULL:
+            Statics.Warning("NULL pointer")
             return False
 
         cdef MdParameter *ptr = self.ptr.getParam(<string>paramName)
@@ -123,12 +161,14 @@ cdef class ParamContainer:
 
     def names(self):
         if self.ptr == NULL:
+            Statics.Warning("NULL pointer")
             return []
 
         return self.ptr.names()
 
     def get(self, paramName, index=0):
         if self.ptr == NULL:
+            Statics.Warning("NULL pointer")
             return None
 
         cdef bint boolValue
@@ -139,6 +179,7 @@ cdef class ParamContainer:
         cdef MdParameter *ptr = self.ptr.getParam(<string>paramName)
 
         if ptr == NULL:
+            Statics.Warning("NULL pointer")
             return None
 
         typ = ptr.getType()
@@ -160,6 +201,7 @@ cdef class ParamContainer:
 
     def getParamInfos(self):
         if self.ptr == NULL:
+            Statics.Warning("NULL pointer")
             return []
 
         return_list = []
@@ -175,6 +217,7 @@ cdef class ParamContainer:
 
     def getDefault(self, paramName):
         if self.ptr == NULL:
+            Statics.Warning("NULL pointer")
             return None
 
         cdef bint boolValue
@@ -185,6 +228,7 @@ cdef class ParamContainer:
         cdef MdParameter *ptr = self.ptr.getParam(<string>paramName)
 
         if ptr == NULL:
+            Statics.Warning("NULL pointer")
             return None
 
         typ = ptr.getType()
@@ -225,6 +269,7 @@ cdef class Node:
 
     def initialize(self):
         if self.ptr == NULL:
+            Statics.Warning("NULL pointer")
             return False
 
         self.__obj = OpenMaya.MObject()
@@ -241,6 +286,7 @@ cdef class Node:
 
     @staticmethod
     def Create(name):
+        Statics.Debug("Create a new Node")
         node = Node()
         node.ptr = new MdNode(<string>name)
         node.needToDelete = True
@@ -249,12 +295,14 @@ cdef class Node:
 
     def name(self):
         if self.ptr == NULL:
+            Statics.Warning("NULL pointer")
             return ""
 
         return self.ptr.name()
 
     def type(self):
         if self.ptr == NULL:
+            Statics.Warning("NULL pointer")
             return ""
 
         return self.ptr.type()
@@ -273,12 +321,17 @@ cdef class Node:
 
     def isDag(self):
         if self.ptr == NULL:
+            Statics.Warning("NULL pointer")
             return False
 
         return self.ptr.isDag()
 
     def getPath(self):
-        if self.ptr == NULL or not self.isDag():
+        if self.ptr == NULL:
+            Statics.Warning("NULL pointer")
+            return OpenMaya.MDagPath()
+
+        if not self.isDag():
             return OpenMaya.MDagPath()
 
         path = OpenMaya.MDagPath()
@@ -287,6 +340,7 @@ cdef class Node:
 
     def parents(self):
         if self.ptr == NULL:
+            Statics.Warning("NULL pointer")
             return []
 
         if not self.isDag():
@@ -310,6 +364,7 @@ cdef class Node:
 
     def children(self):
         if self.ptr == NULL:
+            Statics.Warning("NULL pointer")
             return []
 
         if not self.isDag():
@@ -340,6 +395,7 @@ cdef class Context:
 
     @staticmethod
     def Create(name):
+        Statics.Debug("Create a new Context")
         context = Context()
         context.ptr = new MdContext(<string>name)
 
@@ -347,18 +403,21 @@ cdef class Context:
 
     def name(self):
         if self.ptr == NULL:
+            Statics.Warning("NULL pointer")
             return ""
 
         return self.ptr.name()
 
     def params(self):
         if self.ptr == NULL:
+            Statics.Warning("NULL pointer")
             return None
 
         cdef MdParamContainer* conptr = NULL
 
         conptr = self.ptr.params()
         if conptr == NULL:
+            Statics.Warning("NULL pointer")
             return None
 
         con = ParamContainer()
@@ -379,36 +438,42 @@ cdef class Tester:
 
     def Scope(self):
         if self.ptr == NULL:
+            Statics.Warning("NULL pointer")
             return None
 
         return self.ptr.Scope()
 
     def Name(self):
         if self.ptr == NULL:
+            Statics.Warning("NULL pointer")
             return ""
 
         return self.ptr.Name()
 
     def Description(self):
         if self.ptr == NULL:
+            Statics.Warning("NULL pointer")
             return ""
 
         return self.ptr.Description()
 
     def Dependencies(self):
         if self.ptr == NULL:
+            Statics.Warning("NULL pointer")
             return []
 
         return self.ptr.Dependencies()
 
     def IsFixable(self):
         if self.ptr == NULL:
+            Statics.Warning("NULL pointer")
             return False
 
         return self.ptr.IsFixable()
 
     def GetParameters(self):
         if self.ptr == NULL:
+            Statics.Warning("NULL pointer")
             return None
 
         con = ParamContainer()
@@ -417,6 +482,7 @@ cdef class Tester:
 
     def fix(self, Report report, ParamContainer params):
         if self.ptr == NULL:
+            Statics.Warning("NULL pointer")
             return False
 
         return self.ptr.fix(report.ptr, params.ptr)
@@ -430,12 +496,14 @@ cdef class Report:
 
     def addSelection(self):
         if self.ptr == NULL:
+            Statics.Warning("NULL pointer")
             return
 
         self.ptr.addSelection()
 
     def node(self):
         if self.ptr == NULL:
+            Statics.Warning("NULL pointer")
             return None
 
         cdef MdNode *nodeptr = self.ptr.node()
@@ -451,6 +519,7 @@ cdef class Report:
 
     def context(self):
         if self.ptr == NULL:
+            Statics.Warning("NULL pointer")
             return None
 
         cdef MdContext *contextptr = self.ptr.context()
@@ -473,18 +542,21 @@ cdef class Karte:
 
     def Name(self):
         if self.ptr == NULL:
+            Statics.Warning("NULL pointer")
             return ""
 
         return self.ptr.Name()
 
     def Description(self):
         if self.ptr == NULL:
+            Statics.Warning("NULL pointer")
             return ""
 
         return self.ptr.Description()
 
     def Visible(self):
         if self.ptr == NULL:
+            Statics.Warning("NULL pointer")
             return False
 
         return self.ptr.Visible()
@@ -498,6 +570,7 @@ cdef class Karte:
 
     def __hasTester(self, Tester tester):
         if self.ptr == NULL:
+            Statics.Warning("NULL pointer")
             return False
 
         return self.ptr.hasTester(tester.ptr)
@@ -511,6 +584,7 @@ cdef class Karte:
 
     def cppTesters(self):
         if self.ptr == NULL:
+            Statics.Warning("NULL pointer")
             return []
 
         testers = []
@@ -558,7 +632,19 @@ cdef class Visitor:
         self.assets_collected = False
 
     def __dealloc__(self):
-        del(self.ptr)
+        if self.ptr != NULL:
+            del(self.ptr)
+
+    def selectionOnly(self):
+        if self.ptr == NULL:
+            Statics.Warning("NULL pointer")
+            return False
+
+        return self.ptr.selectionOnly()
+
+    def setSelectionOnly(self, v):
+        if self.ptr != NULL:
+            self.ptr.setSelectionOnly(v)
 
     def collectScene(self):
         pass
@@ -580,6 +666,7 @@ cdef class Visitor:
 
     def setScene(self, Context scene):
         if self.ptr == NULL:
+            Statics.Warning("NULL pointer")
             return False
 
         self.ptr.setScene(scene.ptr)
@@ -589,6 +676,7 @@ cdef class Visitor:
 
     def scene(self):
         if self.ptr == NULL:
+            Statics.Warning("NULL pointer")
             return None
 
         cdef MdContext *scn_ptr = self.ptr.scene()
@@ -603,6 +691,7 @@ cdef class Visitor:
 
     def addAsset(self, Context asset):
         if self.ptr == NULL:
+            Statics.Warning("NULL pointer")
             return False
 
         self.assets_collected = True
@@ -737,14 +826,14 @@ cdef class Visitor:
 
         for key, options in optionDict.iteritems():
             if not isinstance(key, basestring) or not isinstance(options, dict):
-                print("Warning : Invalid Option '{}' - {}".format(key, options))
+                Statics.Warning("Invalid Option '{}' - {}".format(key, options))
                 continue
 
             con = self.ptr.getOptions(key)
 
             for n, v in options.iteritems():
                 if not isinstance(n, basestring):
-                    print("Warning : Invalid Option '{}' - {}".format(n, v))
+                    Statics.Warning("Invalid Option '{}' - {}".format(n, v))
 
                 if isinstance(v, list):
                     values = []
@@ -753,7 +842,7 @@ cdef class Visitor:
                     else:
                         dt = self.__getArrayType(v)
                         if dt is None:
-                            print("Warning : Invalid Option List'{}'".format(v))
+                            Statics.Warning("Invalid Option List'{}'".format(v))
                             continue
 
                         values = map(lambda x: dt(x), v)
@@ -787,7 +876,7 @@ cdef class Visitor:
                             con.set[string](n, v, <size_t>i)
 
                     else:
-                        print("Warning : Invalid value type {}:{} '{}'".format(key, n, dt))
+                        Statics.Warning("Invalid value type {}:{} '{}'".format(key, n, dt))
                         continue
 
                 else:
@@ -812,7 +901,7 @@ cdef class Visitor:
                         con.set[string](n, str(v))
 
                     else:
-                        print("Warning : Invalid value type {}:{} '{}'".format(key, n, type(v)))
+                        Statics.Warning("Invalid value type {}:{} '{}'".format(key, n, type(v)))
                         continue
 
         return True
@@ -820,6 +909,8 @@ cdef class Visitor:
     def test(self, karte, tester):
         if not karte.hasTester(tester):
             return
+
+        Statics.Debug("Start Tester '{}'".format(tester.Name()))
 
         if tester.Scope() == MdAssetTester and not self.assets_collected:
             self.collectAssets()
@@ -1102,8 +1193,13 @@ cdef class __PluginManager:
                     continue
 
                 full_path = os.path.join(sdir, f).replace("\\", "/")
-                if self.__addTester(full_path) == MdLoadingFailure:
-                    print "Load PlugIn Failed : %s" % full_path
+                add_res = self.__addTester(full_path)
+                if add_res == MdLoadingFailure:
+                    Statics.Debug("Failed to load plugin : '{}'".format(full_path))
+                elif add_res == MdExistsPlugin:
+                    Statics.Debug("Tester exists already that has a same name : '{}'".format(full_path))
+                else:
+                    Statics.Debug("Tester Added : '{}'".format(full_path))
 
         exists_list = self.__cTesterNames()
 
@@ -1120,17 +1216,20 @@ cdef class __PluginManager:
                 module = Statics.ImportModule(full_path)
 
                 if not hasattr(module, "Create"):
+                    Statics.Debug("Failed to load plugin - No 'Create' function '{}'".format(full_path))
                     continue
 
                 tester = module.Create()
 
                 if not isinstance(tester, PyTester):
+                    Statics.Debug("Failed to load plugin - It is not a instance of medic.PyTester '{}'".format(full_path))
                     continue
 
                 if tester.Name() in exists_list:
-                    print "Tester already exists '%s'" % tester.Name()
+                    Statics.Debug("Same tester exists already : '{}'".format(tester.Name()))
                     continue
 
+                Statics.Debug("Tester Added : '{}'".format(full_path))
                 self.__py_tester_manager.regist(tester)
 
     def __addTester(self, path):
@@ -1156,8 +1255,8 @@ cdef class __PluginManager:
                     with open(full_path, "r") as f:
                         karte_data = eval(f.read())
 
-                except:
-                    print "Load Karte Failed : %s" % full_path
+                except Exception as e:
+                    Statics.Debug("Failed to load karte '{}' : '{}'".format(full_path, e))
                     continue
 
                 name = karte_data.get("Name", "UNKNOWN")
@@ -1171,9 +1270,13 @@ cdef class __PluginManager:
                         if fnmatch.fnmatchcase(tester, pt):
                             karte_testers.append(tester)
                             break
+                add_res = self.__addKarte(full_path, name, description, visible, karte_testers)
+                if add_res == MdLoadingFailure:
+                    Statics.Debug("Failed to load karte : '{}'".format(full_path))
+                    continue
 
-                if self.__addKarte(full_path, name, description, visible, karte_testers) == MdLoadingFailure:
-                    print "Load Karte Failed : %s" % full_path
+                elif add_res == MdExistsPlugin:
+                    Statics.Debug("Same karte exists already : '{}'".format(full_path))
                     continue
 
                 karte = self.karte(name)
@@ -1181,6 +1284,8 @@ cdef class __PluginManager:
                     for pt in tester_patterns:
                         if fnmatch.fnmatchcase(pyt, pt):
                             karte.addPyTester(self.__py_tester_manager.tester(pyt))
+
+                Statics.Debug("Karte Added : '{}'".format(full_path))
 
                 self.__py_karte_manager.regist(karte)
 
@@ -1234,6 +1339,8 @@ cdef class __PluginManager:
         return self.__py_karte_manager.karteNames()
 
     def reloadPlugins(self):
+        Statics.Debug("Reload Plugins")
+
         self.__py_tester_manager.unload()
         self.__py_karte_manager.unload()
         self.ptr.unload()
@@ -1259,6 +1366,8 @@ class PluginManager(object):
 
 class PyReport(object):
     def __init__(self, node_or_context, components=None):
+        Statics.Debug("Create a new PyReport")
+        super(PyReport, self).__init__()
         self.__node = None
         self.__context = None
 
@@ -1305,6 +1414,7 @@ class PyReport(object):
 
 class PyTester(object):
     def __init__(self):
+        Statics.Debug("Create a new PyTester")
         super(PyTester, self).__init__()
         self.__options = {}
 

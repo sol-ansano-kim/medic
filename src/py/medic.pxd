@@ -144,7 +144,8 @@ cdef extern from "medic/visitor.h" namespace "MEDIC":
         MdContextIterator assets()
         void clearScene()
         void clearAssets()
-
+        bint selectionOnly() const
+        void setSelectionOnly(bint v)
 
 cdef extern from "medic/pluginManager.h" namespace "MEDIC":
     cdef enum MdPluginLoadingStatus:
