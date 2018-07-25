@@ -145,6 +145,47 @@ QPushButton#detail_button::pressed
     background-color: rgb(200, 200, 200);
 }
 
+QCheckBox#selection_check
+{
+    border: none;
+    background: transparent;
+}
+
+QCheckBox#selection_check::indicator
+{
+    width: 40px;
+    height: 40px;
+}
+
+QCheckBox#selection_check::indicator:unchecked
+{
+    image: url("icons/all.png");
+}
+
+QCheckBox#selection_check::indicator:unchecked:hover
+{
+    image: url("icons/allHover.png");
+}
+
+QCheckBox#selection_check::indicator:unchecked:pressed
+{
+    image: url("icons/allPressed.png");
+}
+
+QCheckBox#selection_check::indicator:checked
+{
+    image: url("icons/sel.png");
+}
+
+QCheckBox#selection_check::indicator:checked:hover
+{
+    image: url("icons/selHover.png");
+}
+
+QCheckBox#selection_check::indicator:checked:pressed {
+    image: url("icons/selPressed.png");
+}
+
 QScrollBar
 {
     border: none;
