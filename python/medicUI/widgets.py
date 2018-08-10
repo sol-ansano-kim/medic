@@ -124,7 +124,7 @@ class StatusLabel(QtWidgets.QLabel):
     def __init__(self, parent=None):
         super(StatusLabel, self).__init__(parent=parent)
         self.setObjectName("status_label")
-        self.setFixedWidth(70)
+        self.setFixedWidth(80)
         self.__ready_icon = QtGui.QPixmap(os.path.join(IconDir, "success.png")).scaled(16, 16)
         self.__success_icon = QtGui.QPixmap(os.path.join(IconDir, "success.png")).scaled(16, 16)
         self.__failure_icon = QtGui.QPixmap(os.path.join(IconDir, "failure.png")).scaled(16, 16)
@@ -209,6 +209,9 @@ class KarteList(QtWidgets.QListView):
         self.setModel(self.source_model)
         self.setItemDelegate(self.delegate)
         self.__current_karte = None
+
+    def setSelectionOnly(self, v):
+        self.source_model.setSelectionOnly(v)
 
     def currentKarte(self):
         return self.__current_karte
@@ -473,6 +476,7 @@ class TesterDetailWidget(QtWidgets.QWidget):
 class TopBarWidget(QtWidgets.QFrame):
     BackClicked = QtCore.Signal()
     NextClicked = QtCore.Signal()
+    SelectionOnlyChanged = QtCore.Signal(bool)
 
     def __init__(self, parent=None):
         super(TopBarWidget, self).__init__(parent=parent)
@@ -525,17 +529,20 @@ class TopBarWidget(QtWidgets.QFrame):
         self.__browser_button_widget = BrowserButtonWidget()
         self.reset_button = QtWidgets.QPushButton()
         self.test_button = QtWidgets.QPushButton()
+        self.selection_only_check = QtWidgets.QCheckBox()
         self.reset_button.setObjectName("reset_button")
         self.test_button.setObjectName("test_button")
+        self.selection_only_check.setObjectName("selection_check")
         self.status_label = StatusLabel()
         self.__current_karte_label = CurrentKarteLabel()
 
-        self.__phase_items[1] = [self.reset_button, self.test_button, self.status_label]
+        self.__phase_items[1] = [self.reset_button, self.test_button, self.selection_only_check, self.status_label]
         
         horizon_layout.addWidget(self.__browser_button_widget)
         horizon_layout.addSpacing(20)
         horizon_layout.addWidget(self.reset_button)
         horizon_layout.addWidget(self.test_button)
+        horizon_layout.addWidget(self.selection_only_check)
         horizon_layout.addWidget(self.status_label)
         horizon_layout.addStretch(9999)
         horizon_layout.addWidget(self.__current_karte_label)
@@ -544,6 +551,10 @@ class TopBarWidget(QtWidgets.QFrame):
 
         self.__browser_button_widget.BackClicked.connect(self.BackClicked.emit)
         self.__browser_button_widget.NextClicked.connect(self.NextClicked.emit)
+        self.selection_only_check.stateChanged.connect(self.__selectionOnlyChanged)
+
+    def __selectionOnlyChanged(self, state):
+        self.SelectionOnlyChanged.emit(state == QtCore.Qt.Checked)
 
 
 class MainWidget(QtWidgets.QWidget):
@@ -595,6 +606,9 @@ class MainWidget(QtWidgets.QWidget):
             self.reset()
 
         self.ConditionChanged.emit(able_back, able_next)
+
+    def setSelectionOnly(self, v):
+        self.__kartes_widget.setSelectionOnly(v)
 
     def __makeWidgets(self):
         main_layout = QtWidgets.QHBoxLayout()

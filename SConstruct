@@ -9,7 +9,7 @@ import re
 
 major = 1
 minor = 2
-patch = 2
+patch = 3
 
 os.environ["PYTHONPATH"] = os.environ.get("PYTHONPATH", "") + os.pathsep + os.path.abspath("cython")
 maya.SetupMscver()

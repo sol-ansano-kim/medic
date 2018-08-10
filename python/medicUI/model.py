@@ -108,6 +108,9 @@ class KarteItem(object):
             self.__visitor = medic.Visitor()
         self.__tester_items = testerItems
 
+    def setSelectionOnly(self, v):
+        self.__visitor.setSelectionOnly(v)
+
     def testerItems(self):
         return self.__tester_items
 
@@ -233,6 +236,10 @@ class KarteModel(QtCore.QAbstractListModel):
 
     def rowCount(self, parent=None):
         return len(self.__karte_items)
+
+    def setSelectionOnly(self, v):
+        for k in self.__karte_items:
+            k.setSelectionOnly(v)
 
     def data(self, index, role):
         if index.row() < 0 or index.row() > self.rowCount():
