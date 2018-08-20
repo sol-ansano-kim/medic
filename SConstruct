@@ -5,6 +5,7 @@ import os
 import sys
 import shutil
 import re
+import SCons
 
 
 major = 1
@@ -16,7 +17,6 @@ maya.SetupMscver()
 
 env = excons.MakeBaseEnv()
 
-do_pacakage = int(excons.GetArgument("package", 0)) != 0
 include_qt = int(excons.GetArgument("include-qt", 1)) != 0
 
 
@@ -52,7 +52,8 @@ except:
 out_incdir = excons.OutputBaseDirectory() + "/include"
 out_libdir = excons.OutputBaseDirectory() + "/lib/" + mayaver
 out_pydir = excons.OutputBaseDirectory() + "/py/" + mayaver
-package_dir = "%s/package/medic_%s_%s/medic" % (excons.OutputBaseDirectory(), sys.platform, mayaver)
+install_dir = "%s/dist/medic_%s_%s/medic" % (excons.OutputBaseDirectory(), sys.platform, mayaver)
+package_file = "%s/dist/medic_%s_maya%s-%s_%s_%s.zip" % (excons.OutputBaseDirectory(), sys.platform, mayaver, major, minor, patch)
 
 ## cython
 run_cython = False
@@ -92,20 +93,20 @@ def Pacakage(target, source, env):
     path = target[0].get_path()
     path_split = re.split(r"[\\/]", path)
 
-    dirname = package_dir
+    dirname = install_dir
 
     if "include" in path_split:
-        dirname = os.path.join(package_dir, "include/medic")
+        dirname = os.path.join(install_dir, "include/medic")
     elif "lib" in path_split:
-        dirname = os.path.join(package_dir, "lib")
+        dirname = os.path.join(install_dir, "lib")
     elif "bin" in path_split:
-        dirname = os.path.join(package_dir, "bin")
+        dirname = os.path.join(install_dir, "bin")
     elif "Karte" in path_split:
-        dirname = os.path.join(package_dir, "plugins/Karte")
+        dirname = os.path.join(install_dir, "plugins/Karte")
     elif "Tester" in path_split:
-        dirname = os.path.join(package_dir, "plugins/Tester")
+        dirname = os.path.join(install_dir, "plugins/Tester")
     elif "py" in path_split:
-        dirname = os.path.join(package_dir, "py")
+        dirname = os.path.join(install_dir, "py")
 
     if not os.path.isdir(dirname):
         os.makedirs(dirname)
@@ -114,7 +115,6 @@ def Pacakage(target, source, env):
     if not os.path.isfile(out_path):
         print("Package : %s -> %s" % (path, out_path))
         shutil.copy(path, out_path)
-
 
 prjs.append({"name": "medic",
              "type": "sharedlib",
@@ -128,13 +128,6 @@ prjs.append({"name": "medic",
              "symvis": "default",
              "install": {out_incdir + "/medic": headers},
              "custom": customs})
-
-if do_pacakage:
-    prjs.append({"name": "packageHeaders",
-                 "type": "install",
-                 "alias": "medic-package",
-                 "install": {os.path.join(package_dir, "include/medic"): headers}})
-
 
 prjs.append({"name": "_medic",
              "type": "dynamicmodule",
@@ -153,12 +146,6 @@ prjs.append({"name": "_medic",
              "srcs": [cython_out],
              "install": {out_pydir: ["src/py/medic.py"]},
              "custom": customs + [python.SoftRequire]})
-
-if do_pacakage:
-    prjs.append({"name": "pacakgeMedicPy",
-                 "type": "install",
-                 "alias": "medic-package",
-                 "install": {os.path.join(package_dir, "py"): ["src/py/medic.py"]}})
 
 # plugins
 for plug in excons.glob("plugins/Tester/*.cpp"):
@@ -185,12 +172,6 @@ if py_plugs:
                  "type": "install",
                  "alias": "medic-py-plugins",
                  "install": {"plugins/%s/Tester" % (mayaver): py_plugs}})
-    if do_pacakage:
-        prjs.append({"name": "packagePyPlugins",
-                     "type": "install",
-                     "alias": "medic-package",
-                     "install": {os.path.join(package_dir, "plugins/Tester"): py_plugs}})
-
 
 kartes = excons.glob("plugins/Karte/*.karte")
 if kartes:
@@ -198,12 +179,6 @@ if kartes:
                  "type": "install",
                  "alias": "medic-kartes",
                  "install": {"plugins/%s/Karte" % (mayaver): kartes}})
-
-    if do_pacakage:
-        prjs.append({"name": "packageKarte",
-                     "type": "install",
-                     "alias": "medic-package",
-                     "install": {os.path.join(package_dir, "plugins/Karte"): kartes}})
 
 if custom_cpp:
     for cpp in custom_cpp:
@@ -223,29 +198,16 @@ if custom_cpp:
                      "srcs": [cpp],
                      "custom": customs})
 
-
 if custom_py:
     prjs.append({"name": "medicCustonPyPlugins",
                  "type": "install",
                  "alias": "medic-custom-py-plugins",
                  "install": {"custom/%s/Tester" % (mayaver): custom_py}})
 
-    if do_pacakage:
-        prjs.append({"name": "packageCustomPyPlugin",
-                     "type": "install",
-                     "alias": "medic-package",
-                     "install": {os.path.join(package_dir, "plugins/Tester"): custom_py}})
-
-
 prjs.append({"name": "medicUI",
              "type": "install",
              "alias": "medic-ui",
              "install": {out_pydir: ["python/medicUI"]}})
-if do_pacakage:
-    prjs.append({"name": "packageUI",
-                 "type": "install",
-                 "alias": "medic-package",
-                 "install": {os.path.join(package_dir, "py"): ["python/medicUI"]}})
 
 if include_qt:
     prjs.append({"name": "Qt",
@@ -253,21 +215,62 @@ if include_qt:
                  "alias": "Qt",
                  "install": {os.path.join(out_pydir, "medicUI/qt"): ["Qt.py/Qt.py"]}})
 
-    if do_pacakage:
-        prjs.append({"name": "packageQt",
-                     "type": "install",
-                     "alias": "qt-package",
-                     "install": {os.path.join(package_dir, "py/medicUI/qt"): ["Qt.py/Qt.py"]}})
 
-if do_pacakage:
-    for prj in prjs:
-        if prj["type"] != "install":
-            prj["post"] = Pacakage
+targets = excons.DeclareTargets(env, prjs)
 
-    prjs.append({"name": "packageMod",
-                 "type": "install",
-                 "alias": "medic-package",
-                 "install": {os.path.join(package_dir, ".."): ["medic.mod"]}})
+env.Alias("medicAll", targets.keys())
 
 
-excons.DeclareTargets(env, prjs)
+def __getAllPaths(c):
+    if isinstance(c, basestring):
+        return [c]
+
+    if isinstance(c, SCons.Node.FS.File):
+        return [c.get_path()]
+
+    paths = []
+    if isinstance(c, SCons.Node.FS.Entry):
+        for child in c.all_children():
+            paths += __getAllPaths(child)
+
+    return paths
+
+
+env.Alias("install", env.Install(os.path.join(install_dir, ".."), "medic.mod"))
+env.Alias("install", env.Install(os.path.join(install_dir, "py"), "src/py/medic.py"))
+
+for h in headers:
+    env.Alias("install", env.Install(os.path.join(install_dir, "include/medic"), h))
+
+for k, contents in targets.iteritems():
+    for c in contents:
+        for path in __getAllPaths(c):
+            path_split = re.split(r"[\\/]", path)
+
+            dirname = install_dir
+            if "include" in path_split:
+                dirname = os.path.join(install_dir, "include/medic")
+            elif "lib" in path_split:
+                dirname = os.path.join(install_dir, "lib")
+            elif "bin" in path_split:
+                dirname = os.path.join(install_dir, "bin")
+            elif "Karte" in path_split:
+                dirname = os.path.join(install_dir, "plugins/Karte")
+            elif "Tester" in path_split:
+                dirname = os.path.join(install_dir, "plugins/Tester")
+            elif "py" in path_split:
+                dirname = os.path.join(install_dir, "py")
+            elif "python" == path_split[0]:
+                dirname = os.path.join(install_dir, "py", *path_split[1:-1])
+            elif "Qt.py" == path_split[-1]:
+                dirname = os.path.join(install_dir, "py/medicUI/qt")
+            else:
+                print("UNKNOWN INSTALL TARGET : {}".format(path))
+                continue
+
+            env.Alias("install", env.Install(dirname, path))
+
+env["ZIPROOT"] = os.path.join(install_dir, "..")
+
+env.Alias("package", env.Zip(package_file, [install_dir, os.path.join(install_dir, "../medic.mod")]))
+env.Default(["medicAll"])
