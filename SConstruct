@@ -52,8 +52,14 @@ except:
 out_incdir = excons.OutputBaseDirectory() + "/include"
 out_libdir = excons.OutputBaseDirectory() + "/lib/" + mayaver
 out_pydir = excons.OutputBaseDirectory() + "/py/" + mayaver
-install_dir = "%s/dist/medic_%s_%s/medic" % (excons.OutputBaseDirectory(), sys.platform, mayaver)
-package_file = "%s/dist/medic_%s_maya%s-%s_%s_%s.zip" % (excons.OutputBaseDirectory(), sys.platform, mayaver, major, minor, patch)
+os_name = "linux"
+if sys.platform == "win32":
+    os_name = "windows"
+elif sys.platform == "darwin":
+    os_name = "macOS"
+install_dir = "%s/dist/medic_%s_%s/medic" % (excons.OutputBaseDirectory(), os_name, mayaver)
+package_file = "%s/dist/medic_%s_maya%s-%s_%s_%s.zip" % (excons.OutputBaseDirectory(), os_name, mayaver, major, minor, patch)
+
 
 ## cython
 run_cython = False
