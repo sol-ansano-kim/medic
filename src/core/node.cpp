@@ -301,11 +301,13 @@ void MEDIC::GetNodesInSelection(MdNodeContainer *container)
 
                     while (!down_ses.isDone() && !is_in)
                     {
-                        if (down_ses.thisNode().hasFn(MFn::kControllerTag))
-                        {
-                            down_ses.next();
-                            continue;
-                        }
+                        #if MAYA_API_VERSION >= 201700
+                            if (down_ses.thisNode().hasFn(MFn::kControllerTag))
+                            {
+                                down_ses.next();
+                                continue;
+                            }
+                        #endif // MAYA_API_VERSION
 
                         set_node.setObject(down_ses.thisNode());
                         set_node.getMembers(membership, true);
