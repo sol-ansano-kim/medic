@@ -12,7 +12,7 @@ class NotFreezed(medic.PyTester):
         return "NotFreezed"
 
     def Description(self):
-        return "Not freezed trasnform(s)"
+        return "Not freezed transform(s)"
 
     def Match(self, node):
         return node.object().hasFn(OpenMaya.MFn.kTransform)
