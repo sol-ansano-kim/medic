@@ -207,14 +207,14 @@ class KarteItem(object):
 
 
 class KarteModel(QtCore.QAbstractListModel):
-    def __init__(self, parent=None, visitorClass=None):
+    def __init__(self, parent=None, visitorClass=None, karteName=None, showHiddenKartes=False):
         super(KarteModel, self).__init__(parent=parent)
         self.__manager = None
         self.__karte_items = []
         self.__visitor_class = visitorClass
-        self.__initialize()
+        self.__initialize(karteName=karteName, showHiddenKartes=showHiddenKartes)
 
-    def __initialize(self):
+    def __initialize(self, karteName=None, showHiddenKartes=False):
         self.beginResetModel()
         self.__manager = medic.PluginManager()
 
@@ -222,7 +222,7 @@ class KarteModel(QtCore.QAbstractListModel):
         for karte_name in self.__manager.karteNames():
             karte = self.__manager.karte(karte_name)
 
-            if not karte.Visible():
+            if not karte.Visible() and not showHiddenKartes and karteName != karte_name:
                 continue
 
             tester_items = []
@@ -240,6 +240,13 @@ class KarteModel(QtCore.QAbstractListModel):
     def setSelectionOnly(self, v):
         for k in self.__karte_items:
             k.setSelectionOnly(v)
+
+    def findKarteIndex(self, karteName):
+        for i, karte in enumerate(self.__karte_items):
+            if karte.name() == karteName:
+                return self.createIndex(i, 0)
+
+        return self.createIndex(-1, -1)
 
     def data(self, index, role):
         if index.row() < 0 or index.row() > self.rowCount():

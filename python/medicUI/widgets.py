@@ -48,7 +48,7 @@ class ParameterFunctions():
            parm_type is medic.Types.IntArray or\
            parm_type is medic.Types.FloatArray or\
            parm_type is medic.Types.StringArray:
-            print "This type parameter is not supported yet : %s" % parm_type
+            print("This type parameter is not supported yet : %s" % parm_type)
             return None, None
 
         widget = None
@@ -200,11 +200,11 @@ class TesterList(QtWidgets.QListView):
 class KarteList(QtWidgets.QListView):
     KarteChanged = QtCore.Signal("QModelIndex")
 
-    def __init__(self, visitorClass=None, parent=None):
+    def __init__(self, visitorClass=None, karteName=None, showHiddenKartes=False, parent=None):
         super(KarteList, self).__init__(parent=parent)
         self.setObjectName("medic_karte_list")
         self.setUniformItemSizes(True)
-        self.source_model = model.KarteModel(visitorClass=visitorClass)
+        self.source_model = model.KarteModel(visitorClass=visitorClass, karteName=karteName, showHiddenKartes=showHiddenKartes)
         self.delegate = delegate.KarteDelegate()
         self.setModel(self.source_model)
         self.setItemDelegate(self.delegate)
@@ -215,6 +215,24 @@ class KarteList(QtWidgets.QListView):
 
     def currentKarte(self):
         return self.__current_karte
+
+    def setKarte(self, karteName):
+        sel = self.selectionModel()
+
+        index = self.source_model.findKarteIndex(karteName)
+        if not index or not index.isValid():
+            self.blockSignals(True)
+            sel.clear()
+            self.blockSignals(False)
+            return None
+
+        self.__current_karte = self.source_model.data(index, model.KarteItemRole)
+
+        self.blockSignals(True)
+        sel.select(index, QtCore.QItemSelectionModel.ClearAndSelect)
+        self.blockSignals(False)
+
+        return index
 
     def selectionChanged(self, selected, deselected):
         indexes = selected.indexes()
@@ -562,7 +580,7 @@ class MainWidget(QtWidgets.QWidget):
     KarteChanged = QtCore.Signal(str)
     StatusChanged = QtCore.Signal(int)
 
-    def __init__(self, visitorClass=None, parent=None):
+    def __init__(self, visitorClass=None, karteName=None, showHiddenKartes=False, parent=None):
         super(MainWidget, self).__init__(parent=parent)
         self.setObjectName("medic_main_widget")
         self.__visitor_class = visitorClass
@@ -572,8 +590,23 @@ class MainWidget(QtWidgets.QWidget):
         self.__phase_widgets = {}
         self.__callback_ids = []
 
-        self.__makeWidgets()
+        self.__makeWidgets(karteName=karteName, showHiddenKartes=showHiddenKartes)
         self.setPhase(0)
+
+    def setKarte(self, karteName):
+        self.setPhase(0)
+        index = self.__kartes_widget.setKarte(karteName)
+        if index is None or not index.isValid():
+            return False
+
+        karte_model = self.__kartes_widget.model()
+        tester_model = self.__testers_widget.model()
+        karte_item = karte_model.data(index, model.KarteItemRole)
+        if not karte_item:
+            return False
+
+        tester_model.setTesterItems(karte_model.data(index, model.KarteTesterItemsRole))
+        return True
 
     def phase(self):
         return self.__phase
@@ -610,12 +643,12 @@ class MainWidget(QtWidgets.QWidget):
     def setSelectionOnly(self, v):
         self.__kartes_widget.setSelectionOnly(v)
 
-    def __makeWidgets(self):
+    def __makeWidgets(self, karteName=None, showHiddenKartes=False):
         main_layout = QtWidgets.QHBoxLayout()
         main_layout.setContentsMargins(0, 0, 0, 0)
         main_layout.setSpacing(0)
         self.setLayout(main_layout)
-        self.__kartes_widget = KarteList(visitorClass=self.__visitor_class)
+        self.__kartes_widget = KarteList(visitorClass=self.__visitor_class, karteName=karteName, showHiddenKartes=showHiddenKartes)
         self.__testers_widget = TesterList()
         self.__detail_widget = TesterDetailWidget()
 

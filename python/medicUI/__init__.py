@@ -7,7 +7,7 @@ from maya import cmds
 MedicUIInstance = None
 
 
-def Show(visitorClass=None):
+def Show(visitorClass=None, karteName=None, showHiddenKartes=False):
     global MedicUIInstance
 
     if MedicUIInstance:
@@ -17,5 +17,5 @@ def Show(visitorClass=None):
         if cmds.window(window.MainWindow.Name, q=True, ex=True):
             cmds.deleteUI(window.MainWindow.Name)
 
-        MedicUIInstance = window.MainWindow(visitorClass=visitorClass, parent=functions.getMayaMainWindow())
+        MedicUIInstance = window.MainWindow(visitorClass=visitorClass, karteName=karteName, showHiddenKartes=showHiddenKartes, parent=functions.getMayaMainWindow())
         MedicUIInstance.show()
