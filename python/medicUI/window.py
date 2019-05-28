@@ -8,15 +8,13 @@ class MainWindow(QtWidgets.QMainWindow):
     Name = "medic_main_window"
     Title = "MEDIC"
 
-    def __init__(self, visitorClass=None, karteName=None, showHiddenKartes=False, parent=None):
+    def __init__(self, visitorClass=None, parent=None):
         super(MainWindow, self).__init__(parent=parent)
         self.__visitor_class = visitorClass
         self.setObjectName(MainWindow.Name)
         self.setWindowTitle(MainWindow.Title)
-        self.__makeWidgets(karteName=karteName, showHiddenKartes=showHiddenKartes)
+        self.__makeWidgets()
         self.__setStyleSheet()
-        if karteName:
-            self.setKarte(karteName)
 
     def setKarte(self, karteName):
         if self.__main_widget.setKarte(karteName):
@@ -26,6 +24,9 @@ class MainWindow(QtWidgets.QMainWindow):
         else:
             self.__top_widget.setCurrentKarteName("")
             self.__top_widget.setBrowserButtonEnabled(False, False)
+
+    def showAllKartes(self, v):
+        self.__main_widget.showAllKartes(v)
 
     def __setStyleSheet(self):
         qss_path = os.path.abspath(os.path.join(__file__, "../style.qss"))
@@ -42,7 +43,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.setStyleSheet(style)
 
-    def __makeWidgets(self, karteName=None, showHiddenKartes=False):
+    def __makeWidgets(self):
         self.setMinimumWidth(450)
         self.setMinimumHeight(300)
         self.__central_widget = QtWidgets.QWidget()
@@ -51,7 +52,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.__central_widget.setLayout(self.__central_layout)
 
         self.__top_widget = widgets.TopBarWidget()
-        self.__main_widget = widgets.MainWidget(visitorClass=self.__visitor_class, karteName=karteName, showHiddenKartes=showHiddenKartes)
+        self.__main_widget = widgets.MainWidget(visitorClass=self.__visitor_class)
 
         self.__central_layout.addWidget(self.__top_widget)
         self.__central_layout.addWidget(self.__main_widget)
