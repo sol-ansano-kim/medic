@@ -1,4 +1,5 @@
 #include "medic/node.h"
+#include "medic/helpers.h"
 
 
 using namespace MEDIC;
@@ -41,7 +42,7 @@ MdNode::~MdNode() {}
 
 bool MdNode::Match(MObject &obj)
 {
-    return (!obj.isNull() && obj.hasFn(MFn::kDependencyNode)) ? true : false;
+    return (!obj.isNull() && obj.hasFn(MFn::kDependencyNode) && !IsTemplated(obj)) ? true : false;
 }
 
 MObject &MdNode::object()

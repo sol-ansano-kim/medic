@@ -31,7 +31,7 @@
 
 ```python
 import medicUI
-medicUi.Show()
+medicUI.Show()
 ```
 
 4. チェックリストを新しく作成する場合は[Karteの書き方](https://github.com/sol-ansano-kim/medic/wiki/Japaness#karte)を参照してください。
