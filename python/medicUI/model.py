@@ -207,14 +207,31 @@ class KarteItem(object):
 
 
 class KarteModel(QtCore.QAbstractListModel):
-    def __init__(self, parent=None, visitorClass=None, karteName=None, showHiddenKartes=False):
+    def __init__(self, parent=None, visitorClass=None):
         super(KarteModel, self).__init__(parent=parent)
         self.__manager = None
+        self.__visible_items = []
+        self.__invisible_items = []
         self.__karte_items = []
         self.__visitor_class = visitorClass
-        self.__initialize(karteName=karteName, showHiddenKartes=showHiddenKartes)
+        self.__initialize()
+        self.__show_all = False
 
-    def __initialize(self, karteName=None, showHiddenKartes=False):
+    def showAllKartes(self, v):
+        if self.__show_all == v:
+            return
+
+        self.__show_all = v
+        self.beginResetModel()
+
+        if v:
+            self.__karte_items = self.__visible_items + self.__invisible_items
+        else:
+            self.__karte_items = self.__visible_items
+
+        self.endResetModel()
+
+    def __initialize(self):
         self.beginResetModel()
         self.__manager = medic.PluginManager()
 
@@ -222,15 +239,16 @@ class KarteModel(QtCore.QAbstractListModel):
         for karte_name in self.__manager.karteNames():
             karte = self.__manager.karte(karte_name)
 
-            if not karte.Visible() and not showHiddenKartes and karteName != karte_name:
-                continue
-
             tester_items = []
             for tester in all_testers:
                 if karte.hasTester(tester):
                     tester_items.append(TesterItem(tester))
+            if karte.Visible():
+                self.__visible_items.append(KarteItem(karte, tester_items, visitorClass=self.__visitor_class))
+            else:
+                self.__invisible_items.append(KarteItem(karte, tester_items, visitorClass=self.__visitor_class))
 
-            self.__karte_items.append(KarteItem(karte, tester_items, visitorClass=self.__visitor_class))
+        self.__karte_items = self.__visible_items
 
         self.endResetModel()
 

@@ -200,15 +200,18 @@ class TesterList(QtWidgets.QListView):
 class KarteList(QtWidgets.QListView):
     KarteChanged = QtCore.Signal("QModelIndex")
 
-    def __init__(self, visitorClass=None, karteName=None, showHiddenKartes=False, parent=None):
+    def __init__(self, visitorClass=None, parent=None):
         super(KarteList, self).__init__(parent=parent)
         self.setObjectName("medic_karte_list")
         self.setUniformItemSizes(True)
-        self.source_model = model.KarteModel(visitorClass=visitorClass, karteName=karteName, showHiddenKartes=showHiddenKartes)
+        self.source_model = model.KarteModel(visitorClass=visitorClass)
         self.delegate = delegate.KarteDelegate()
         self.setModel(self.source_model)
         self.setItemDelegate(self.delegate)
         self.__current_karte = None
+
+    def showAllKartes(self, v):
+        self.source_model.showAllKartes(v)
 
     def setSelectionOnly(self, v):
         self.source_model.setSelectionOnly(v)
@@ -580,7 +583,7 @@ class MainWidget(QtWidgets.QWidget):
     KarteChanged = QtCore.Signal(str)
     StatusChanged = QtCore.Signal(int)
 
-    def __init__(self, visitorClass=None, karteName=None, showHiddenKartes=False, parent=None):
+    def __init__(self, visitorClass=None, parent=None):
         super(MainWidget, self).__init__(parent=parent)
         self.setObjectName("medic_main_widget")
         self.__visitor_class = visitorClass
@@ -590,8 +593,15 @@ class MainWidget(QtWidgets.QWidget):
         self.__phase_widgets = {}
         self.__callback_ids = []
 
-        self.__makeWidgets(karteName=karteName, showHiddenKartes=showHiddenKartes)
+        self.__makeWidgets()
         self.setPhase(0)
+
+    def showAllKartes(self, v):
+        self.blockSignals(True)
+        self.__karte_toggle.setChecked(v)
+        self.blockSignals(False)
+
+        self.__kartes_widget.showAllKartes(v)
 
     def setKarte(self, karteName):
         self.setPhase(0)
@@ -643,18 +653,32 @@ class MainWidget(QtWidgets.QWidget):
     def setSelectionOnly(self, v):
         self.__kartes_widget.setSelectionOnly(v)
 
-    def __makeWidgets(self, karteName=None, showHiddenKartes=False):
+    def __showToggleChanged(self, state):
+        self.__kartes_widget.showAllKartes(state == QtCore.Qt.Checked)
+
+    def __makeWidgets(self):
         main_layout = QtWidgets.QHBoxLayout()
         main_layout.setContentsMargins(0, 0, 0, 0)
         main_layout.setSpacing(0)
         self.setLayout(main_layout)
-        self.__kartes_widget = KarteList(visitorClass=self.__visitor_class, karteName=karteName, showHiddenKartes=showHiddenKartes)
+
+        self.__kartes_widget = KarteList(visitorClass=self.__visitor_class)
         self.__testers_widget = TesterList()
         self.__detail_widget = TesterDetailWidget()
+        self.__karte_toggle = QtWidgets.QCheckBox()
+        self.__karte_toggle.setChecked(False)
+        self.__karte_toggle.setObjectName("show_all_kartes")
+        self.__karte_toggle.stateChanged.connect(self.__showToggleChanged)
 
         ## phase 0
-        main_layout.addWidget(self.__kartes_widget)
-        self.__phase_widgets[0] = [self.__kartes_widget]
+        karte_layout_v = QtWidgets.QVBoxLayout()
+        karte_layout_h = QtWidgets.QHBoxLayout()
+        karte_layout_v.addWidget(self.__kartes_widget)
+        karte_layout_h.setAlignment(QtCore.Qt.AlignRight)
+        karte_layout_h.addWidget(self.__karte_toggle)
+        karte_layout_v.addLayout(karte_layout_h)
+        main_layout.addLayout(karte_layout_v)
+        self.__phase_widgets[0] = [self.__kartes_widget, self.__karte_toggle]
 
         ## phase 2
         h_layout = QtWidgets.QHBoxLayout()
