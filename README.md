@@ -32,7 +32,7 @@
 
 ```python
 import medicUI
-medicUi.Show()
+medicUI.Show()
 ```
 
 4. To create a new checklist(Karte), see [Karte](https://github.com/sol-ansano-kim/medic/wiki#karte).
