@@ -20,6 +20,7 @@ def Show(visitorClass=None, karteName=None, showAllKartes=False):
         MedicUIInstance = window.MainWindow(visitorClass=visitorClass, parent=functions.getMayaMainWindow())
         MedicUIInstance.show()
 
+    MedicUIInstance.showAllKartes(showAllKartes)
+
     if karteName:
         MedicUIInstance.setKarte(karteName)
-    MedicUIInstance.showAllKartes(showAllKartes)

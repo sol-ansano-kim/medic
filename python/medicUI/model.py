@@ -227,7 +227,7 @@ class KarteModel(QtCore.QAbstractListModel):
         if v:
             self.__karte_items = self.__visible_items + self.__invisible_items
         else:
-            self.__karte_items = self.__visible_items
+            self.__karte_items = self.__visible_items[:]
 
         self.endResetModel()
 
@@ -248,7 +248,7 @@ class KarteModel(QtCore.QAbstractListModel):
             else:
                 self.__invisible_items.append(KarteItem(karte, tester_items, visitorClass=self.__visitor_class))
 
-        self.__karte_items = self.__visible_items
+        self.__karte_items = self.__visible_items[:]
 
         self.endResetModel()
 
@@ -259,10 +259,21 @@ class KarteModel(QtCore.QAbstractListModel):
         for k in self.__karte_items:
             k.setSelectionOnly(v)
 
-    def findKarteIndex(self, karteName):
+    def findKarteIndex(self, karteName, addHiddenKarte=False):
         for i, karte in enumerate(self.__karte_items):
             if karte.name() == karteName:
                 return self.createIndex(i, 0)
+
+        if not addHiddenKarte or len(self.__karte_items) == len(self.__visible_items) + len(self.__invisible_items):
+            return self.createIndex(-1, -1)
+
+        for karte in self.__invisible_items:
+            if karte.name() == karteName:
+                num = len(self.__karte_items)
+                self.beginInsertRows(QtCore.QModelIndex(), num, num)
+                self.__karte_items.append(karte)
+                self.endInsertRows()
+                return self.createIndex(num, 0)
 
         return self.createIndex(-1, -1)
 
