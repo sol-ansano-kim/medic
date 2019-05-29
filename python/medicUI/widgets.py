@@ -222,7 +222,7 @@ class KarteList(QtWidgets.QListView):
     def setKarte(self, karteName):
         sel = self.selectionModel()
 
-        index = self.source_model.findKarteIndex(karteName)
+        index = self.source_model.findKarteIndex(karteName, addHiddenKarte=True)
         if not index or not index.isValid():
             self.blockSignals(True)
             sel.clear()
