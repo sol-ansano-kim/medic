@@ -21,9 +21,17 @@ class MainWindow(QtWidgets.QMainWindow):
             self.__top_widget.setCurrentKarteName(karteName)
             self.__top_widget.setBrowserButtonEnabled(False, True)
             self.__next()
+            return True
         else:
             self.__top_widget.setCurrentKarteName("")
             self.__top_widget.setBrowserButtonEnabled(False, False)
+            return False
+
+    def runSingle(self, karteName, testerName):
+        if self.setKarte(karteName):
+            return self.__main_widget.runSingle(testerName)
+        else:
+            return None
 
     def showAllKartes(self, v):
         self.__main_widget.showAllKartes(v)
