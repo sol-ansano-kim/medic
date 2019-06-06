@@ -20,3 +20,5 @@ def Show(visitorClass=None, karteName=None, showAllKartes=False):
 
     if karteName:
         MedicUIInstance.setKarte(karteName)
+
+    return MedicUIInstance
