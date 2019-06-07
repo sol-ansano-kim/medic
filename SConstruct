@@ -77,6 +77,7 @@ else:
             break
 
 if run_cython:
+    python.RequireCython(env)
     print("=== generating python wrapper sources ===")
     python.CythonGenerate(env, cython_source, cpp=True, incdirs=["include"])
 
