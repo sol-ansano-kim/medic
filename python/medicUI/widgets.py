@@ -618,6 +618,19 @@ class MainWidget(QtWidgets.QWidget):
         tester_model.setTesterItems(karte_model.data(index, model.KarteTesterItemsRole))
         return True
 
+    def runSingle(self, testerName):
+        if self.phase() > 0:
+            mdl = self.__testers_widget.model()
+            idxs = mdl.match(mdl.index(0, 0, QtCore.QModelIndex()), model.DisplayRole, testerName, flags=QtCore.Qt.MatchExactly)
+            if idxs:
+                self.__testers_widget.selectionModel().setCurrentIndex(idxs[0], QtCore.QItemSelectionModel.ClearAndSelect)
+                self.__singleTest()
+                return mdl.data(idxs[0], model.TesterRole)
+            else:
+                return None
+        else:
+            return None
+
     def phase(self):
         return self.__phase
 
