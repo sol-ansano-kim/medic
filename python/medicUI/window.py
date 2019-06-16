@@ -16,6 +16,26 @@ class MainWindow(QtWidgets.QMainWindow):
         self.__makeWidgets()
         self.__setStyleSheet()
 
+    def setKarte(self, karteName):
+        if self.__main_widget.setKarte(karteName):
+            self.__top_widget.setCurrentKarteName(karteName)
+            self.__top_widget.setBrowserButtonEnabled(False, True)
+            self.__next()
+            return True
+        else:
+            self.__top_widget.setCurrentKarteName("")
+            self.__top_widget.setBrowserButtonEnabled(False, False)
+            return False
+
+    def runSingle(self, karteName, testerName):
+        if self.setKarte(karteName):
+            return self.__main_widget.runSingle(testerName)
+        else:
+            return None
+
+    def showAllKartes(self, v):
+        self.__main_widget.showAllKartes(v)
+
     def __setStyleSheet(self):
         qss_path = os.path.abspath(os.path.join(__file__, "../style.qss"))
 
