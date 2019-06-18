@@ -13,6 +13,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.__visitor_class = visitorClass
         self.setObjectName(MainWindow.Name)
         self.setWindowTitle(MainWindow.Title)
+        self.setWindowFlags(self.windowFlags() | QtCore.Qt.WindowStaysOnTopHint)
         self.__makeWidgets()
         self.__setStyleSheet()
 
