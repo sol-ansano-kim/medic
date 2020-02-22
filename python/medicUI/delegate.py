@@ -74,11 +74,11 @@ class TesterDelegate(ListItemDelegate):
         tester_name = index.data(model.DisplayRole)
 
         status = index.data(model.StatusRole)
-        if status is model.Ready:
+        if status == model.Ready:
             icon = self.__ready_icon
-        elif status is model.Success:
+        elif status == model.Success:
             icon = self.__success_icon
-        elif status is model.Failure:
+        elif status == model.Failure:
             icon = self.__failure_icon
 
         painter.fillRect(rect, self.getBackgroudColor(option, index))
