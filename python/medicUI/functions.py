@@ -27,7 +27,10 @@ def getMayaMainWindow():
             import shiboken
 
     else:
-        import shiboken
+        try:
+            import shiboken2 as shiboken
+        except:
+            import shiboken
 
     return shiboken.wrapInstance(long(OpenMayaUI.MQtUtil_mainWindow()), QtWidgets.QMainWindow)
 

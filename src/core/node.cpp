@@ -1,4 +1,5 @@
 #include "medic/node.h"
+#include "medic/helpers.h"
 
 
 using namespace MEDIC;
@@ -41,7 +42,7 @@ MdNode::~MdNode() {}
 
 bool MdNode::Match(MObject &obj)
 {
-    return (!obj.isNull() && obj.hasFn(MFn::kDependencyNode)) ? true : false;
+    return (!obj.isNull() && obj.hasFn(MFn::kDependencyNode) && !IsTemplated(obj)) ? true : false;
 }
 
 MObject &MdNode::object()
@@ -302,14 +303,14 @@ void MEDIC::GetNodesInSelection(MdNodeContainer *container)
                     while (!down_ses.isDone() && !is_in)
                     {
                         #if MAYA_API_VERSION >= 201700
-                            if (down_ses.thisNode().hasFn(MFn::kControllerTag))
+                            if (down_ses.currentItem().hasFn(MFn::kControllerTag))
                             {
                                 down_ses.next();
                                 continue;
                             }
                         #endif // MAYA_API_VERSION
 
-                        set_node.setObject(down_ses.thisNode());
+                        set_node.setObject(down_ses.currentItem());
                         set_node.getMembers(membership, true);
 
                         for (unsigned int j = 0; j < membership.length(); ++j)

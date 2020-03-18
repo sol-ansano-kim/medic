@@ -9,8 +9,8 @@ import SCons
 
 
 major = 1
-minor = 2
-patch = 4
+minor = 3
+patch = 0
 
 os.environ["PYTHONPATH"] = os.environ.get("PYTHONPATH", "") + os.pathsep + os.path.abspath("cython")
 maya.SetupMscver()
@@ -77,6 +77,7 @@ else:
             break
 
 if run_cython:
+    python.RequireCython(env)
     print("=== generating python wrapper sources ===")
     python.CythonGenerate(env, cython_source, cpp=True, incdirs=["include"])
 

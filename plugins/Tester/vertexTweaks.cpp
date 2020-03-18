@@ -47,7 +47,7 @@ bool VertexTweaks::IsFixable()
 
 MdReport *VertexTweaks::test(MdNode *node)
 {
-    MPlug plug = node->dg().findPlug("pnts");
+    MPlug plug = node->dg().findPlug("pnts", true);
 
     for (unsigned int i = 0; i < plug.numElements(); ++i)
     {

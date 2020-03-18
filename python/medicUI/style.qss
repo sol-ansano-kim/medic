@@ -186,6 +186,36 @@ QCheckBox#selection_check::indicator:checked:pressed {
     image: url("icons/selPressed.png");
 }
 
+QCheckBox#show_all_kartes::indicator:unchecked
+{
+    image: url("icons/hidden.png");
+}
+
+QCheckBox#show_all_kartes::indicator:unchecked:hover
+{
+    image: url("icons/hiddenHover.png");
+}
+
+QCheckBox#show_all_kartes::indicator:unchecked:pressed
+{
+    image: url("icons/hiddenPressed.png");
+}
+
+QCheckBox#show_all_kartes::indicator:checked
+{
+    image: url("icons/show.png");
+}
+
+QCheckBox#show_all_kartes::indicator:checked:hover
+{
+    image: url("icons/hiddenHover.png");
+}
+
+QCheckBox#show_all_kartes::indicator:checked:pressed
+{
+    image: url("icons/hiddenPressed.png");
+}
+
 QScrollBar
 {
     border: none;
