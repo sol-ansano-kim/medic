@@ -54,11 +54,11 @@ namespace MEDIC
 
             if (!overridden)
             {
-                plug = dn.findPlug("overrideEnabled");
+                plug = dn.findPlug("overrideEnabled", true);
                 if (!plug.isNull() && plug.asBool())
                 {
                     overridden = true;
-                    plug = dn.findPlug("overrideDisplayType");
+                    plug = dn.findPlug("overrideDisplayType", true);
                     if (!plug.isNull() && plug.asShort() == 1)
                     {
                         return true;
@@ -66,7 +66,7 @@ namespace MEDIC
                 }
             }
 
-            plug = dn.findPlug("template");
+            plug = dn.findPlug("template", true);
             if (!plug.isNull() && plug.asBool())
             {
                 return true;
