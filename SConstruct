@@ -37,15 +37,12 @@ else:
 prjs = []
 customs = [excons.tools.maya.Require]
 
-
-mayaver = excons.GetArgument("mayaver", None)
-if not mayaver:
-    mayaver = excons.GetArgument("with-maya", None)
+mayaver = excons.GetArgument("with-maya", None)
 
 try:
     float(mayaver)
 except:
-    print("ERROR : Set Maya version with 'mayaver'")
+    print("ERROR : Set Maya version with 'with-maya'")
     sys.exit(1)
 
 
