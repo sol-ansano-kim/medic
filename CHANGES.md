@@ -1,12 +1,12 @@
 # 1.4.0
-- Add public API Tester, Karte, TesterNames, KarteNames, ReloadPlugins.
+- Add public API GetTester, GetKarte, GetTesterNames, GetKarteNames, ReloadPlugins.
 
 ```python
 import medic
-medic.Karte("All")
-medic.Tester("NGon")
-print(medic.TesterNames())
-print(medic.KarteNames())
+medic.GetKarte("All")
+medic.GetTester("NGon")
+print(medic.GetTesterNames())
+print(medic.GetKarteNames())
 medic.ReloadPlugins()
 
 ```
