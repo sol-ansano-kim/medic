@@ -37,3 +37,7 @@ medicUI.Show()
 
 4. To create a new checklist(Karte), see [Karte](https://github.com/sol-ansano-kim/medic/wiki#karte).
 5. To write a new check plugin(Tester), see [Custom Tester](https://github.com/sol-ansano-kim/medic/wiki#custom-tester).
+
+## Changes
+
+[Release Notes](CHANGES.md)
