@@ -129,6 +129,11 @@ void MdVisitor::visitContext(MdTester *tester, MdContext *context)
     }
 }
 
+bool MdVisitor::canVisit(MdKarte *karte, MdTester *tester, MdNode *node, MdContext *context)
+{
+    return true;
+}
+
 bool MdVisitor::addReport(MdTester *tester, MdReport *report)
 {
     TesterReportsMap::iterator it = m_results.find(tester);

@@ -29,6 +29,7 @@ namespace MEDIC
             virtual void visitTester(MdTester *tester);
             virtual void visitNode(MdTester *tester, MdNode *node);
             virtual void visitContext(MdTester *tester, MdContext *context);
+            virtual bool canVisit(MdKarte *karte=NULL, MdTester *tester=NULL, MdNode *node=NULL, MdContext *context=NULL);
             bool addReport(MdTester *tester, MdReport *report);
             MEDIC_EXPORT void reset();
             MEDIC_EXPORT std::vector<MdTester *> reportTesters();

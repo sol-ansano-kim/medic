@@ -924,7 +924,40 @@ cdef class Visitor:
 
         return True
 
+    def initializeTester(self, tester):
+        if isinstance(tester, PyTester):
+            tester.initialize()
+            options = self.getOptions()
+            tester.setOptions(options.get(tester.Name(), {}))
+        else:
+            self._initializeTester(tester)
+
+    def _initializeTester(self, Tester tester):
+        self.ptr.initializeTester(tester.ptr)
+
+    def finalizeTester(self, tester):
+        if isinstance(tester, PyTester):
+            tester.finalize()
+        else:
+            self._finalizeTester(tester)
+
+    def _finalizeTester(self, Tester tester):
+        self.ptr.finalizeTester(tester.ptr)
+
+    def addReport(self, tester, report):
+        if tester not in self.__report_cache:
+            self.__report_cache[tester] = []
+        self.__report_cache[tester].append(report)
+
+    def canVisit(self, karte=None, tester=None, node=None, context=None):
+        return True
+
     def visitKarte(self, karte):
+        if not self.canVisit(karte, None, None, None):
+            for name, tester_dict in testers.items():
+                tester_dict["state"] = Statics.Done
+            return
+
         self.__report_cache = {}
 
         over_states = [Statics.Done, Statics.Failed, Statics.Suspended]
@@ -967,10 +1000,13 @@ cdef class Visitor:
 
                 tester = tester_dict["tester"]
 
-                self.visitTester(tester)
+                if not self.canVisit(karte, tester, None, None):
+                    self.visitTester(tester)
 
-                if self.hasError(tester):
-                    tester_dict["state"] = Statics.Failed
+                    if self.hasError(tester):
+                        tester_dict["state"] = Statics.Failed
+                    else:
+                        tester_dict["state"] = Statics.Done
                 else:
                     tester_dict["state"] = Statics.Done
 
@@ -984,32 +1020,10 @@ cdef class Visitor:
             if is_done:
                 break
 
-    def initializeTester(self, tester):
-        if isinstance(tester, PyTester):
-            tester.initialize()
-            options = self.getOptions()
-            tester.setOptions(options.get(tester.Name(), {}))
-        else:
-            self._initializeTester(tester)
-
-    def _initializeTester(self, Tester tester):
-        self.ptr.initializeTester(tester.ptr)
-
-    def finalizeTester(self, tester):
-        if isinstance(tester, PyTester):
-            tester.finalize()
-        else:
-            self._finalizeTester(tester)
-
-    def _finalizeTester(self, Tester tester):
-        self.ptr.finalizeTester(tester.ptr)
-
-    def addReport(self, tester, report):
-        if tester not in self.__report_cache:
-            self.__report_cache[tester] = []
-        self.__report_cache[tester].append(report)
-
     def visitTester(self, tester):
+        if not self.canVisit(None, tester, None, None):
+            return
+
         Statics.Debug("Start Tester '{}'".format(tester.Name()))
 
         if tester.Scope() == MdAssetTester and not self.assets_collected:
@@ -1039,13 +1053,13 @@ cdef class Visitor:
         self.finalizeTester(tester)
 
     def visitNode(self, tester, node):
-        if tester.Match(node):
+        if tester.Match(node) and self.canVisit(None, tester, node, None):
             r = tester.test(node)
             if r is not None:
                 self.addReport(tester, r)
 
     def visitContext(self, tester, context):
-        if tester.Match(context):
+        if tester.Match(context) and self.canVisit(None, tester, None, context):
             r = tester.test(context)
             if r is not None:
                 self.addReport(tester, r)
