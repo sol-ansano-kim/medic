@@ -954,8 +954,6 @@ cdef class Visitor:
 
     def visitKarte(self, karte):
         if not self.canVisit(karte, None, None, None):
-            for name, tester_dict in testers.items():
-                tester_dict["state"] = Statics.Done
             return
 
         self.__report_cache = {}
