@@ -2,19 +2,19 @@ from _medic import *
 from maya import OpenMaya
 
 
-def Tester(name):
+def GetTester(name):
    return PluginManager().tester(name)
 
 
-def Karte(name):
+def GetKarte(name):
    return PluginManager().karte(name)
 
 
-def TesterNames():
+def GetTesterNames():
    return PluginManager().testerNames()
 
 
-def KarteNames():
+def GetKarteNames():
    return PluginManager().karteNames()
 
 
