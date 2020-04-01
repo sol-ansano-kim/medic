@@ -115,6 +115,7 @@ cdef extern from "medic/tester.h" namespace "MEDIC":
         MdReport *test(MdNode *node)
         MdReport *test(MdContext *node)
         bint IsFixable()
+        MdParamContainer *GetParameters()
         bint fix(MdReport *report, MdParamContainer *params)
 
 

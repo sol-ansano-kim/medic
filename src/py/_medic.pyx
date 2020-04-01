@@ -473,6 +473,15 @@ cdef class Tester:
 
         return self.ptr.IsFixable()
 
+    def GetParameters(self):
+        if self.ptr == NULL:
+            Statics.Warning("NULL pointer")
+            return None
+
+        con = ParamContainer()
+        con.ptr = self.ptr.GetParameters()
+        return con
+
     def fix(self, Report report, ParamContainer params):
         if self.ptr == NULL:
             Statics.Warning("NULL pointer")
