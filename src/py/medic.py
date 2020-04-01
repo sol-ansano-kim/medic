@@ -1,6 +1,26 @@
 from _medic import *
-
 from maya import OpenMaya
+
+
+def Tester(name):
+   return PluginManager().tester(name)
+
+
+def Karte(name):
+   return PluginManager().karte(name)
+
+
+def TesterNames():
+   return PluginManager().testerNames()
+
+
+def KarteNames():
+   return PluginManager().karteNames()
+
+
+def ReloadPlugins():
+   PluginManager().reloadPlugins()
+
 
 def IsTemplated(_input):
    if not _input:

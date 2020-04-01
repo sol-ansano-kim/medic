@@ -432,10 +432,6 @@ cdef class Tester:
     def __cinit__(self):
         pass
 
-    @staticmethod
-    def IsPyTester():
-        return False
-
     def Scope(self):
         if self.ptr == NULL:
             Statics.Warning("NULL pointer")
@@ -449,6 +445,12 @@ cdef class Tester:
             return ""
 
         return self.ptr.Name()
+
+    def Match(self, Node node):
+        return self.ptr.Match(node.ptr)
+
+    def Match(self, Context context):
+        return self.ptr.Match(context.ptr)
 
     def Description(self):
         if self.ptr == NULL:
@@ -486,6 +488,22 @@ cdef class Tester:
             return False
 
         return self.ptr.fix(report.ptr, params.ptr)
+
+    def initialize(self):
+        if self.ptr == NULL:
+            Statics.Warning("NULL pointer")
+        else:
+            self.ptr.initialize()
+
+    def test(self, Node node):
+        r = self.ptr.test(node.ptr)
+        if r == NULL:
+            return None
+
+        report = Report()
+        report.ptr = r
+
+        return report
 
 
 cdef class Report:
@@ -562,7 +580,7 @@ cdef class Karte:
         return self.ptr.Visible()
 
     def hasTester(self, tester):
-        if tester.IsPyTester():
+        if isinstance(tester, PyTester):
             return self.hasPyTester(tester)
 
         else:
@@ -824,14 +842,14 @@ cdef class Visitor:
         if not isinstance(optionDict, dict):
             return False
 
-        for key, options in optionDict.iteritems():
+        for key, options in optionDict.items():
             if not isinstance(key, basestring) or not isinstance(options, dict):
                 Statics.Warning("Invalid Option '{}' - {}".format(key, options))
                 continue
 
             con = self.ptr.getOptions(key)
 
-            for n, v in options.iteritems():
+            for n, v in options.items():
                 if not isinstance(n, basestring):
                     Statics.Warning("Invalid Option '{}' - {}".format(n, v))
 
@@ -906,62 +924,38 @@ cdef class Visitor:
 
         return True
 
-    def test(self, karte, tester):
-        if not karte.hasTester(tester):
-            return
-
-        Statics.Debug("Start Tester '{}'".format(tester.Name()))
-
-        if tester.Scope() == MdAssetTester and not self.assets_collected:
-            self.collectAssets()
-            self.assets_collected = True
-
-        if tester.Scope() == MdSceneTester and not self.scene_collected:
-            self.collectScene()
-            self.scene_collected = True
-
-        if tester.IsPyTester():
+    def initializeTester(self, tester):
+        if isinstance(tester, PyTester):
             tester.initialize()
-
             options = self.getOptions()
             tester.setOptions(options.get(tester.Name(), {}))
+        else:
+            self._initializeTester(tester)
 
-            self.__report_cache.pop(tester, [])
+    def _initializeTester(self, Tester tester):
+        self.ptr.initializeTester(tester.ptr)
 
-            if tester.Scope() == MdNodeTester:
-                nodes = self.__nodes()
-                for n in nodes:
-                    if tester.Match(n):
-                        r = tester.test(n)
-                        if r:
-                            if not self.__report_cache.has_key(tester):
-                                self.__report_cache[tester] = []
-                            self.__report_cache[tester].append(r)
-
-            elif tester.Scope() == MdSceneTester:
-                scn = self.scene()
-                if scn and tester.Match(scn):
-                    r = tester.test(scn)
-                    if r:
-                        if not self.__report_cache.has_key(tester):
-                            self.__report_cache[tester] = []
-                        self.__report_cache[tester].append(r)
-
-            elif tester.Scope() == MdAssetTester:
-                assets = self.assets()
-                for asset in assets:
-                    if tester.Match(asset):
-                        r = tester.test(asset)
-                        if r:
-                            if not self.__report_cache.has_key(tester):
-                                self.__report_cache[tester] = []
-                            self.__report_cache[tester].append(r)
-
+    def finalizeTester(self, tester):
+        if isinstance(tester, PyTester):
             tester.finalize()
         else:
-            self.__visitWithTester(karte, tester)
+            self._finalizeTester(tester)
 
-    def testAll(self, karte):
+    def _finalizeTester(self, Tester tester):
+        self.ptr.finalizeTester(tester.ptr)
+
+    def addReport(self, tester, report):
+        if tester not in self.__report_cache:
+            self.__report_cache[tester] = []
+        self.__report_cache[tester].append(report)
+
+    def canVisit(self, karte=None, tester=None, node=None, context=None):
+        return True
+
+    def visitKarte(self, karte):
+        if not self.canVisit(karte, None, None, None):
+            return
+
         self.__report_cache = {}
 
         over_states = [Statics.Done, Statics.Failed, Statics.Suspended]
@@ -973,7 +967,7 @@ cdef class Visitor:
 
         pynodes = self.__nodes()
         while (True):
-            for name, tester_dict in testers.iteritems():
+            for name, tester_dict in testers.items():
                 if tester_dict["state"] in over_states:
                     continue
 
@@ -1004,15 +998,18 @@ cdef class Visitor:
 
                 tester = tester_dict["tester"]
 
-                self.test(karte, tester)
+                if self.canVisit(karte, tester, None, None):
+                    self.visitTester(tester)
 
-                if self.hasError(tester):
-                    tester_dict["state"] = Statics.Failed
+                    if self.hasError(tester):
+                        tester_dict["state"] = Statics.Failed
+                    else:
+                        tester_dict["state"] = Statics.Done
                 else:
                     tester_dict["state"] = Statics.Done
 
             is_done = True
-            for tester_dict in testers.itervalues():
+            for tester_dict in testers.values():
                 st = tester_dict["state"]
                 if st not in over_states:
                     is_done = False
@@ -1021,24 +1018,77 @@ cdef class Visitor:
             if is_done:
                 break
 
+    def visitTester(self, tester):
+        if not self.canVisit(None, tester, None, None):
+            return
+
+        Statics.Debug("Start Tester '{}'".format(tester.Name()))
+
+        if tester.Scope() == MdAssetTester and not self.assets_collected:
+            self.collectAssets()
+            self.assets_collected = True
+
+        if tester.Scope() == MdSceneTester and not self.scene_collected:
+            self.collectScene()
+            self.scene_collected = True
+
+        self.initializeTester(tester)
+
+        self.__report_cache.pop(tester, [])
+
+        if tester.Scope() == MdNodeTester:
+            nodes = self.__nodes()
+            for n in nodes:
+                self.visitNode(tester, n)
+
+        elif tester.Scope() == MdSceneTester:
+            self.visitContext(tester, self.scene())
+
+        elif tester.Scope() == MdAssetTester:
+            for asset in self.assets():
+                self.visitContext(tester, asset)
+
+        self.finalizeTester(tester)
+
+    def visitNode(self, tester, node):
+        if tester.Match(node) and self.canVisit(None, tester, node, None):
+            r = tester.test(node)
+            if r is not None:
+                self.addReport(tester, r)
+
+    def visitContext(self, tester, context):
+        if tester.Match(context) and self.canVisit(None, tester, None, context):
+            r = tester.test(context)
+            if r is not None:
+                self.addReport(tester, r)
+
+    def test(self, karte, tester):
+        if not karte.hasTester(tester):
+            return
+
+        self.visitTester(tester)
+
+    def testAll(self, karte):
+        self.visitKarte(karte)
+
     def hasError(self, tester):
-        if tester.IsPyTester():
+        if isinstance(tester, PyTester):
             return True if self.__report_cache.get(tester) else False
 
         return self.__hasError(tester)
 
-    cdef __hasError(self, Tester tester):
+    def __hasError(self, Tester tester):
         return self.ptr.hasError(tester.ptr)
 
     def reportAll(self):
-        return self.__reportAll()
+        results = {}
+        for t, r in self.__report_cache.items():
+            results[t] = r[:]
+
+        return results
 
     def report(self, tester):
-        if tester.IsPyTester():
-            return self.__report_cache.get(tester, [])[:]
-
-        else:
-            return self.__report(tester)
+        return self.__report_cache.get(tester, [])[:]
 
     def reset(self):
         self.ptr.reset()
@@ -1060,59 +1110,6 @@ cdef class Visitor:
                 nodes.append(new_node)
 
         return nodes
-
-    cdef __visitAll(self, Karte karte):
-        self.ptr.visit(karte.ptr)
-
-    cdef __visitWithTester(self, Karte karte, Tester tester):
-        tester.ptr.initialize()
-        self.ptr.visit(karte.ptr, tester.ptr)
-        tester.ptr.finalize()
-
-    cdef __report(self, Tester tester):
-        cdef MdReportIterator reports
-        cdef MdReport *report
-        results = []
-        reports = self.ptr.report(tester.ptr)
-
-        while (not reports.isDone()):
-            report = reports.next()
-            new_report = Report()
-            new_report.ptr = report
-            results.append(new_report)
-
-        return results
-
-    cpdef __reportAll(self):
-        cdef std_vector[MdTester *] testers = self.ptr.reportTesters()
-        cdef std_vector[MdTester *].iterator it = testers.begin()
-        cdef MdTester *tester
-        cdef MdReportIterator reports
-        cdef MdReport *report
-
-        results = {}
-
-        while (it != testers.end()):
-            tester = dereference(it)
-            new_tester = Tester()
-            new_tester.ptr = tester
-            reports = self.ptr.report(tester)
-            results[new_tester] = []
-
-            while (not reports.isDone()):
-                report = reports.next()
-                new_report = Report()
-                new_report.ptr = report
-                results[new_tester].append(new_report)
-
-            preincrement(it)
-
-        for pytester, pyreports in self.__report_cache.iteritems():
-            results[pytester] = []
-            for pyr in pyreports:
-                results[pytester].append(pyr)
-
-        return results
 
 
 class PyKarteManager(object):
@@ -1379,10 +1376,6 @@ class PyReport(object):
         self.__components = components
         self.__has_components = False if components is None else True
 
-    @staticmethod
-    def IsPyReport():
-        return True
-
     def addSelection(self):
         if self.__node is None:
             return
@@ -1405,12 +1398,6 @@ class PyReport(object):
     def context(self):
         return self.__context
 
-    def components(self):
-        return self.__components
-
-    def hasComponents(self):
-        return self.__has_components
-
 
 class PyTester(object):
     def __init__(self):
@@ -1423,10 +1410,6 @@ class PyTester(object):
 
     def getOptions(self):
         return copy.deepcopy(self.__options)
-
-    @staticmethod
-    def IsPyTester():
-        return True
 
     def initialize(self):
         pass

@@ -84,7 +84,6 @@ cdef extern from "medic/report.h" namespace "MEDIC":
     cdef cppclass MdReport:
         MdNode *node()
         MdContext *context()
-        bint hasComponents() const
         void addSelection() const
 
     cdef cppclass MdReportIterator:
@@ -111,8 +110,12 @@ cdef extern from "medic/tester.h" namespace "MEDIC":
         void initialize()
         void finalize()
         std_vector[string] Dependencies()
-        MdParamContainer *GetParameters()
+        bint Match(MdNode *node)
+        bint Match(MdContext *context)
+        MdReport *test(MdNode *node)
+        MdReport *test(MdContext *node)
         bint IsFixable()
+        MdParamContainer *GetParameters()
         bint fix(MdReport *report, MdParamContainer *params)
 
 
@@ -128,8 +131,9 @@ cdef extern from "medic/karte.h" namespace "MEDIC":
 cdef extern from "medic/visitor.h" namespace "MEDIC":
     cdef cppclass MdVisitor:
         MdVisitor()
-        void visit(MdKarte *karte)
-        bint visit(MdKarte *karte, MdTester *tester)
+        void visitTester(MdTester *tester)
+        void visitNode(MdTester *tester, MdNode* node)
+        void visitContext(MdTester *tester, MdContext* context)
         std_vector[MdTester *] reportTesters()
         MdReportIterator report(MdTester *tester)
         bint hasError(MdTester *tester)
@@ -146,6 +150,8 @@ cdef extern from "medic/visitor.h" namespace "MEDIC":
         void clearAssets()
         bint selectionOnly() const
         void setSelectionOnly(bint v)
+        void initializeTester(MdTester *tester)
+        void finalizeTester(MdTester *tester)
 
 cdef extern from "medic/pluginManager.h" namespace "MEDIC":
     cdef enum MdPluginLoadingStatus:

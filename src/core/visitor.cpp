@@ -1,7 +1,12 @@
 #include "medic/visitor.h"
+#include <maya/MGlobal.h>
 
 
 using namespace MEDIC;
+
+
+bool MdVisitor::warned_visit_karter = false;
+bool MdVisitor::warned_visit_tester = false;
 
 
 MdVisitor::MdVisitor()
@@ -15,6 +20,17 @@ MdVisitor::~MdVisitor()
 
 void MdVisitor::visit(MdKarte *karte)
 {
+    if (!warned_visit_karter)
+    {
+        MGlobal::displayWarning("MdVisitor::visit(MdKarte *karte) is deprecated. please use MdVisitor::visitKarte(MdKarte *karte) instead");
+        warned_visit_karter = true;
+    }
+
+    visitKarte(karte);
+}
+
+void MdVisitor::visitKarte(MdKarte *karte)
+{
     reset();
 
     collectNodes();
@@ -25,67 +41,30 @@ void MdVisitor::visit(MdKarte *karte)
     while (!tester_it.isDone())
     {
         MdTester *tester = tester_it.next();
-
-        tester->initialize();
-        tester->setOptions(getOptions(tester->Name()));
-
-        if (tester->Scope() == MdNodeTester)
-        {
-            MdNodeIterator node_it = m_nodes.iterator();
-            while (!node_it.isDone())
-            {
-                MdNode *node = node_it.next();
-                if (tester->Match(node))
-                {
-                    MdReport *r = tester->test(node);
-                    if (r)
-                    {
-                        addReport(tester, r);
-                    }
-                }
-            }
-        }
-
-        else if (tester->Scope() == MdSceneTester && m_scene)
-        {
-            if (tester->Match(m_scene))
-            {
-                MdReport *r = tester->test(m_scene);
-                if (r)
-                {
-                    addReport(tester, r);
-                }
-            }
-        }
-
-        else if (tester->Scope() == MdAssetTester)
-        {
-            MdContextIterator asset_it = m_assets.iterator();
-            while (!asset_it.isDone())
-            {
-                MdContext *asset = asset_it.next();
-                if (tester->Match(asset))
-                {
-                    MdReport *r = tester->test(asset);
-                    if (r)
-                    {
-                        addReport(tester, r);
-                    }
-                }
-            }
-        }
-
-        tester->finalize();
+        visit(karte, tester);
     }
 }
 
 bool MdVisitor::visit(MdKarte *karte, MdTester *tester)
 {
+    if (!warned_visit_tester)
+    {
+        MGlobal::displayWarning("MdVisitor::visit(MdKarte *karte, MdTester *tester) is deprecated. please use MdVisitor::visitTester(MdTester *tester) instead");
+        warned_visit_tester = true;
+    }
+
     if (!karte->hasTester(tester))
     {
         return false;
     }
 
+    visitTester(tester);
+
+    return true;
+}
+
+void MdVisitor::visitTester(MdTester *tester)
+{
     tester->setOptions(getOptions(tester->Name()));
 
     if (!m_node_collected)
@@ -95,23 +74,14 @@ bool MdVisitor::visit(MdKarte *karte, MdTester *tester)
     }
 
     cleanReport(tester);
-    tester->initialize();
-    tester->setOptions(getOptions(tester->Name()));
+    initializeTester(tester);
 
     if (tester->Scope() == MdNodeTester)
     {
         MdNodeIterator node_it = m_nodes.iterator();
         while (!node_it.isDone())
         {
-            MdNode *node = node_it.next();
-            if (tester->Match(node))
-            {
-                MdReport *r = tester->test(node);
-                if (r)
-                {
-                    addReport(tester, r);
-                }
-            }
+            visitNode(tester, node_it.next());
         }
     }
 
@@ -119,11 +89,7 @@ bool MdVisitor::visit(MdKarte *karte, MdTester *tester)
     {
         if (tester->Match(m_scene))
         {
-            MdReport *r = tester->test(m_scene);
-            if (r)
-            {
-                addReport(tester, r);
-            }
+            visitContext(tester, m_scene);
         }
     }
 
@@ -132,20 +98,39 @@ bool MdVisitor::visit(MdKarte *karte, MdTester *tester)
         MdContextIterator asset_it = m_assets.iterator();
         while (!asset_it.isDone())
         {
-            MdContext *asset = asset_it.next();
-            if (tester->Match(asset))
-            {
-                MdReport *r = tester->test(asset);
-                if (r)
-                {
-                    addReport(tester, r);
-                }
-            }
+            visitContext(tester, asset_it.next());
         }
     }
 
-    tester->finalize();
+    finalizeTester(tester);
+}
 
+void MdVisitor::visitNode(MdTester *tester, MdNode *node)
+{
+    if (tester->Match(node))
+    {
+        MdReport *r = tester->test(node);
+        if (r)
+        {
+            addReport(tester, r);
+        }
+    }
+}
+
+void MdVisitor::visitContext(MdTester *tester, MdContext *context)
+{
+    if (tester->Match(context))
+    {
+        MdReport *r = tester->test(context);
+        if (r)
+        {
+            addReport(tester, r);
+        }
+    }
+}
+
+bool MdVisitor::canVisit(MdKarte *karte, MdTester *tester, MdNode *node, MdContext *context)
+{
     return true;
 }
 
@@ -311,6 +296,17 @@ void MdVisitor::clearAssets()
 bool MdVisitor::selectionOnly() const
 {
     return m_collect_in_selection;
+}
+
+void MdVisitor::initializeTester(MdTester *tester)
+{
+    tester->initialize();
+    tester->setOptions(getOptions(tester->Name()));
+}
+
+void MdVisitor::finalizeTester(MdTester *tester)
+{
+    tester->finalize();
 }
 
 void MdVisitor::setSelectionOnly(bool v)
