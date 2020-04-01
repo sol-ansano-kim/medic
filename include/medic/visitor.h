@@ -25,6 +25,10 @@ namespace MEDIC
             MEDIC_EXPORT virtual ~MdVisitor();
             virtual void visit(MdKarte *karte);
             virtual bool visit(MdKarte *karte, MdTester *tester);
+            virtual void visitKarte(MdKarte *karte);
+            virtual void visitTester(MdTester *tester);
+            virtual void visitNode(MdTester *tester, MdNode *node);
+            virtual void visitContext(MdTester *tester, MdContext *context);
             bool addReport(MdTester *tester, MdReport *report);
             MEDIC_EXPORT void reset();
             MEDIC_EXPORT std::vector<MdTester *> reportTesters();
@@ -43,8 +47,13 @@ namespace MEDIC
             MEDIC_EXPORT void clearAssets();
             MEDIC_EXPORT bool selectionOnly() const;
             MEDIC_EXPORT void setSelectionOnly(bool v);
+            MEDIC_EXPORT void initializeTester(MdTester *tester);
+            MEDIC_EXPORT void finalizeTester(MdTester *tester);
 
-        protected:
+        private:
+            static bool warned_visit_karter;
+            static bool warned_visit_tester;
+
             bool m_node_collected;
             bool m_collect_in_selection;
             MdContext *m_scene;
