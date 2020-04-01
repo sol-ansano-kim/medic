@@ -998,7 +998,7 @@ cdef class Visitor:
 
                 tester = tester_dict["tester"]
 
-                if not self.canVisit(karte, tester, None, None):
+                if self.canVisit(karte, tester, None, None):
                     self.visitTester(tester)
 
                     if self.hasError(tester):
