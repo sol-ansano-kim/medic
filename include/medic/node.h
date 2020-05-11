@@ -8,6 +8,7 @@
 #include <set>
 #include <maya/MString.h>
 #include <maya/MObject.h>
+#include <maya/MObjectHandle.h>
 #include <maya/MSelectionList.h>
 #include <maya/MFnDependencyNode.h>
 #include <maya/MFnDagNode.h>
@@ -38,6 +39,7 @@ namespace MEDIC
             MEDIC_EXPORT MObject &object();
             MEDIC_EXPORT std::string name() const;
             MEDIC_EXPORT std::string type() const;
+            MEDIC_EXPORT bool isAlive() const;
             MEDIC_EXPORT bool isDag() const;
             MEDIC_EXPORT void parents(MdNodeContainer *container) const;
             MEDIC_EXPORT void children(MdNodeContainer *container) const;
@@ -50,6 +52,7 @@ namespace MEDIC
             bool m_is_dag;
             MFnDependencyNode m_dg;
             MFnDagNode m_dag;
+            MObjectHandle m_handle;
 	};
 
 

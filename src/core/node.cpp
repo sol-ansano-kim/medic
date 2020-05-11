@@ -11,6 +11,7 @@ MdNode::MdNode(MObject &obj)
 {
     m_obj = obj;
     m_dg.setObject(obj);
+    m_handle = MObjectHandle(obj);
     m_is_dag = false;
 
     if (obj.hasFn(MFn::kDagNode))
@@ -29,6 +30,7 @@ MdNode::MdNode(std::string name)
 
     m_obj = obj;
     m_dg.setObject(obj);
+    m_handle = MObjectHandle(obj);
     m_is_dag = false;
 
     if (obj.hasFn(MFn::kDagNode))
@@ -64,6 +66,11 @@ std::string MdNode::name() const
 std::string MdNode::type() const
 {
     return (std::string)m_dg.typeName().asChar();
+}
+
+bool MdNode::isAlive() const
+{
+    return m_handle.isAlive();
 }
 
 bool MdNode::isDag() const
