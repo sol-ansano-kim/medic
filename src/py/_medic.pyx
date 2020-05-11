@@ -319,6 +319,13 @@ cdef class Node:
     def object(self):
         return self.__obj
 
+    def isAlive(self):
+        if self.ptr == NULL:
+            Statics.Warning("NULL pointer")
+            return False
+
+        return self.ptr.isAlive()
+
     def isDag(self):
         if self.ptr == NULL:
             Statics.Warning("NULL pointer")
@@ -1376,8 +1383,20 @@ class PyReport(object):
         self.__components = components
         self.__has_components = False if components is None else True
 
+    def isAlive(self):
+        if self.__context is not None:
+            return True
+
+        elif self.__node is not None:
+            return self.__node.isAlive()
+
+        return False
+
     def addSelection(self):
         if self.__node is None:
+            return
+
+        if not self.isAlive():
             return
 
         Statics.SelectionList.clear()
