@@ -25,6 +25,7 @@ namespace MEDIC
             MEDIC_EXPORT MdReport(MdNode *node);
             MEDIC_EXPORT MdReport(MdContext* context);
             MEDIC_EXPORT ~MdReport();
+            MEDIC_EXPORT bool isAlive() const;
             MEDIC_EXPORT void addSelection() const;
             MEDIC_EXPORT MdNode *node();
             MEDIC_EXPORT MdContext *context();

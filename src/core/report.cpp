@@ -15,9 +15,24 @@ MdReport::MdReport(MdContext *context)
 
 MdReport::~MdReport() {};
 
+bool MdReport::isAlive() const
+{
+    if (m_context != NULL)
+    {
+        return true;
+    }
+
+    if (m_node != NULL)
+    {
+        return m_node->isAlive();
+    }
+
+    return false;
+}
+
 void MdReport::addSelection() const
 {
-    if (m_node == NULL)
+    if (m_node == NULL || !m_node->isAlive())
     {
         return;
     }

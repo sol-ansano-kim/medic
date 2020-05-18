@@ -59,6 +59,7 @@ cdef extern from "medic/node.h" namespace "MEDIC":
         string name() const
         string type() const
         bint isDag() const
+        bint isAlive() const
         void parents(MdNodeContainer *container) const
         void children(MdNodeContainer *container) const
 
@@ -85,6 +86,7 @@ cdef extern from "medic/report.h" namespace "MEDIC":
         MdNode *node()
         MdContext *context()
         void addSelection() const
+        bint isAlive() const
 
     cdef cppclass MdReportIterator:
         MdReportIterator()
