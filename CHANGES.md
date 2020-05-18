@@ -1,3 +1,6 @@
+# 1.5.0
+- Fix crash issue when node deleted.
+
 # 1.4.0
 - Add public API GetTester, GetKarte, GetTesterNames, GetKarteNames, ReloadPlugins.
 

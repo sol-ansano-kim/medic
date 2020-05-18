@@ -23,9 +23,9 @@
 
    Module directory path
 
-    windows : C:/Users/%USERNAME%/Documents/Maya/<Maya Version>/modules  
-    osx : ~/Library/Preferences/Autodesk/maya/<Maya Version>/modules  
-    linux : ~/maya/<Maya Version>/modules  
+    windows : C:/Users/%USERNAME%/Documents/Maya/\<Maya Version\>/modules  
+    osx : ~/Library/Preferences/Autodesk/maya/\<Maya Version\>/modules  
+    linux : ~/maya/\<Maya Version\>/modules  
 
 3. Execute the following command in Maya. For details on the usage, see [Usage](https://github.com/sol-ansano-kim/medic/wiki#usage).
 

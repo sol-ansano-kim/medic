@@ -31,7 +31,11 @@ class ReportItem(object):
         return self.__report.node()
 
     def name(self):
+        if not self.__report.isAlive():
+            return "<Deleted>"
+
         node = self.__report.node()
+
         if node:
             return node.name()
 
@@ -77,7 +81,11 @@ class TesterItem(object):
         if report not in self.__reports:
             return False
 
-        return self.__tester.fix(report.report(), param)
+        rp = report.report()
+        if not rp.isAlive():
+            return True
+
+        return self.__tester.fix(rp, param)
 
     def removeReports(self, reports):
         for report in reports:
