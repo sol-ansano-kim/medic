@@ -519,6 +519,13 @@ cdef class Report:
     def __cinit__(self):
         pass
 
+    def isAlive(self):
+        if self.ptr == NULL:
+            Statics.Warning("NULL pointer")
+            return False
+
+        return self.ptr.isAlive()
+
     def addSelection(self):
         if self.ptr == NULL:
             Statics.Warning("NULL pointer")
