@@ -1,3 +1,6 @@
+# 1.5.1
+- Fix missing isAlive method of Report class
+
 # 1.5.0
 - Fix crash issue when node deleted.
 
