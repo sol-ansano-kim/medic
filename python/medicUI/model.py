@@ -1,6 +1,8 @@
 import medic
 from Qt import QtCore
 
+from operator import attrgetter
+
 
 DisplayRole = QtCore.Qt.DisplayRole
 KarteRole = QtCore.Qt.UserRole + 1
@@ -310,14 +312,26 @@ class TesterModel(QtCore.QAbstractListModel):
         super(TesterModel, self).__init__(parent=parent)
         self.__tester_items = []
 
-    def setTesterItems(self, testerItems):
+    def setTesterItems(self, testerItems, sortItems=True):
         self.beginRemoveRows(QtCore.QModelIndex(), 0, len(self.__tester_items))
         self.__tester_items = []
         self.endRemoveRows()
 
         self.beginInsertRows(QtCore.QModelIndex(), 0, len(testerItems))
         self.__tester_items = testerItems
+
+        if sortItems:
+            self.sort()
+
         self.endInsertRows()
+
+    def sort(self):
+        tempDict = {x.name():x for x in self.__tester_items}
+        tempDict = sorted(tempDict.items())
+        self.__tester_items = []
+        for k,v in tempDict:
+            self.__tester_items.append(v)
+        return self.__tester_items
 
     def rowCount(self, parent=None):
         return len(self.__tester_items)
