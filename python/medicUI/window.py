@@ -8,11 +8,13 @@ class MainWindow(QtWidgets.QMainWindow):
     Name = "medic_main_window"
     Title = "MEDIC"
 
-    def __init__(self, visitorClass=None, parent=None):
+    def __init__(self, visitorClass=None, parent=None, topMost=False):
         super(MainWindow, self).__init__(parent=parent)
         self.__visitor_class = visitorClass
         self.setObjectName(MainWindow.Name)
         self.setWindowTitle(MainWindow.Title)
+        if topMost:
+            self.setWindowFlags(self.windowFlags() | QtCore.Qt.WindowStaysOnTopHint)
         self.__makeWidgets()
         self.__setStyleSheet()
 

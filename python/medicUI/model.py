@@ -1,7 +1,6 @@
 import medic
 from Qt import QtCore
 
-
 DisplayRole = QtCore.Qt.DisplayRole
 KarteRole = QtCore.Qt.UserRole + 1
 KarteItemRole = QtCore.Qt.UserRole + 2
@@ -239,12 +238,16 @@ class KarteModel(QtCore.QAbstractListModel):
 
         self.endResetModel()
 
-    def __initialize(self):
+    def __initialize(self, sortKartes=True):
         self.beginResetModel()
         self.__manager = medic.PluginManager()
 
+        karte_names = self.__manager.karteNames()
+        if sortKartes:
+            karte_names = self.sort(karte_names)
+
         all_testers = map(lambda x: self.__manager.tester(x), self.__manager.testerNames())
-        for karte_name in self.__manager.karteNames():
+        for karte_name in karte_names:
             karte = self.__manager.karte(karte_name)
 
             tester_items = []
@@ -259,6 +262,15 @@ class KarteModel(QtCore.QAbstractListModel):
         self.__karte_items = self.__visible_items[:]
 
         self.endResetModel()
+
+    #Karte "All" is prior to others
+    def sort(self, karteNames):
+        res = [x for x in karteNames]
+        res.sort()
+        if "All" in res:
+            res.remove("All")
+            res.insert(0, "All")
+        return res
 
     def rowCount(self, parent=None):
         return len(self.__karte_items)
@@ -310,14 +322,26 @@ class TesterModel(QtCore.QAbstractListModel):
         super(TesterModel, self).__init__(parent=parent)
         self.__tester_items = []
 
-    def setTesterItems(self, testerItems):
+    def setTesterItems(self, testerItems, sortTesters=True):
         self.beginRemoveRows(QtCore.QModelIndex(), 0, len(self.__tester_items))
         self.__tester_items = []
         self.endRemoveRows()
 
         self.beginInsertRows(QtCore.QModelIndex(), 0, len(testerItems))
         self.__tester_items = testerItems
+
+        if sortTesters:
+            self.__tester_items = self.sort(self.__tester_items)
+
         self.endInsertRows()
+
+    def sort(self, testerItems):
+        temp = {x.name():x for x in testerItems}
+        temp = sorted(temp.items())
+        res = []
+        for k,v in temp:
+            res.append(v)
+        return res
 
     def rowCount(self, parent=None):
         return len(self.__tester_items)
