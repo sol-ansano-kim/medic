@@ -1,3 +1,6 @@
+# 1.5.2
+- Sort Karte and Tester list
+
 # 1.5.1
 - Fix missing isAlive method of Report class
 
