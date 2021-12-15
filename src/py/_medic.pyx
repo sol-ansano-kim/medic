@@ -199,7 +199,8 @@ cdef class ParamContainer:
             Statics.Warning("NULL pointer")
             return []
 
-        return [_c2p(x) for x in self.ptr.names()]
+        names = self.ptr.names()
+        return [_c2p(x) for x in names]
 
     def get(self, paramName, index=0):
         if self.ptr == NULL:
@@ -520,7 +521,8 @@ cdef class Tester:
             Statics.Warning("NULL pointer")
             return []
 
-        return [_c2p(x) for x in self.ptr.Dependencies()]
+        deps = self.ptr.Dependencies()
+        return [_c2p(x) for x in deps]
 
     def IsFixable(self):
         if self.ptr == NULL:
