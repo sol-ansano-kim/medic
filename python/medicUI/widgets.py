@@ -1,4 +1,4 @@
-from Qt import QtWidgets, QtCore, QtGui
+from PySide2 import QtWidgets, QtCore, QtGui
 from . import model
 from . import delegate
 from . import functions

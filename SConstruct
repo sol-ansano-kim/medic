@@ -17,8 +17,6 @@ maya.SetupMscver()
 
 env = excons.MakeBaseEnv()
 
-include_qt = int(excons.GetArgument("include-qt", 1)) != 0
-
 
 if sys.platform == "win32":
     excons.SetArgument("with-cython", os.path.abspath("cython/bin/cython.bat"))
@@ -213,12 +211,6 @@ prjs.append({"name": "medicUI",
              "alias": "medic-ui",
              "install": {out_pydir: ["python/medicUI"]}})
 
-if include_qt:
-    prjs.append({"name": "Qt",
-                 "type": "install",
-                 "alias": "Qt",
-                 "install": {os.path.join(out_pydir, "medicUI/qt"): ["Qt.py/Qt.py"]}})
-
 
 targets = excons.DeclareTargets(env, prjs)
 
@@ -266,8 +258,6 @@ for k, contents in targets.iteritems():
                 dirname = os.path.join(install_dir, "py")
             elif "python" == path_split[0]:
                 dirname = os.path.join(install_dir, "py", *path_split[1:-1])
-            elif "Qt.py" == path_split[-1]:
-                dirname = os.path.join(install_dir, "py/medicUI/qt")
             else:
                 print("UNKNOWN INSTALL TARGET : {}".format(path))
                 continue
