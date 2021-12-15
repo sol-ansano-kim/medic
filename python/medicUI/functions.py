@@ -2,9 +2,12 @@ from maya import OpenMaya
 from maya import OpenMayaUI
 import Qt
 from Qt import QtWidgets
+import sys
 
 
 BlankSelectionList = OpenMaya.MSelectionList()
+if not hasattr(__builtins__, "long"):
+    long = int
 
 
 def ClearSelection():

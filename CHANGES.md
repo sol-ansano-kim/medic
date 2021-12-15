@@ -1,3 +1,6 @@
+# 1.5.3
+- Support maya2022 and python3
+
 # 1.5.2
 - Sort Karte and Tester list
 

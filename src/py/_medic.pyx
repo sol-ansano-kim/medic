@@ -10,6 +10,35 @@ import imp
 import copy
 import logging
 from maya import OpenMaya
+import sys
+
+
+__Encoding = sys.getfilesystemencoding()
+cpdef _cstr_to_py_str(s):
+    if isinstance(s, bytes):
+        return s.decode(__Encoding)
+    return s
+
+cpdef _py_text_to_cstr(s):
+    if isinstance(s, str):
+        return s.encode(__Encoding)
+    return s
+
+
+if sys.version_info.major > 2:
+    basestring = (bytes, str)
+    def _c2p(s):
+        return _cstr_to_py_str(s)
+
+    def _p2c(s):
+        return _py_text_to_cstr(s)
+
+else:
+    def _c2p(s):
+        return s
+
+    def _p2c(s):
+        return s
 
 
 LogDebug = logging.DEBUG
@@ -93,6 +122,8 @@ cdef class Parameter:
 
     @staticmethod
     def Create(name, label, typ, defaultValue):
+        name = _p2c(name)
+        label = _p2c(label)
         pram = Parameter()
         if typ == Types.Bool or typ == Types.BoolArray:
             Statics.Debug("Create a new bool Parameter")
@@ -103,9 +134,12 @@ cdef class Parameter:
         elif typ == Types.Float or typ == Types.FloatArray:
             Statics.Debug("Create a new float Parameter")
             pram.ptr = MdParameter.Create[float](name, label, typ, defaultValue, NULL)
-        elif typ == Types.String or typ == Types.StringArray:
+        elif typ == Types.String:
             Statics.Debug("Create a new string Parameter")
-            pram.ptr = MdParameter.Create[string](name, label, typ, defaultValue, NULL)
+            pram.ptr = MdParameter.Create[string](name, label, typ, _p2c(defaultValue), NULL)
+        elif typ == Types.StringArray:
+            Statics.Debug("Create a new string Parameter")
+            pram.ptr = MdParameter.Create[string](name, label, typ, [_p2c(x) for x in defaultValue], NULL)
         else:
             Statics.Warning("Not supported type")
 
@@ -141,6 +175,7 @@ cdef class ParamContainer:
             Statics.Warning("NULL pointer")
             return False
 
+        paramName = _p2c(paramName)
         cdef MdParameter *ptr = self.ptr.getParam(<string>paramName)
 
         if ptr == NULL:
@@ -155,7 +190,7 @@ cdef class ParamContainer:
         elif typ == Types.Float or typ == Types.FloatArray:
             return self.ptr.set[float](paramName, value, <size_t>index)
         elif typ == Types.String or typ == Types.StringArray:
-            return self.ptr.set[string](paramName, value, <size_t>index)
+            return self.ptr.set[string](paramName, _p2c(value), <size_t>index)
 
         return False
 
@@ -164,7 +199,7 @@ cdef class ParamContainer:
             Statics.Warning("NULL pointer")
             return []
 
-        return self.ptr.names()
+        return [_c2p(x) for x in self.ptr.names()]
 
     def get(self, paramName, index=0):
         if self.ptr == NULL:
@@ -176,6 +211,7 @@ cdef class ParamContainer:
         cdef float floatValue
         cdef string stringValue
 
+        paramName = _p2c(paramName)
         cdef MdParameter *ptr = self.ptr.getParam(<string>paramName)
 
         if ptr == NULL:
@@ -195,7 +231,7 @@ cdef class ParamContainer:
             return floatValue
         elif typ == Types.String or typ == Types.StringArray:
             self.ptr.get[string](paramName, stringValue, <size_t>index)
-            return stringValue
+            return _c2p(stringValue)
 
         return None
 
@@ -211,7 +247,7 @@ cdef class ParamContainer:
 
         for n in names:
             param = self.ptr.getParam(n)
-            return_list.append((n, param.getLabel(), param.getType(), self.getDefault(n)))
+            return_list.append((_c2p(n), _c2p(param.getLabel()), param.getType(), self.getDefault(_c2p(n))))
 
         return return_list
 
@@ -225,6 +261,7 @@ cdef class ParamContainer:
         cdef float floatValue
         cdef string stringValue
 
+        paramName = _p2c(paramName)
         cdef MdParameter *ptr = self.ptr.getParam(<string>paramName)
 
         if ptr == NULL:
@@ -242,9 +279,12 @@ cdef class ParamContainer:
         elif typ == Types.Float or typ == Types.FloatArray:
             self.ptr.getDefault[float](paramName, floatValue)
             return floatValue
-        elif typ == Types.String or typ == Types.StringArray:
+        elif typ == Types.String:
             self.ptr.getDefault[string](paramName, stringValue)
-            return stringValue
+            return _c2p(stringValue)
+        elif typ == Types.StringArray:
+            self.ptr.getDefault[string](paramName, stringValue)
+            return [_c2p(x) for x in stringValue]
 
         return None
 
@@ -288,7 +328,7 @@ cdef class Node:
     def Create(name):
         Statics.Debug("Create a new Node")
         node = Node()
-        node.ptr = new MdNode(<string>name)
+        node.ptr = new MdNode(<string>_p2c(name))
         node.needToDelete = True
         node.initialize()
         return node
@@ -298,14 +338,14 @@ cdef class Node:
             Statics.Warning("NULL pointer")
             return ""
 
-        return self.ptr.name()
+        return _c2p(self.ptr.name())
 
     def type(self):
         if self.ptr == NULL:
             Statics.Warning("NULL pointer")
             return ""
 
-        return self.ptr.type()
+        return _c2p(self.ptr.type())
 
     def dag(self):
         if not self.isDag():
@@ -363,8 +403,9 @@ cdef class Node:
         cdef MdNode *n
         while (not it.isDone()):
             n = it.next()
-            new_node = Node.Create(n.name())
-            parent_list.append(new_node)
+            if n:
+                new_node = Node.Create(n.name())
+                parent_list.append(new_node)
 
         del(parents)
         return parent_list
@@ -404,7 +445,7 @@ cdef class Context:
     def Create(name):
         Statics.Debug("Create a new Context")
         context = Context()
-        context.ptr = new MdContext(<string>name)
+        context.ptr = new MdContext(<string>_p2c(name))
 
         return context
 
@@ -413,7 +454,7 @@ cdef class Context:
             Statics.Warning("NULL pointer")
             return ""
 
-        return self.ptr.name()
+        return _c2p(self.ptr.name())
 
     def params(self):
         if self.ptr == NULL:
@@ -451,12 +492,20 @@ cdef class Tester:
             Statics.Warning("NULL pointer")
             return ""
 
-        return self.ptr.Name()
+        return _c2p(self.ptr.Name())
 
-    def Match(self, Node node):
+    def Match(self, target):
+        if isinstance(target, Node):
+            return self.__matchNode(target)
+        elif isinstance(target, Context):
+            return self.__matchContext(target)
+        else:
+            return False
+
+    def __matchNode(self, Node node):
         return self.ptr.Match(node.ptr)
 
-    def Match(self, Context context):
+    def __matchContext(self, Context context):
         return self.ptr.Match(context.ptr)
 
     def Description(self):
@@ -464,14 +513,14 @@ cdef class Tester:
             Statics.Warning("NULL pointer")
             return ""
 
-        return self.ptr.Description()
+        return _c2p(self.ptr.Description())
 
     def Dependencies(self):
         if self.ptr == NULL:
             Statics.Warning("NULL pointer")
             return []
 
-        return self.ptr.Dependencies()
+        return [_c2p(x) for x in self.ptr.Dependencies()]
 
     def IsFixable(self):
         if self.ptr == NULL:
@@ -577,14 +626,14 @@ cdef class Karte:
             Statics.Warning("NULL pointer")
             return ""
 
-        return self.ptr.Name()
+        return _c2p(self.ptr.Name())
 
     def Description(self):
         if self.ptr == NULL:
             Statics.Warning("NULL pointer")
             return ""
 
-        return self.ptr.Description()
+        return _c2p(self.ptr.Description())
 
     def Visible(self):
         if self.ptr == NULL:
@@ -774,19 +823,19 @@ cdef class Visitor:
                 if not param.isArray():
                     if typ == Types.Bool:
                         con.get[bint](n, boolValue)
-                        cur_dict[n] = boolValue
+                        cur_dict[_c2p(n)] = boolValue
                     elif typ == Types.Int:
                         con.get[int](n, intValue)
-                        cur_dict[n] = intValue
+                        cur_dict[_c2p(n)] = intValue
                     elif typ == Types.Float:
                         con.get[float](n, floatValue)
-                        cur_dict[n] = floatValue
+                        cur_dict[_c2p(n)] = floatValue
                     elif typ == Types.String:
                         con.get[string](n, stringValue)
-                        cur_dict[n] = stringValue
+                        cur_dict[_c2p(n)] = _c2p(stringValue)
                 else:
                     values = []
-                    cur_dict[n] = values
+                    cur_dict[_c2p(n)] = values
 
                     if typ == Types.BoolArray:
                         for i in range(param.size()):
@@ -806,7 +855,7 @@ cdef class Visitor:
                     elif typ == Types.StringArray:
                         for i in range(param.size()):
                             con.get[string](n, stringValue, <size_t>i)
-                            values.append(stringValue)
+                            values.append(_c2p(stringValue))
 
             if cur_dict:
                 return_dict[k] = cur_dict
@@ -877,7 +926,7 @@ cdef class Visitor:
                             Statics.Warning("Invalid Option List'{}'".format(v))
                             continue
 
-                        values = map(lambda x: dt(x), v)
+                        values = [dt(x) for x in v]
 
                     if dt == bool:
                         parm = MdParameter.Create(n, n, Types.BoolArray, False, NULL)
@@ -1137,7 +1186,7 @@ class PyKarteManager(object):
         return self.__Kartes.get(name, None)
 
     def regist(self, karte):
-        if self.__Kartes.has_key(karte.Name()):
+        if karte.Name() in self.__Kartes:
             return False
 
         self.__Kartes[karte.Name()] = karte
@@ -1157,7 +1206,7 @@ class PyTesterManager(object):
     __Testers = {}
 
     def regist(self, tester):
-        if self.__Testers.has_key(tester.Name()):
+        if tester.Name() in self.__Testers:
             return False
 
         self.__Testers[tester.Name()] = tester
@@ -1194,7 +1243,7 @@ cdef class __PluginManager:
         self.__registKartes()
 
     def __registTesters(self):
-        search_dirs = map(lambda x : os.path.abspath(x), filter(lambda y : y, os.environ.get(Statics.TesterPathEnvName, "").split(os.pathsep)))
+        search_dirs = [os.path.abspath(x) for x in os.environ.get(Statics.TesterPathEnvName, "").split(os.pathsep) if x]
         for sdir in search_dirs:
             if not os.path.isdir(sdir):
                 continue
@@ -1244,12 +1293,11 @@ cdef class __PluginManager:
                 self.__py_tester_manager.regist(tester)
 
     def __addTester(self, path):
-        return self.ptr.addTester(<string>path)
+        return self.ptr.addTester(<string>_p2c(path))
 
     def __registKartes(self):
         ctesters = self.__cTesterNames()
-
-        search_dirs = map(lambda x : os.path.abspath(x), filter(lambda y : y, os.environ.get(Statics.KartePathEnvName, "").split(os.pathsep)))
+        search_dirs = [os.path.abspath(x) for x in os.environ.get(Statics.KartePathEnvName, "").split(os.pathsep) if x]
         for sdir in search_dirs:
             if not os.path.isdir(sdir):
                 continue
@@ -1301,9 +1349,11 @@ cdef class __PluginManager:
                 self.__py_karte_manager.regist(karte)
 
     cdef __addKarte(self, filepath, name, description, visible, testers):
+        name = _p2c(name)
+        description = _p2c(name)
         cdef std_vector[string] tester_names;
         for t in testers:
-            tester_names.push_back(<string>t)
+            tester_names.push_back(<string>_p2c(t))
         result = self.ptr.addKarte(<string>name, <string>description, <bint>visible, tester_names)
 
         if result:
@@ -1320,7 +1370,7 @@ cdef class __PluginManager:
 
         cdef MdTester *t
 
-        t = self.ptr.tester(<string>name)
+        t = self.ptr.tester(<string>_p2c(name))
         if t != NULL:
             new_tester = Tester()
             new_tester.ptr = t
@@ -1338,16 +1388,16 @@ cdef class __PluginManager:
         cdef std_vector[string].iterator it = names.begin()
 
         while (it != names.end()):
-            name_list.append(dereference(it))
+            name_list.append(_c2p(dereference(it)))
             preincrement(it)
 
         return name_list
 
     def testerNames(self):
-        return self.__cTesterNames() + self.__py_tester_manager.testerNames()
+        return self.__cTesterNames() + list(self.__py_tester_manager.testerNames())
 
     def karteNames(self):
-        return self.__py_karte_manager.karteNames()
+        return list(self.__py_karte_manager.karteNames())
 
     def reloadPlugins(self):
         Statics.Debug("Reload Plugins")
