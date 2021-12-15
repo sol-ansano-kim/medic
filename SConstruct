@@ -53,7 +53,10 @@ if sys.platform == "win32":
 elif sys.platform == "darwin":
     os_name = "macOS"
 install_dir = "%s/dist/medic_%s_%s/medic" % (excons.OutputBaseDirectory(), os_name, mayaver)
-package_file = "%s/dist/medic_%s_maya%s-%s_%s_%s.zip" % (excons.OutputBaseDirectory(), os_name, mayaver, major, minor, patch)
+if mayaver in ("2022", ):
+    package_file = "%s/dist/medic_%s_maya%s-py%s-%s_%s_%s.zip" % (excons.OutputBaseDirectory(), os_name, mayaver, python.Version().replace(".", "_"), major, minor, patch)
+else:
+    package_file = "%s/dist/medic_%s_maya%s-%s_%s_%s.zip" % (excons.OutputBaseDirectory(), os_name, mayaver, major, minor, patch)
 
 
 ## cython
