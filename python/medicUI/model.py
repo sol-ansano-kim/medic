@@ -1,5 +1,5 @@
 import medic
-from Qt import QtCore
+from PySide2 import QtCore
 
 DisplayRole = QtCore.Qt.DisplayRole
 KarteRole = QtCore.Qt.UserRole + 1
@@ -98,7 +98,7 @@ class TesterItem(object):
         self.__status = Ready
 
         visitor.test(karte, self.__tester)
-        self.__reports = map(ReportItem, visitor.report(self.__tester))
+        self.__reports = [ReportItem(x) for x in visitor.report(self.__tester)]
 
         if not self.__reports:
             self.__status = Success
@@ -132,7 +132,7 @@ class KarteItem(object):
             testers[t.name()] = {"tester": t, "dep": t.tester().Dependencies(), "state": medic.Statics.Wait}
 
         while (True):
-            for name, tester_dict in testers.iteritems():
+            for name, tester_dict in testers.items():
                 if tester_dict["state"] in over_states:
                     continue
 
@@ -174,7 +174,7 @@ class KarteItem(object):
                     tester_dict["state"] = medic.Statics.Failed
 
             is_done = True
-            for tester_dict in testers.itervalues():
+            for tester_dict in testers.values():
                 st = tester_dict["state"]
                 if st not in over_states:
                     is_done = False
@@ -246,7 +246,7 @@ class KarteModel(QtCore.QAbstractListModel):
         if sortKartes:
             karte_names = self.sort(karte_names)
 
-        all_testers = map(lambda x: self.__manager.tester(x), self.__manager.testerNames())
+        all_testers = [self.__manager.tester(x) for x in self.__manager.testerNames()]
         for karte_name in karte_names:
             karte = self.__manager.karte(karte_name)
 

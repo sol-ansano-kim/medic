@@ -1,3 +1,7 @@
+# 1.5.3
+- Support maya2022 and python3
+- Use PySide2 directly instead of Qt.py. Versions prior to maya2016 are no longer supported
+
 # 1.5.2
 - Sort Karte and Tester list
 

@@ -1,4 +1,3 @@
-from . import qtutil
 from . import window
 from . import functions
 from maya import cmds

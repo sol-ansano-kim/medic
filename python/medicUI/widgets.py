@@ -1,4 +1,4 @@
-from Qt import QtWidgets, QtCore, QtGui
+from PySide2 import QtWidgets, QtCore, QtGui
 from . import model
 from . import delegate
 from . import functions
@@ -303,7 +303,8 @@ class ReportList(QtWidgets.QListView):
 
         for index in self.selectedIndexes():
             report = self.source_model.data(index, model.ReportRole)
-            report.addSelection()
+            if report:
+                report.addSelection()
 
         super(ReportList, self).selectionChanged(selected, deselected)
 
@@ -531,7 +532,7 @@ class TopBarWidget(QtWidgets.QFrame):
 
     def setPhase(self, phase):
         self.__phase = phase
-        for p, items in self.__phase_items.iteritems():
+        for p, items in self.__phase_items.items():
             if p == self.__phase:
                 for item in items:
                     item.show()
@@ -642,7 +643,7 @@ class MainWidget(QtWidgets.QWidget):
 
     def setPhase(self, p):
         self.__phase = p
-        for phase, widgets in self.__phase_widgets.iteritems():
+        for phase, widgets in self.__phase_widgets.items():
             if phase is p:
                 for widget in widgets:
                     widget.show()

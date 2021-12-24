@@ -1,4 +1,4 @@
-from Qt import QtWidgets, QtCore
+from PySide2 import QtWidgets, QtCore
 from . import widgets
 from . import model
 import os

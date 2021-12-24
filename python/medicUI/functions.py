@@ -1,10 +1,13 @@
 from maya import OpenMaya
 from maya import OpenMayaUI
-import Qt
-from Qt import QtWidgets
+from PySide2 import QtWidgets
+import shiboken2
+import sys
 
 
 BlankSelectionList = OpenMaya.MSelectionList()
+if not hasattr(__builtins__, "long"):
+    long = int
 
 
 def ClearSelection():
@@ -13,26 +16,7 @@ def ClearSelection():
 
 
 def getMayaMainWindow():
-    if hasattr(Qt, "IsPySide2"):
-        if Qt.IsPySide2:
-            import shiboken2 as shiboken
-        else:
-            import shiboken
-
-    # Qt version less than 1.0.0
-    elif hasattr(Qt, "__version_info__"):
-        if Qt.__version_info__[0] >= 2:
-            import shiboken2 as shiboken
-        else:
-            import shiboken
-
-    else:
-        try:
-            import shiboken2 as shiboken
-        except:
-            import shiboken
-
-    return shiboken.wrapInstance(long(OpenMayaUI.MQtUtil_mainWindow()), QtWidgets.QMainWindow)
+    return shiboken2.wrapInstance(long(OpenMayaUI.MQtUtil_mainWindow()), QtWidgets.QMainWindow)
 
 
 def registSceneOpenCallback(function):

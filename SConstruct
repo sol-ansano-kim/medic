@@ -10,14 +10,12 @@ import SCons
 
 major = 1
 minor = 5
-patch = 2
+patch = 3
 
 os.environ["PYTHONPATH"] = os.environ.get("PYTHONPATH", "") + os.pathsep + os.path.abspath("cython")
 maya.SetupMscver()
 
 env = excons.MakeBaseEnv()
-
-include_qt = int(excons.GetArgument("include-qt", 1)) != 0
 
 
 if sys.platform == "win32":
@@ -54,8 +52,13 @@ if sys.platform == "win32":
     os_name = "windows"
 elif sys.platform == "darwin":
     os_name = "macOS"
-install_dir = "%s/dist/medic_%s_%s/medic" % (excons.OutputBaseDirectory(), os_name, mayaver)
-package_file = "%s/dist/medic_%s_maya%s-%s_%s_%s.zip" % (excons.OutputBaseDirectory(), os_name, mayaver, major, minor, patch)
+
+if mayaver in ("2022", ):
+    install_dir = "%s/dist/medic_%s_%s_py%s/medic" % (excons.OutputBaseDirectory(), os_name, mayaver, python.Version().replace(".", ""))
+    package_file = "%s/dist/medic_%s_maya%s-py%s-%s_%s_%s.zip" % (excons.OutputBaseDirectory(), os_name, mayaver, python.Version().replace(".", ""), major, minor, patch)
+else:
+    install_dir = "%s/dist/medic_%s_%s/medic" % (excons.OutputBaseDirectory(), os_name, mayaver)
+    package_file = "%s/dist/medic_%s_maya%s-%s_%s_%s.zip" % (excons.OutputBaseDirectory(), os_name, mayaver, major, minor, patch)
 
 
 ## cython
@@ -213,12 +216,6 @@ prjs.append({"name": "medicUI",
              "alias": "medic-ui",
              "install": {out_pydir: ["python/medicUI"]}})
 
-if include_qt:
-    prjs.append({"name": "Qt",
-                 "type": "install",
-                 "alias": "Qt",
-                 "install": {os.path.join(out_pydir, "medicUI/qt"): ["Qt.py/Qt.py"]}})
-
 
 targets = excons.DeclareTargets(env, prjs)
 
@@ -266,8 +263,6 @@ for k, contents in targets.iteritems():
                 dirname = os.path.join(install_dir, "py")
             elif "python" == path_split[0]:
                 dirname = os.path.join(install_dir, "py", *path_split[1:-1])
-            elif "Qt.py" == path_split[-1]:
-                dirname = os.path.join(install_dir, "py/medicUI/qt")
             else:
                 print("UNKNOWN INSTALL TARGET : {}".format(path))
                 continue
