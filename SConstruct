@@ -7,7 +7,6 @@ import shutil
 import re
 import SCons
 
-
 major = 1
 minor = 5
 patch = 3
@@ -223,7 +222,7 @@ env.Alias("medicAll", targets.keys())
 
 
 def __getAllPaths(c):
-    if isinstance(c, basestring):
+    if isinstance(c, str):
         return [c]
 
     if isinstance(c, SCons.Node.FS.File):
@@ -243,7 +242,7 @@ env.Alias("install", env.Install(os.path.join(install_dir, "py"), "src/py/medic.
 for h in headers:
     env.Alias("install", env.Install(os.path.join(install_dir, "include/medic"), h))
 
-for k, contents in targets.iteritems():
+for k, contents in targets.items():
     for c in contents:
         for path in __getAllPaths(c):
             path_split = re.split(r"[\\/]", path)
