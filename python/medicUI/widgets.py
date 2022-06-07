@@ -644,14 +644,14 @@ class MainWidget(QtWidgets.QWidget):
     def setPhase(self, p):
         self.__phase = p
         for phase, widgets in self.__phase_widgets.items():
-            if phase is p:
+            if phase == p:
                 for widget in widgets:
                     widget.show()
             else:
                 for widget in widgets:
                     widget.hide()
 
-        if self.__phase is 0:
+        if self.__phase == 0:
             able_back = False
             able_next = True if self.__kartes_widget.currentKarte() else False
             self.__testers_widget.reset()
@@ -659,7 +659,7 @@ class MainWidget(QtWidgets.QWidget):
             able_back = True
             able_next = False
 
-        if self.__phase is 1:
+        if self.__phase == 1:
             self.reset()
 
         self.ConditionChanged.emit(able_back, able_next)
@@ -775,7 +775,7 @@ class MainWidget(QtWidgets.QWidget):
         self.StatusChanged.emit(karte_item.status())
 
     def __karteChanged(self, current):
-        able_back = False if self.__phase is 0 else True
+        able_back = False if self.__phase == 0 else True
         able_next = False
 
         karte_model = self.__kartes_widget.model()
