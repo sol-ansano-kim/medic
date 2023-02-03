@@ -952,7 +952,7 @@ cdef class Visitor:
                             con.set[float](n, v, <size_t>i)
 
                     elif dt == str:
-                        parm = MdParameter.Create(n, n, Types.StringArray, "", NULL)
+                        parm = MdParameter.Create(n, n, Types.StringArray, _p2c(""), NULL)
                         parm.resize(len(values))
                         con.append(parm)
                         for i, v in enumerate(values):
@@ -979,7 +979,7 @@ cdef class Visitor:
                         con.set[float](n, float(v))
 
                     elif isinstance(v, str):
-                        parm = MdParameter.Create(n, n, Types.String, "", NULL)
+                        parm = MdParameter.Create(n, n, Types.String, _p2c(""), NULL)
                         con.append(parm)
                         con.set[string](n, str(v))
 
