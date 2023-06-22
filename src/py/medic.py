@@ -53,7 +53,7 @@ def IsTemplated(_input):
       if _input.isDag():
          dp = _input.getPath()
 
-   elif isinstance(_input, basestring):
+   elif isinstance(_input, str):
       sl = OpenMaya.MSelectionList()
       try:
          _dp = OpenMaya.MDagPath()
