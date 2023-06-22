@@ -16,7 +16,7 @@ def ClearSelection():
 
 
 def getMayaMainWindow():
-    return shiboken2.wrapInstance(long(OpenMayaUI.MQtUtil_mainWindow()), QtWidgets.QMainWindow)
+    return shiboken2.wrapInstance(long(OpenMayaUI.MQtUtil.mainWindow()), QtWidgets.QMainWindow)
 
 
 def registSceneOpenCallback(function):
