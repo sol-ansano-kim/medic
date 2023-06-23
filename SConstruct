@@ -7,10 +7,9 @@ import shutil
 import re
 import SCons
 
-
 major = 1
 minor = 5
-patch = 3
+patch = 4
 
 os.environ["PYTHONPATH"] = os.environ.get("PYTHONPATH", "") + os.pathsep + os.path.abspath("cython")
 maya.SetupMscver()
@@ -139,7 +138,7 @@ prjs.append({"name": "medic",
 prjs.append({"name": "_medic",
              "type": "dynamicmodule",
              "alias": "medic-python",
-             "ext": python.ModuleExtension(),
+             "ext": ".so" if sys.platform != "win32" else ".pyd",
              "prefix": "py/%s" % (mayaver),
              "bldprefix": "maya-%s" % mayaver,
              "defs": defs,
@@ -223,7 +222,7 @@ env.Alias("medicAll", targets.keys())
 
 
 def __getAllPaths(c):
-    if isinstance(c, basestring):
+    if isinstance(c, str):
         return [c]
 
     if isinstance(c, SCons.Node.FS.File):
@@ -243,7 +242,7 @@ env.Alias("install", env.Install(os.path.join(install_dir, "py"), "src/py/medic.
 for h in headers:
     env.Alias("install", env.Install(os.path.join(install_dir, "include/medic"), h))
 
-for k, contents in targets.iteritems():
+for k, contents in targets.items():
     for c in contents:
         for path in __getAllPaths(c):
             path_split = re.split(r"[\\/]", path)
