@@ -3,7 +3,7 @@ import os
 if hasattr(os, "add_dll_directory"):
    lib_path = os.environ.get("MEDIC_LIB_PATH")
    if not lib_path:
-      lib_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "lib")
+      lib_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "bin")
 
    if lib_path and os.path.isdir(lib_path):
       os.add_dll_directory(lib_path)
