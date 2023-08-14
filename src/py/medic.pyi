@@ -48,21 +48,21 @@ def SetLogLevel(log_level: int) -> None: ...
 
 
 class Types:
-    Null: int
-    Bool: int
-    Int: int
-    Float: int
-    String: int
-    BoolArray: int
-    IntArray: int
-    FloatArray: int
-    StringArray: int
+    Null: Types
+    Bool: Types
+    Int: Types
+    Float: Types
+    String: Types
+    BoolArray: Types
+    IntArray: Types
+    FloatArray: Types
+    StringArray: Types
 
 
 class TesterScopes:
-    NodeTester: int
-    AssetTester: int
-    SceneTester: int
+    NodeTester: TesterScopes
+    AssetTester: TesterScopes
+    SceneTester: TesterScopes
 
 
 class Parameter:
@@ -296,7 +296,7 @@ class PyReport:
 
     def __init__(self,
                  node_or_context: Union[Node, Context],
-                 components: Optional[MObject]
+                 components: Optional[MObject] = None
                  ) -> None:
         ...
 
