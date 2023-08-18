@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+__auther__ = 'nrtkbb'
+
 import re
 import logging
 from types import ModuleType
