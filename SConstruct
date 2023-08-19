@@ -150,7 +150,7 @@ prjs.append({"name": "_medic",
              "libs": ["medic"],
              "deps": ["medic-lib"],
              "srcs": [cython_out],
-             "install": {out_pydir: ["src/py/medic.py"]},
+             "install": {out_pydir: ["src/py/medic.py", "src/py/medic.pyi"]},
              "custom": customs + [python.SoftRequire]})
 
 # plugins
