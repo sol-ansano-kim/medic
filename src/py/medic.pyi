@@ -1,6 +1,6 @@
+# file name : medic.pyi
+# author : nrtkbb
 from __future__ import annotations
-
-__auther__ = 'nrtkbb'
 
 import re
 import logging
