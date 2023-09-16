@@ -1,4 +1,5 @@
 from PySide2 import QtWidgets, QtCore
+from maya import cmds
 from . import widgets
 from . import model
 import os
@@ -17,6 +18,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.setWindowFlags(self.windowFlags() | QtCore.Qt.WindowStaysOnTopHint)
         self.__makeWidgets()
         self.__setStyleSheet()
+        self.__registJobs()
 
     def setKarte(self, karteName):
         if self.__main_widget.setKarte(karteName):
@@ -78,6 +80,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.__top_widget.reset_button.clicked.connect(self.__main_widget.reset)
         self.__top_widget.test_button.clicked.connect(self.__main_widget.test)
         self.__main_widget.StatusChanged.connect(self.__top_widget.status_label.setStatus)
+
+    def __registJobs(self):
+        cmds.scriptJob(event=('NewSceneOpened', self.__main_widget.reset), parent=self.objectName())
+        cmds.scriptJob(event=('SceneOpened', self.__main_widget.reset), parent=self.objectName())
 
     def __next(self):
         self.__top_widget.next()
