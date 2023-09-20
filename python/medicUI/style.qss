@@ -5,6 +5,16 @@ QWidget
     color: rgb(0, 0, 0);
 }
 
+QWidget#detail_tester_top
+{
+    background-color: transparent;
+}
+
+QWidget#detail_tester_bottom
+{
+    background-color: transparent;
+}
+
 QFrame#medic_top_bar
 {
     border-bottom: 1px solid gray;
@@ -271,5 +281,10 @@ QTextEdit#detail_tester_description
     color: rgb(175, 175, 175);
     font-size: 14px;
     border: none;
+    background: transparent;
+}
+
+QSplitter#detail_tester_splitter
+{
     background: transparent;
 }
