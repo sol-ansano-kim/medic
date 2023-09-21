@@ -707,17 +707,6 @@ class MainWidget(QtWidgets.QWidget):
         self.__detail_widget.ReportsChanged.connect(self.__reportsChanged)
         self.__testers_widget.SingleTestTriggered.connect(self.__singleTest)
 
-        ## set maya event callback
-        self.__callback_ids.append(functions.registSceneOpenCallback(self.__sceneChanged))
-        self.__callback_ids.append(functions.registNewSceneOpenCallback(self.__sceneChanged))
-        self.destroyed.connect(self.__removeCallbacks)
-
-    def __removeCallbacks(self):
-        functions.removeCallbacks(self.__callback_ids)
-
-    def __sceneChanged(self, *args):
-        self.reset()
-
     def reset(self):
         karte_item = self.__kartes_widget.currentKarte()
         if karte_item:

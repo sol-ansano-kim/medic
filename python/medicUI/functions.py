@@ -2,8 +2,6 @@ from maya import OpenMaya
 from maya import OpenMayaUI
 from PySide2 import QtWidgets
 import shiboken2
-import sys
-
 
 BlankSelectionList = OpenMaya.MSelectionList()
 if not hasattr(__builtins__, "long"):
