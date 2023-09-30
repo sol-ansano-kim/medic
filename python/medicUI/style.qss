@@ -288,3 +288,8 @@ QSplitter#detail_tester_splitter
 {
     background: transparent;
 }
+
+QSplitter#phase_2_splitter
+{
+    background-color: rgb(227, 227, 227);
+}

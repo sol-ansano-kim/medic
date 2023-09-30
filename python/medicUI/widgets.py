@@ -711,6 +711,7 @@ class MainWidget(QtWidgets.QWidget):
 
         ## phase 2
         h_splitter = QtWidgets.QSplitter(QtCore.Qt.Horizontal)
+        h_splitter.setObjectName("phase_2_splitter")
         h_splitter.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         h_splitter.setChildrenCollapsible(False)
         h_splitter.addWidget(self.__testers_widget)
