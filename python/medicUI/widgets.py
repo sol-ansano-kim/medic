@@ -715,7 +715,7 @@ class MainWidget(QtWidgets.QWidget):
         h_splitter.setChildrenCollapsible(False)
         h_splitter.addWidget(self.__testers_widget)
         h_splitter.addWidget(self.__detail_widget)
-        self.__phase_widgets[1] = [self.__testers_widget, self.__detail_widget]
+        self.__phase_widgets[1] = [h_splitter]
         main_layout.addWidget(h_splitter)
 
         ## signal
