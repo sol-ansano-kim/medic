@@ -378,6 +378,17 @@ class TesterDetailWidget(QtWidgets.QWidget):
         self.__qt_parameter_layout = QtWidgets.QVBoxLayout()
         button_layout = QtWidgets.QHBoxLayout()
 
+        # splitter
+        v_splitter = QtWidgets.QSplitter(QtCore.Qt.Vertical)
+        v_splitter.setObjectName("detail_tester_splitter")
+        v_splitter.setChildrenCollapsible(False)
+        top_widget = QtWidgets.QWidget()
+        top_widget.setObjectName("detail_tester_top")
+        bottom_widget = QtWidgets.QWidget()
+        bottom_widget.setObjectName("detail_tester_bottom")
+        top_layout = QtWidgets.QVBoxLayout(top_widget)
+        bottom_layout = QtWidgets.QVBoxLayout(bottom_widget)
+
         # widgets
         self.__qt_tester_label = QtWidgets.QLabel()
         self.__qt_description = QtWidgets.QTextEdit()
@@ -397,12 +408,16 @@ class TesterDetailWidget(QtWidgets.QWidget):
         button_layout.addWidget(self.__qt_fix_selected_button)
         button_layout.addWidget(self.__qt_fix_all_button)
 
-        frame_layout.addWidget(self.__qt_tester_label)
-        frame_layout.addSpacing(20)
-        frame_layout.addWidget(self.__qt_description)
-        frame_layout.addWidget(self.__qt_report_list)
-        frame_layout.addLayout(self.__qt_parameter_layout)
-        frame_layout.addLayout(button_layout)
+        top_layout.addWidget(self.__qt_tester_label)
+        top_layout.addItem(QtWidgets.QSpacerItem(20, 20))
+        top_layout.addWidget(self.__qt_description)
+        bottom_layout.addWidget(self.__qt_report_list)
+        bottom_layout.addLayout(self.__qt_parameter_layout)
+        bottom_layout.addLayout(button_layout)
+
+        v_splitter.addWidget(top_widget)
+        v_splitter.addWidget(bottom_widget)
+        frame_layout.addWidget(v_splitter)
 
         self.__qt_fix_all_button.clicked.connect(self.__fixAll)
         self.__qt_fix_selected_button.clicked.connect(self.__fixSelected)
@@ -695,11 +710,14 @@ class MainWidget(QtWidgets.QWidget):
         self.__phase_widgets[0] = [self.__kartes_widget, self.__karte_toggle]
 
         ## phase 2
-        h_layout = QtWidgets.QHBoxLayout()
-        h_layout.addWidget(self.__testers_widget)
-        h_layout.addWidget(self.__detail_widget)
-        self.__phase_widgets[1] = [self.__testers_widget, self.__detail_widget]
-        main_layout.addLayout(h_layout)
+        h_splitter = QtWidgets.QSplitter(QtCore.Qt.Horizontal)
+        h_splitter.setObjectName("phase_2_splitter")
+        h_splitter.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        h_splitter.setChildrenCollapsible(False)
+        h_splitter.addWidget(self.__testers_widget)
+        h_splitter.addWidget(self.__detail_widget)
+        self.__phase_widgets[1] = [h_splitter]
+        main_layout.addWidget(h_splitter)
 
         ## signal
         self.__kartes_widget.KarteChanged.connect(self.__karteChanged)
