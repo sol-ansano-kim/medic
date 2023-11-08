@@ -1,8 +1,10 @@
 from PySide2 import QtWidgets, QtCore
 from maya import cmds
 from . import widgets
-from . import model
+from . import functions
 import os
+import json
+import string
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -42,15 +44,21 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def __setStyleSheet(self):
         qss_path = os.path.abspath(os.path.join(__file__, "../style.qss"))
+        scale_style_path = os.path.abspath(os.path.join(__file__, "../scale_style.json"))
 
-        if not os.path.isfile(qss_path):
+        if not os.path.isfile(qss_path) or not os.path.isfile(scale_style_path):
             return
 
         current_dir = os.path.dirname(__file__)
 
-        style = ""
+        with open(scale_style_path, "r") as f:
+            scale_style_data = json.load(f)
+            scale_style_data = {k: functions.applyMonitorScalingTo(v)
+                                for k, v in scale_style_data.items()}
+
         with open(qss_path, "r") as f:
-            style = f.read()
+            template = string.Template(f.read())
+            style = template.safe_substitute(scale_style_data)
             style = style.replace('url("', 'url("%s/' % current_dir.replace("\\", "/"))
 
         self.setStyleSheet(style)

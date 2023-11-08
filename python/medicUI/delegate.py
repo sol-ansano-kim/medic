@@ -3,7 +3,7 @@ from PySide2 import QtCore
 from PySide2 import QtGui
 import os
 from . import model
-
+from . import functions
 
 IconDir = os.path.abspath(os.path.join(__file__, "../icons"))
 
@@ -34,10 +34,14 @@ class ReportDelegate(ListItemDelegate):
         report_name = index.data(model.DisplayRole)
 
         painter.fillRect(rect, self.getBackgroudColor(option, index))
-        painter.drawText(rect.x() + 5, rect.y() + 15, report_name)
+        painter.drawText(rect.x() + functions.applyMonitorScalingTo(5),
+                         rect.y() + functions.applyMonitorScalingTo(15),
+                         report_name)
 
         painter.restore()
 
+    def sizeHint(self, option, index):
+        return QtCore.QSize(option.decorationSize.width(), functions.applyMonitorScalingTo(22))
 
 class KarteDelegate(ListItemDelegate):
     def __init__(self, parent=None):
@@ -51,13 +55,20 @@ class KarteDelegate(ListItemDelegate):
         karte_name = index.data(model.DisplayRole)
 
         painter.fillRect(rect, self.getBackgroudColor(option, index))
-        painter.drawPixmap(QtCore.QRect(rect.x() + 10, rect.y(), 50, 50), self.__karte_icon)
-        painter.drawText(rect.x() + 80, rect.y() + rect.height() * 0.5 + font_matrics.height() * 0.5 - 4, karte_name)
+        painter.drawPixmap(QtCore.QRect(rect.x() + functions.applyMonitorScalingTo(10),
+                                        rect.y(),
+                                        functions.applyMonitorScalingTo(50),
+                                        functions.applyMonitorScalingTo(50)),
+                           self.__karte_icon)
+        painter.drawText(rect.x() + functions.applyMonitorScalingTo(80),
+                         rect.y() + rect.height() * 0.5 + font_matrics.height() * 0.5 - functions.applyMonitorScalingTo(
+                             4),
+                         karte_name)
 
         painter.restore()
 
     def sizeHint(self, option, index):
-        return QtCore.QSize(option.decorationSize.width(), 50)
+        return QtCore.QSize(option.decorationSize.width(), functions.applyMonitorScalingTo(50))
 
 
 class TesterDelegate(ListItemDelegate):
@@ -82,10 +93,16 @@ class TesterDelegate(ListItemDelegate):
             icon = self.__failure_icon
 
         painter.fillRect(rect, self.getBackgroudColor(option, index))
-        painter.drawPixmap(QtCore.QRect(rect.x() + 12, rect.y() + 2, 16, 16), icon)
-        painter.drawText(rect.x() + 40, rect.y() + rect.height() * 0.5 + font_matrics.height() * 0.5 - 4, tester_name)
+        painter.drawPixmap(QtCore.QRect(rect.x() + functions.applyMonitorScalingTo(12),
+                                        rect.y() + functions.applyMonitorScalingTo(3),
+                                        functions.applyMonitorScalingTo(16),
+                                        functions.applyMonitorScalingTo(16)),
+                           icon)
+        painter.drawText(rect.x() + functions.applyMonitorScalingTo(40),
+                         rect.y() + rect.height() * 0.5 + font_matrics.height() * 0.5 - functions.applyMonitorScalingTo(2),
+                         tester_name)
 
         painter.restore()
 
     def sizeHint(self, option, index):
-        return QtCore.QSize(option.decorationSize.width(), 20)
+        return QtCore.QSize(option.decorationSize.width(), functions.applyMonitorScalingTo(22))
