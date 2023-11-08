@@ -34,14 +34,14 @@ QFrame#medic_top_bar, QFrame#medic_browser_buttons_widget
 QLabel
 {
     color: rgb(53, 53, 53);
-    margin-right: 20px;
-    font-size: 18px;
+    margin-right: ${QLabel_margin_right}px;
+    font-size: ${QLabel_font_size}px;
     background-color: rgb(235, 235, 235);
 }
 
 QLabel#status_label
 {
-    font-size: 14px;
+    font-size: ${QLabel_status_label_font_size}px;
 }
 
 QLabel#detail_tester_label
@@ -52,14 +52,14 @@ QLabel#detail_tester_label
 QLabel#parameter_label
 {
     background: transparent;
-    font-size: 12px;
+    font-size: ${QLabel_parameter_label_font_size}px;
 }
 
 QPushButton
 {
     color: rgb(140, 140, 140);
-    width: 24px;
-    height: 24px;
+    width: ${QPushButton_width}px;
+    height: ${QPushButton_height}px;
 }
 
 QPushButton#medic_browser_back
@@ -67,7 +67,7 @@ QPushButton#medic_browser_back
     background-color: rgb(246, 246, 246);
     border-style: solid;
     border-width: 0.5px;
-    border-radius: 4px;
+    border-radius: ${QPushButton_medic_browser_back_border_radius}px;
     border-color: rgb(199, 199, 199);
     image: url("icons/backOn.png");
 }
@@ -82,7 +82,7 @@ QPushButton#medic_browser_next
     background-color: rgb(246, 246, 246);
     border-style: solid;
     border-width: 0.5px;
-    border-radius: 4px;
+    border-radius: ${QPushButton_medic_browser_next_border_radius}px;
     border-color: rgb(199, 199, 199);
     image: url("icons/nextOn.png");
 }
@@ -138,9 +138,9 @@ QPushButton#test_button::pressed
 
 QPushButton#detail_button
 {
-    font-size: 11px;
+    font-size: ${QPushButton_detail_button_font_size}px;
     border: 1px solid rgb(100, 100, 100);
-    border-radius: 5px;
+    border-radius: ${QPushButton_detail_button_border_radius}px;
     background-color: rgb(255, 255, 255);
     color: rgb(0, 12, 20);
 }
@@ -254,32 +254,27 @@ QListView
 
 QListView#medic_tester_list
 {
-    font-size: 12px;
+    font-size: ${QListView_medic_tester_list_font_size}px;
 }
 
 QListView#medic_karte_list
 {
-    font-size: 18px;
+    font-size: ${QListView_medic_karte_list_font_size}px;
 }
 
-QListView#detial_report_list
+QListView#detail_report_list
 {
-    font-size: 12px;
+    font-size: ${QListView_detail_report_list_font_size}px;
     border: none;
-    border-radius: 5px;
-    padding: 5px;
-    height: 20px;
-}
-
-QListView#detial_report_list::item
-{
-    height: 18px;
+    border-radius: ${QListView_detail_report_list_border_radius}px;
+    padding: ${QListView_detail_report_list_padding}px;
+    height: ${QListView_detail_report_list_height}px;
 }
 
 QTextEdit#detail_tester_description
 {
     color: rgb(175, 175, 175);
-    font-size: 14px;
+    font-size: ${QTextEdit_detail_tester_description_font_size}px;
     border: none;
     background: transparent;
 }
@@ -289,7 +284,7 @@ QSplitter#detail_tester_splitter
     background: transparent;
 }
 
-QSplitter#phase_2_splitter
+QSplitter#phase2_splitter
 {
     background-color: rgb(227, 227, 227);
 }

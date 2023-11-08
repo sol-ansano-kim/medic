@@ -1,6 +1,7 @@
 from maya import OpenMaya
 from maya import OpenMayaUI
 from PySide2 import QtWidgets
+from PySide2.QtGui import QGuiApplication
 import shiboken2
 
 BlankSelectionList = OpenMaya.MSelectionList()
@@ -28,3 +29,17 @@ def registNewSceneOpenCallback(function):
 def removeCallbacks(ids):
     for id in ids:
         OpenMaya.MMessage.removeCallback(id)
+
+
+def getMoniterScalingFactor() -> float:
+    screen = QGuiApplication.primaryScreen()
+    if screen:
+        return screen.logicalDotsPerInch() / 96.0
+    return 1.0
+
+
+MONITOR_SCALING_FACTOR = getMoniterScalingFactor()
+
+
+def applyMonitorScalingTo(value: int | float) -> int:
+    return int(value * MONITOR_SCALING_FACTOR)

@@ -124,7 +124,7 @@ class StatusLabel(QtWidgets.QLabel):
     def __init__(self, parent=None):
         super(StatusLabel, self).__init__(parent=parent)
         self.setObjectName("status_label")
-        self.setFixedWidth(80)
+        self.setFixedWidth(functions.applyMonitorScalingTo(80))
         self.__ready_icon = QtGui.QPixmap(os.path.join(IconDir, "success.png")).scaled(16, 16)
         self.__success_icon = QtGui.QPixmap(os.path.join(IconDir, "success.png")).scaled(16, 16)
         self.__failure_icon = QtGui.QPixmap(os.path.join(IconDir, "failure.png")).scaled(16, 16)
@@ -391,8 +391,8 @@ class TesterDetailWidget(QtWidgets.QWidget):
 
         # widgets
         self.__qt_tester_label = QtWidgets.QLabel()
+        self.__qt_tester_label.setFixedHeight(functions.applyMonitorScalingTo(20))
         self.__qt_description = QtWidgets.QTextEdit()
-        self.__qt_description.setFixedHeight(50)
         self.__qt_description.setReadOnly(True)
         self.__qt_tester_label.setObjectName("detail_tester_label")
         self.__qt_description.setObjectName("detail_tester_description")
