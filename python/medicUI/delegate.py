@@ -3,7 +3,7 @@ from PySide2 import QtCore
 from PySide2 import QtGui
 import os
 from . import model
-
+from . import functions
 
 IconDir = os.path.abspath(os.path.join(__file__, "../icons"))
 
@@ -49,6 +49,7 @@ class KarteDelegate(ListItemDelegate):
         rect = option.rect
         font_matrics = QtGui.QFontMetrics(option.font)
         karte_name = index.data(model.DisplayRole)
+        karte_name = functions.pascal_case_to_space_separated(karte_name)
 
         painter.fillRect(rect, self.getBackgroudColor(option, index))
         painter.drawPixmap(QtCore.QRect(rect.x() + 10, rect.y(), 50, 50), self.__karte_icon)
@@ -72,6 +73,7 @@ class TesterDelegate(ListItemDelegate):
         rect = option.rect
         font_matrics = QtGui.QFontMetrics(option.font)
         tester_name = index.data(model.DisplayRole)
+        tester_name = functions.pascal_case_to_space_separated(tester_name)
 
         status = index.data(model.StatusRole)
         if status == model.Ready:

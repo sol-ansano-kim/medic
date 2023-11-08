@@ -350,7 +350,7 @@ class TesterDetailWidget(QtWidgets.QWidget):
         self.__setReportItems(self.__tester_item.reports())
 
     def __setTester(self, testerItem):
-        self.__setTesterName(testerItem.name())
+        self.__setTesterName(functions.pascal_case_to_space_separated(testerItem.name()))
         self.__setDescription(testerItem.description())
         self.__clearParameters()
         self.__setParameters(testerItem.parameters())
