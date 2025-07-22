@@ -3,9 +3,14 @@ cmake_minimum_required(VERSION 3.13)
 project(medic)
 
 set(_OS_NAME "")
-if (APPLE)
-    set(_OS_NAME macOS)
-endif()
+ if (WIN32)
+        set(_OS_NAME Windows)
+    elseif(APPLE)
+        set(_OS_NAME macOS)
+    elseif(UNIX)
+        set(_OS_NAME linux)
+    endif()
+
 
 set(MEDIC_VERSION_MAJOR 1)
 set(MEDIC_VERSION_MINOR 5)
@@ -52,6 +57,6 @@ install(DIRECTORY python/medicUI DESTINATION medic/py)
 install(DIRECTORY include/medic DESTINATION medic/include)
 install(FILES medic.mod DESTINATION .)
 
-set(CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}/medic_${MEDIC_VERSION_MAJOR}.${MEDIC_VERSION_MINOR}.${MEDIC_VERSION_PATCH}_maya${MAYA_VERSION}_${CMAKE_SYSTEM_NAME}_${CMAKE_SYSTEM_PROCESSOR}")
+set(CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}/medic_${MEDIC_VERSION_MAJOR}.${MEDIC_VERSION_MINOR}.${MEDIC_VERSION_PATCH}_${_OS_NAME}_maya${MAYA_VERSION}_${CMAKE_SYSTEM_PROCESSOR}")
 
 set_target_properties(_medic PROPERTIES LINK_FLAGS "-Wl,-rpath,@loader_path/../lib")
