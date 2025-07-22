@@ -1,4 +1,4 @@
-from PySide2 import QtWidgets, QtCore, QtGui
+from ._qt import QtWidgets, QtCore, QtGui, QAction
 from . import model
 from . import delegate
 from . import functions
@@ -187,7 +187,7 @@ class TesterList(QtWidgets.QListView):
 
         elif QtCore.Qt.MouseButton.RightButton == evnt.button():
             menu = QtWidgets.QMenu(self)
-            test = QtWidgets.QAction("Single Test", menu)
+            test = QAction("Single Test", menu)
             menu.addAction(test)
             pos = self.mapToGlobal(evnt.pos())
             menu.popup(QtCore.QPoint(pos.x() - 10, pos.y() - 10))
