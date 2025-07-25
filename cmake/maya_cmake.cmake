@@ -77,12 +77,17 @@ macro(find_maya)
             PATHS ${MAYA_ROOT}/Maya.app/Contents/MacOS)
     elseif (WIN32)
         find_path(_mayapy_dir
-            NAMES bin/mayapy.exe
-            PATHS ${MAYA_ROOT})
+            NAMES mayapy.exe
+            PATHS ${MAYA_ROOT}/bin)
     endif()
 
     if (_mayapy_dir)
-        set(MAYAPY_PATH "${_mayapy_dir}/mayapy")
+        if (WIN32)
+            set(MAYAPY_PATH "${_mayapy_dir}/mayapy.exe")
+        else()
+            set(MAYAPY_PATH "${_mayapy_dir}/mayapy")
+        endif()
+
     else()
         message(FATAL_ERROR "NO MAYAPY")
     endif()
