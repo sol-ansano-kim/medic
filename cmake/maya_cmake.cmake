@@ -71,9 +71,15 @@ macro(find_maya)
         endif()
     endif()
 
-    find_path(_mayapy_dir
-        NAMES mayapy
-        PATHS ${MAYA_ROOT}/Maya.app/Contents/MacOS)
+    if (APPLE)
+        find_path(_mayapy_dir
+            NAMES mayapy
+            PATHS ${MAYA_ROOT}/Maya.app/Contents/MacOS)
+    elseif (WIN32)
+        find_path(_mayapy_dir
+            NAMES bin/mayapy.exe
+            PATHS ${MAYA_ROOT})
+    endif()
 
     if (_mayapy_dir)
         set(MAYAPY_PATH "${_mayapy_dir}/mayapy")
@@ -118,6 +124,21 @@ macro(find_maya)
 
     if (APPLE)
         set(MAYA_PY_INCLUDE_DIR ${MAYA_ROOT}/Maya.app/Contents/Frameworks/Python.framework/Headers)
+    elseif (WIN32)
+        execute_process(
+            COMMAND powershell -Command "Get-ChildItem -Path '${MAYA_ROOT}/include' -Directory | ForEach-Object { $_.Name }"
+            OUTPUT_VARIABLE _includes
+            OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+        foreach(_inc_dir ${_includes})
+            string(REGEX MATCH "Python[0-9.]+" MATCH_RES ${_inc_dir})
+
+            if (MATCH_RES)
+                set(MAYA_PY_INCLUDE_DIR "${MAYA_ROOT}/include/${MATCH_RES}/Python")
+                break()
+            endif()
+        endforeach()
+
     endif()
 
     if (NOT MAYA_INCLUDE_DIR OR NOT MAYA_LIBRARY_DIR)
@@ -151,12 +172,12 @@ macro(setup_py target)
     elseif(APPLE)
         set_property(TARGET ${target} PROPERTY XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY "libc++")
         target_compile_definitions(${target} PUBLIC -D_BOOL -DDMAC_PLUGIN )
-        target_compile_options(${target} PUBLIC -Wextra -Wno-unused-parameter -Wno-unused-variable -Wno-unused-private-field)
+        target_compile_options(${target} PUBLIC -fPIC -Wextra -Wno-unused-parameter -Wno-unused-variable -Wno-unused-private-field)
         target_link_options(_medic PUBLIC -undefined dynamic_lookup)
         set_target_properties(_medic PROPERTIES PREFIX "" SUFFIX ".so")
     else()
         target_compile_definitions(${target} PUBLIC -D_BOOL)
-        target_compile_options(${target} PUBLIC -Wextra -Wno-unused-parameter -Wno-unused-variable )
+        target_compile_options(${target} PUBLIC -fPIC -Wextra -Wno-unused-parameter -Wno-unused-variable )
     endif()
 
     target_include_directories(${target} PUBLIC ${MAYA_PY_INCLUDE_DIR})
