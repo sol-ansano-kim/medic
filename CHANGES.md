@@ -1,5 +1,6 @@
 # 1.5.5
 - Support maya2025 and maya2026
+- Using CMake instead of scons for building
 
 # 1.5.4
 - Support maya2023 and maya2024
