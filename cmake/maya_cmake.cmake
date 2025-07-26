@@ -79,6 +79,10 @@ macro(find_maya)
         find_path(_mayapy_dir
             NAMES mayapy.exe
             PATHS ${MAYA_ROOT}/bin)
+    elseif (UNIX)
+        find_path(_mayapy_dir
+            NAMES mayapy
+            PATHS ${MAYA_ROOT}/bin)
     endif()
 
     if (_mayapy_dir)
@@ -127,6 +131,7 @@ macro(find_maya)
             "Maya's libraries path"
         )
 
+    set(MAYA_PY_INCLUDE_DIR "")
     if (APPLE)
         set(MAYA_PY_INCLUDE_DIR ${MAYA_ROOT}/Maya.app/Contents/Frameworks/Python.framework/Headers)
     elseif (WIN32)
@@ -143,10 +148,15 @@ macro(find_maya)
                 break()
             endif()
         endforeach()
-
+    elseif (UNIX)
+        file(GLOB _INCDIRS "${MAYA_ROOT}/include/Python*")
+        foreach(_item ${_INCDIRS})
+            set(MAYA_PY_INCLUDE_DIR "${_item}/Python")
+            break()
+        endforeach()
     endif()
 
-    if (NOT MAYA_INCLUDE_DIR OR NOT MAYA_LIBRARY_DIR)
+    if (NOT MAYA_INCLUDE_DIR OR NOT MAYA_LIBRARY_DIR OR NOT MAYA_PY_INCLUDE_DIR)
         message(FATAL_ERROR "Could not find maya include or lib directory")
     endif()
 
