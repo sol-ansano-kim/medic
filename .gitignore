@@ -1,9 +1,8 @@
 .DS_Store
 src/py/*.cpp
 *.pyc
-.sconsign.dblite
+__pycache__
 .build
 release/
 debug/
 *.dylib
-excons.cache
