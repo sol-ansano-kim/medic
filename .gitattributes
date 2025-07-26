@@ -84,3 +84,5 @@ medic.mod      text eol=lf
 *.pyx          text eol=lf
 *.pxd          text eol=lf
 
+build.sh       text eol=lf
+build.bat      text eol=crlf

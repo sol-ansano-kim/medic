@@ -1,6 +1,6 @@
-from PySide2 import QtWidgets
-from PySide2 import QtCore
-from PySide2 import QtGui
+from ._qt import QtWidgets
+from ._qt import QtCore
+from ._qt import QtGui
 import os
 from . import model
 

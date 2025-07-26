@@ -1,3 +1,9 @@
+# 1.5.5
+- Support maya2025 and maya2026
+
+# 1.5.4
+- Support maya2023 and maya2024
+
 # 1.5.3
 - Support maya2022 and python3
 - Use PySide2 directly instead of Qt.py. Versions prior to maya2016 are no longer supported

@@ -1,4 +1,4 @@
-from PySide2 import QtWidgets, QtCore
+from ._qt import QtWidgets, QtCore
 from maya import cmds
 from . import widgets
 from . import model
