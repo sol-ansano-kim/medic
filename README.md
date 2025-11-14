@@ -13,8 +13,6 @@
 
 <br>
 
-* Also, Medic can be used as a [Pyblish](http://pyblish.com) plugin ([medicToPyblish](https://github.com/sol-ansano-kim/medicToPyblish))
-
 <br><br>
 # Usage
 
